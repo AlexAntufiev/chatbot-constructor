@@ -1,0 +1,39 @@
+.bot-broadcasting {
+  flex-wrap: nowrap;
+}
+
+.bot-broadcasting .broadcasting-message {
+  transition: margin 400ms;
+
+  &.selected {
+    margin-left: 20px;
+  }
+}
+
+
+.bot-broadcasting .bot-broadcasting_elements-container .bot-broadcasting_elements-container_element {
+  margin-bottom: 18px;
+}
+
+.bot-broadcasting .bot-broadcasting_elements-container .message-label {
+  font-size: 14px;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 4px;
+
+  &.sheduled {
+    background-color: lightsteelblue;
+  }
+
+  &.sent {
+    background-color: limegreen;
+  }
+
+  &.error {
+    background-color: indianred;
+  }
+
+  &.processing {
+    background-color: goldenrod;
+  }
+}
