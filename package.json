@@ -20,8 +20,10 @@
     "react-router-redux": "^5.0.0-alpha.9",
     "react-spinners": "^0.4.5",
     "react-stomp": "^3.2.0",
+    "react-dropzone": "^8.1.0",
     "reactstrap": "^6.3.1",
-    "redux": "^3.7.2"
+    "redux": "^3.7.2",
+    "superagent": "^4.1.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
