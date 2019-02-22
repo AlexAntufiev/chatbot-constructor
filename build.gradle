@@ -20,7 +20,10 @@ apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'com.moowork.node'
 
-sourceCompatibility = 1.11
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
 
 checkstyle {
     toolVersion "8.17"
@@ -56,6 +59,7 @@ dependencies {
     compile "org.hsqldb:hsqldb:2.4.1"
     testCompile "org.junit.jupiter:junit-jupiter-api:5.4.0"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:5.4.0"
+    testCompile "org.springframework.boot:spring-boot-starter-test:2.0.6.RELEASE"
 }
 
 task webpack(type: NpmTask) {
