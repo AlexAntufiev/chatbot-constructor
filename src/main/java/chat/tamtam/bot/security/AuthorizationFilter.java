@@ -14,7 +14,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -68,10 +67,10 @@ public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
 
         Date expireDate = new Date(System.currentTimeMillis() + EXPIRATION_TIME);
         String token = TOKEN_PREFIX + JWT.create()
-                .withSubject(((User)auth.getPrincipal()).getUsername())
+                .withSubject(((User) auth.getPrincipal()).getUsername())
                 .withExpiresAt(expireDate)
                 .sign(HMAC512(SECRET.getBytes()));
-        UserEntity user = userRepository.findByUsername(((User)auth.getPrincipal()).getUsername());
+        UserEntity user = userRepository.findByUsername(((User) auth.getPrincipal()).getUsername());
         this.sessionRepository.save(new SessionEntity(token, user.getId(), user.getUsername(), expireDate));
         response.addHeader(HEADER_STRING, token);
     }
