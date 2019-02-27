@@ -27,22 +27,7 @@
         <property name="message" value="Line has trailing spaces."/>
     </module>
 
-    <!-- Checks for Headers                                -->
-    <!-- See http://checkstyle.sf.net/config_header.html   -->
-    <!-- <module name="Header"> -->
-    <!--   <property name="headerFile" value="${checkstyle.header.file}"/> -->
-    <!--   <property name="fileExtensions" value="java"/> -->
-    <!-- </module> -->
-
     <module name="TreeWalker">
-
-        <!-- Checks for Javadoc comments.                     -->
-        <!-- See http://checkstyle.sf.net/config_javadoc.html -->
-        <!--<module name="JavadocMethod"/>-->
-        <!--<module name="JavadocType"/>-->
-        <!--<module name="JavadocVariable"/>-->
-        <!--<module name="JavadocStyle"/>-->
-
         <!-- Checks for Naming Conventions.                  -->
         <!-- See http://checkstyle.sf.net/config_naming.html -->
         <module name="ConstantName"/>
@@ -103,7 +88,6 @@
         <module name="AvoidInlineConditionals"/>
         <module name="EmptyStatement"/>
         <module name="EqualsHashCode"/>
-        <!--<module name="HiddenField"/>-->
         <module name="IllegalInstantiation"/>
         <module name="InnerAssignment"/>
         <module name="MagicNumber"/>
@@ -114,7 +98,6 @@
             <property name="allowedDistance" value="7"/>
         </module>
 
-        <!--<module name="HideUtilityClassConstructor"/>-->
         <module name="InterfaceIsType"/>
         <module name="VisibilityModifier"/>
 
