@@ -1,16 +1,19 @@
 package chat.tamtam.bot.domain;
 
+
 import javax.persistence.*;
 
 @Entity
-@Table(name = "UserEntity")
+@Table(name = "User")
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
+
     @Column(name = "username")
     private String username;
+
     @Column(name = "hash")
     private String password;
 

@@ -1,6 +1,9 @@
 package chat.tamtam.bot.controller;
 
+import chat.tamtam.bot.domain.BotEntity;
 import chat.tamtam.bot.domain.UserEntity;
+import chat.tamtam.bot.security.SecurityConstants;
+import chat.tamtam.bot.service.BotService;
 import chat.tamtam.bot.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,28 +11,39 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-
 @Controller
 public class RestController {
-
-    private final UserService userService;
-
     @Autowired
-    RestController(final UserService userService) {
-        this.userService = userService;
-    }
+    private UserService userService;
+    @Autowired
+    private BotService botService;
 
     @PostMapping("/api/registration")
     @ResponseBody
-    public ResponseEntity<?> registration(@RequestBody UserEntity userEntity) {
-        this.userService.addUser(userEntity);
-        return new ResponseEntity<UserEntity>(userEntity, null, HttpStatus.OK);
+    public ResponseEntity<?> registration(@RequestBody final UserEntity userEntity) {
+        boolean done = this.userService.addUser(userEntity);
+        if (done) {
+            return new ResponseEntity<>(null, null, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(null, null, HttpStatus.BAD_REQUEST);
+        }
     }
 
-    @PostMapping(path = "/api/bot/add")
+    @GetMapping("/api/bot/list")
     @ResponseBody
-    public ResponseEntity<?> addBot(@RequestBody final String body) {
-        return new ResponseEntity<Object>(body, null, HttpStatus.OK);
+    public ResponseEntity<?> botList(@RequestHeader(name = SecurityConstants.HEADER_STRING) final String token) {
+        return new ResponseEntity<>(
+                botService.getList(userService.getUserIdByToken(token)),
+                null,
+                HttpStatus.OK
+        );
+    }
+
+    @PostMapping("/api/bot/add")
+    @ResponseBody
+    public ResponseEntity<?> addBot(@RequestBody final String body,
+                                    @RequestHeader(name = SecurityConstants.HEADER_STRING) final String token) {
+        return new ResponseEntity<Object>(null, null, HttpStatus.OK);
     }
 
     @GetMapping("/api/bot/delete")
@@ -53,13 +67,6 @@ public class RestController {
     @GetMapping("/api/bot/{id}/disconnect")
     @ResponseBody
     public ResponseEntity<?> disconnectBot(@PathVariable("id") final Integer id) {
-        return new ResponseEntity<Object>(null, null, HttpStatus.OK);
-    }
-
-    @GetMapping("/api/delete")
-    @ResponseBody
-    public ResponseEntity<?> deleteAllUsers() {
-        this.userService.deleteAll();
         return new ResponseEntity<Object>(null, null, HttpStatus.OK);
     }
 }

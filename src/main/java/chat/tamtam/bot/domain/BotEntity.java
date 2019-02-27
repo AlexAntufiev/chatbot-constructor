@@ -1,12 +1,13 @@
 package chat.tamtam.bot.domain;
 
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "Bot")
-public class Bot {
+public class BotEntity {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
@@ -18,6 +19,16 @@ public class Bot {
 
     @Column(name = "schema")
     private byte[] schema;
+
+    BotEntity() {
+
+    }
+
+    public BotEntity(Integer userId, String token, byte[] schema) {
+        this.userId = userId;
+        this.token = token;
+        this.schema = schema;
+    }
 
     public Integer getId() {
         return id;
@@ -41,5 +52,13 @@ public class Bot {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public byte[] getSchema() {
+        return schema;
+    }
+
+    public void setSchema(byte[] schema) {
+        this.schema = schema;
     }
 }
