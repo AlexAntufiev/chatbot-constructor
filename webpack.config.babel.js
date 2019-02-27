@@ -29,7 +29,7 @@ export default () => ({
         index: path.join(__dirname, 'src/main/js/app/index.jsx')
     },
     output: {
-        filename: 'assets/javascripts/[hash].js',
+        filename: 'assets/javascripts/babel.js',
         path: path.join(__dirname, 'src/main/resources/static'),
         publicPath: `/`
     },
@@ -76,7 +76,7 @@ export default () => ({
             'process.env': {ASSET_PATH: JSON.stringify(publicPath)}
         }),
         new MiniCssExtractPlugin({
-            filename: 'assets/stylesheets/[name]/[hash].css'
+            filename: 'assets/stylesheets/main.css'
         }),
         new HtmlWebpackPlugin({
             appMountId: 'root',
