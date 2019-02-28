@@ -30,4 +30,7 @@ public class UserEntity {
     @Column(name = "passwordHash")
     @NonNull
     private String passwordHash;
+
+    @Column(name = "options")
+    private Long options;
 }
