@@ -25,7 +25,7 @@ public class UserService {
         }
         UserEntity user = new UserEntity(
                 userAuthEntity.getLogin(),
-                bCryptPasswordEncoder.encode(userAuthEntity.getPassword()));;
+                bCryptPasswordEncoder.encode(userAuthEntity.getPassword()));
         userRepository.save(user);
         return true;
     }
