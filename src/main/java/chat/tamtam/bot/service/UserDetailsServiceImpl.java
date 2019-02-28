@@ -21,10 +21,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
-        UserEntity userEntity = this.userRepository.findByUsername(username);
+        UserEntity userEntity = this.userRepository.findByLogin(username);
         if (userEntity == null) {
             throw new UsernameNotFoundException(username);
         }
-        return new User(userEntity.getUsername(), userEntity.getPassword(), Collections.emptyList());
+        return new User(userEntity.getLogin(), userEntity.getPasswordHash(), Collections.emptyList());
     }
 }

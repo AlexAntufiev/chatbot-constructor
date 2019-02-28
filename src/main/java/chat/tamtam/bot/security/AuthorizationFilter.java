@@ -1,6 +1,7 @@
 package chat.tamtam.bot.security;
 
 import chat.tamtam.bot.domain.SessionEntity;
+import chat.tamtam.bot.domain.UserAuthEntity;
 import chat.tamtam.bot.domain.UserEntity;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.repository.UserRepository;
@@ -17,13 +18,13 @@ import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 import static chat.tamtam.bot.security.SecurityConstants.EXPIRATION_TIME;
 import static chat.tamtam.bot.security.SecurityConstants.HEADER_STRING;
-import static chat.tamtam.bot.security.SecurityConstants.TOKEN_PREFIX;
 import static chat.tamtam.bot.security.SecurityConstants.SECRET;
+import static chat.tamtam.bot.security.SecurityConstants.TOKEN_PREFIX;
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
 public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
@@ -34,8 +35,7 @@ public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
     public AuthorizationFilter(
             final AuthenticationManager authenticationManager,
             final SessionRepository sessionRepository,
-            final UserRepository userRepository
-    ) {
+            final UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.sessionRepository = sessionRepository;
         this.userRepository = userRepository;
@@ -45,15 +45,14 @@ public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(final HttpServletRequest request,
                                                 final HttpServletResponse response) throws AuthenticationException {
         try {
-            UserEntity userEntity = new ObjectMapper()
-                    .readValue(request.getInputStream(), UserEntity.class);
+            UserAuthEntity userAuthEntity = new ObjectMapper()
+                    .readValue(request.getInputStream(), UserAuthEntity.class);
 
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            userEntity.getUsername(),
-                            userEntity.getPassword(),
-                            new ArrayList<>())
-            );
+                            userAuthEntity.getLogin(),
+                            userAuthEntity.getPassword(),
+                            Collections.emptyList()));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -64,14 +63,13 @@ public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
                                             final HttpServletResponse response,
                                             final FilterChain chain,
                                             final Authentication auth) {
-
         Date expireDate = new Date(System.currentTimeMillis() + EXPIRATION_TIME);
         String token = TOKEN_PREFIX + JWT.create()
                 .withSubject(((User) auth.getPrincipal()).getUsername())
                 .withExpiresAt(expireDate)
                 .sign(HMAC512(SECRET.getBytes()));
-        UserEntity user = userRepository.findByUsername(((User) auth.getPrincipal()).getUsername());
-        this.sessionRepository.save(new SessionEntity(token, user.getId(), user.getUsername(), expireDate));
+        UserEntity user = userRepository.findByLogin(((User) auth.getPrincipal()).getUsername());
+        sessionRepository.save(new SessionEntity(token, user.getId(), user.getLogin(), expireDate));
         response.addHeader(HEADER_STRING, token);
     }
 }

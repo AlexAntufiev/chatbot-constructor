@@ -58,10 +58,7 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
         if (session == null) {
             return null;
         }
-        UserDetails user = userDetailsService.loadUserByUsername(session.getUsername());
-        if (user == null) {
-            return null;
-        }
+        UserDetails user = userDetailsService.loadUserByUsername(session.getLogin());
         return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
     }
 }

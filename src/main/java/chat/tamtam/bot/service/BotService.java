@@ -13,8 +13,11 @@ public class BotService {
     private BotRepository botRepository;
 
     public boolean addBot(final BotEntity bot) {
-        BotEntity botEntity = botRepository.save(bot);
-        return botEntity != null;
+        return false;
+    }
+
+    public boolean deleteBot(final BotEntity bot) {
+        return false;
     }
 
     public List<BotEntity> getList(final Integer userId) {
