@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BotRepository extends CrudRepository<BotSchemaEntity, Integer> {
+public interface BotSchemaRepository extends CrudRepository<BotSchemaEntity, Integer> {
     List<BotSchemaEntity> findAllByUserId(Integer userId);
 }
