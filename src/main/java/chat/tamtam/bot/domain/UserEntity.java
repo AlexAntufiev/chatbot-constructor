@@ -1,0 +1,34 @@
+package chat.tamtam.bot.domain;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "User")
+@Data
+@NoArgsConstructor
+public class UserEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Integer id;
+
+    @Column(name = "login")
+    @NonNull
+    private String login;
+
+    @Column(name = "passwordHash")
+    @NonNull
+    private String passwordHash;
+
+    @Column(name = "options")
+    private Long options;
+}
