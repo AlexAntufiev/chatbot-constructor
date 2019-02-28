@@ -3,6 +3,7 @@ package chat.tamtam.bot.domain;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,6 +17,7 @@ import java.util.Date;
 @Table(name = "Session")
 @NoArgsConstructor
 @Data
+@RequiredArgsConstructor
 public class SessionEntity {
 
     @Id
