@@ -14,7 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 
 import static chat.tamtam.bot.security.SecurityConstants.HEADER_STRING;
 import static chat.tamtam.bot.security.SecurityConstants.TOKEN_PREFIX;
@@ -59,6 +59,6 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
             return null;
         }
         UserDetails user = userDetailsService.loadUserByUsername(session.getLogin());
-        return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+        return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
     }
 }

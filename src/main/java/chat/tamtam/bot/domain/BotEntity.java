@@ -4,7 +4,6 @@ package chat.tamtam.bot.domain;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,7 +16,6 @@ import javax.persistence.Table;
 @Table(name = "Bot")
 @NoArgsConstructor
 @Data
-@RequiredArgsConstructor
 public class BotEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -48,9 +48,7 @@ public class RestSecurity extends WebSecurityConfigurerAdapter {
     }
 
     private AuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        AuthenticationFilter authenticationFilter =
-                new AuthenticationFilter(authenticationManager(), sessionRepository, userDetailsService);
-        return authenticationFilter;
+        return new AuthenticationFilter(authenticationManager(), sessionRepository, userDetailsService);
     }
 
     private AuthorizationFilter jwtAuthorizationFilter() throws Exception {
