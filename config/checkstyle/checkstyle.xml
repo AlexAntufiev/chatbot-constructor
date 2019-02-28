@@ -98,7 +98,6 @@
             <property name="allowedDistance" value="7"/>
         </module>
 
-        <module name="InterfaceIsType"/>
         <module name="VisibilityModifier"/>
 
         <!-- Miscellaneous other checks.                   -->
