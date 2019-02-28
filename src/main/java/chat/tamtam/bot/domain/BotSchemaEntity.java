@@ -13,10 +13,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "Bot")
+@Table(name = "BotSchema")
 @NoArgsConstructor
 @Data
-public class BotEntity {
+public class BotSchemaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -27,10 +27,8 @@ public class BotEntity {
     private Integer userId;
 
     @Column(name = "token")
-    @NonNull
     private String token;
 
     @Column(name = "schema")
-    @NonNull
     private byte[] schema;
 }
