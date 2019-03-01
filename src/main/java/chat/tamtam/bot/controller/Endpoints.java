@@ -11,4 +11,5 @@ public interface Endpoints {
     String API_BOT_DISCONNECT = "/api/bot/{id}/disconnect";
 
     String STATIC_INDEX = "/index.html";
+    String STATIC_RESOURCES = "/assets/**";
 }
