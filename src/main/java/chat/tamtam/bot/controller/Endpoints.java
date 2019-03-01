@@ -9,4 +9,6 @@ public interface Endpoints {
     String API_BOT_SAVE = "/api/bot/{id}/save";
     String API_BOT_CONNECT = "/api/bot/{id}/connect";
     String API_BOT_DISCONNECT = "/api/bot/{id}/disconnect";
+
+    String STATIC_INDEX = "/index.html";
 }
