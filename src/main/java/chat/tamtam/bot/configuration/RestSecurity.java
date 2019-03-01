@@ -35,6 +35,7 @@ public class RestSecurity extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
                 .antMatchers(Endpoints.API_LOGIN).permitAll()
+                .antMatchers(Endpoints.STATIC_INDEX).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(jwtAuthenticationFilter())
