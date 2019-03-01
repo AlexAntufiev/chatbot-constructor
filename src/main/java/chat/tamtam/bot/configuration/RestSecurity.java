@@ -37,6 +37,8 @@ public class RestSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, Endpoints.API_LOGIN).permitAll()
                 .antMatchers(HttpMethod.GET, Endpoints.STATIC_INDEX).permitAll()
                 .antMatchers(HttpMethod.GET, Endpoints.STATIC_RESOURCES).permitAll()
+                .antMatchers(Endpoints.API_LOGIN).permitAll()
+                .antMatchers(Endpoints.STATIC_INDEX).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(jwtAuthenticationFilter())
