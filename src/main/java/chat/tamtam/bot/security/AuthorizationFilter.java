@@ -21,7 +21,10 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 
-import static chat.tamtam.bot.security.SecurityConstants.*;
+import static chat.tamtam.bot.security.SecurityConstants.EXPIRATION_TIME;
+import static chat.tamtam.bot.security.SecurityConstants.HEADER_STRING;
+import static chat.tamtam.bot.security.SecurityConstants.SECRET;
+import static chat.tamtam.bot.security.SecurityConstants.TOKEN_PREFIX;
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
 public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
