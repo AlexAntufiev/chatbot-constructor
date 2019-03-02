@@ -17,7 +17,7 @@
 
 Add checkstyle:
 
-`Settings` - `Editor` - `Code style` - `Java` - `*Gear*` - `Import Scheme` - `Checkstyle configuration`
+`Settings` - `Editor` - `Code style` - `Java` - `*Gear*` - `Import Scheme` - `Intellij IDEA code style XML`
 
 ### Inspections
 
