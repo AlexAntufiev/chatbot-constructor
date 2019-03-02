@@ -3,7 +3,7 @@ package chat.tamtam.bot.controller;
 import chat.tamtam.bot.security.SecurityConstants;
 import chat.tamtam.bot.service.BotService;
 import chat.tamtam.bot.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,19 +16,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 public class BotController {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private BotService botService;
+    private final UserService userService;
+    private final BotService botService;
 
-    @GetMapping(path = Endpoints.API_BOT_LIST)
+    @GetMapping(Endpoints.API_BOT_LIST)
     public ResponseEntity<?> botList(@RequestHeader(name = SecurityConstants.HEADER_STRING) final String authToken) {
-        return new ResponseEntity<>(
-                botService.getList(userService.getUserIdByToken(authToken)),
-                null,
-                HttpStatus.OK);
+        return new ResponseEntity<>(botService.getList(userService.getUserIdByToken(authToken)), HttpStatus.OK);
     }
 
     @PostMapping(Endpoints.API_BOT_ADD)

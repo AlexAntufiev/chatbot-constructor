@@ -25,8 +25,7 @@ public class BotSchemaEntity {
     private Integer id;
 
     @Column(name = "userId")
-    @NonNull
-    private Integer userId;
+    private @NonNull Integer userId;
 
     @Column(name = "token")
     private String token;

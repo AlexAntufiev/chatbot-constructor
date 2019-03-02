@@ -24,12 +24,10 @@ public class UserEntity {
     private Integer id;
 
     @Column(name = "login")
-    @NonNull
-    private String login;
+    private @NonNull String login;
 
     @Column(name = "passwordHash")
-    @NonNull
-    private String passwordHash;
+    private @NonNull String passwordHash;
 
     @Column(name = "options")
     private Long options;

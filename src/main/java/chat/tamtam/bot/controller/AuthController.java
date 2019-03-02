@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RequestMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 public class AuthController {
-    private UserService userService;
+    private final UserService userService;
 
     @PostMapping(Endpoints.API_REGISTRATION)
     public ResponseEntity<?> registration(@RequestBody final UserAuthEntity userAuthEntity) {
-        boolean done = this.userService.addUser(userAuthEntity);
+        boolean done = userService.addUser(userAuthEntity);
         if (done) {
             return new ResponseEntity<>(null, null, HttpStatus.OK);
         } else {

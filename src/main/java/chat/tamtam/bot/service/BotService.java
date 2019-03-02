@@ -2,14 +2,14 @@ package chat.tamtam.bot.service;
 
 import chat.tamtam.bot.domain.BotSchemaEntity;
 import chat.tamtam.bot.repository.BotSchemaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class BotService {
-    @Autowired
     private BotSchemaRepository botSchemaRepository;
 
     public boolean addBot(final BotSchemaEntity bot) {

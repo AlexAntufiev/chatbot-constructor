@@ -7,8 +7,6 @@ import lombok.NonNull;
 @Data
 @NoArgsConstructor
 public class UserAuthEntity {
-    @NonNull
-    private String login;
-    @NonNull
-    private String password;
+    private @NonNull String login;
+    private @NonNull String password;
 }

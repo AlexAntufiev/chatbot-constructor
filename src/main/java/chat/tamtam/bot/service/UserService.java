@@ -11,12 +11,12 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class UserService {
-    private UserRepository userRepository;
-    private SessionRepository sessionRepository;
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final UserRepository userRepository;
+    private final SessionRepository sessionRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public boolean addUser(final UserAuthEntity userAuthEntity) {
-        if (userRepository.findUserEntitiesByLogin(userAuthEntity.getLogin()).size() > 0) {
+        if (!userRepository.findUserEntitiesByLogin(userAuthEntity.getLogin()).isEmpty()) {
             return false;
         }
         //todo expand filters

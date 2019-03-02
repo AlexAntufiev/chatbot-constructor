@@ -26,18 +26,14 @@ public class SessionEntity {
     private Integer id;
 
     @Column(name = "token")
-    @NonNull
-    private String token;
+    private @NonNull String token;
 
     @Column(name = "userId")
-    @NonNull
-    private Integer userId;
+    private @NonNull Integer userId;
 
     @Column(name = "login")
-    @NonNull
-    private String login;
+    private @NonNull String login;
 
     @Column(name = "expireDate")
-    @NonNull
-    private Date expireDate;
+    private @NonNull Date expireDate;
 }

@@ -6,7 +6,7 @@ import chat.tamtam.bot.repository.UserRepository;
 import chat.tamtam.bot.security.AuthenticationFilter;
 import chat.tamtam.bot.security.AuthorizationFilter;
 import chat.tamtam.bot.service.UserDetailsServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -20,15 +20,12 @@ import static chat.tamtam.bot.security.SecurityConstants.SIGN_UP_URL;
 
 @Configuration
 @EnableWebSecurity
+@AllArgsConstructor
 public class RestSecurity extends WebSecurityConfigurerAdapter {
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private SessionRepository sessionRepository;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final UserRepository userRepository;
+    private final SessionRepository sessionRepository;
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
