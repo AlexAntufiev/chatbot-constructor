@@ -14,11 +14,11 @@ import java.util.Collections;
 @Service
 @AllArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
-        UserEntity userEntity = this.userRepository.findByLogin(username);
+        UserEntity userEntity = userRepository.findByLogin(username);
         if (userEntity == null) {
             throw new UsernameNotFoundException(username);
         }

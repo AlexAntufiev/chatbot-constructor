@@ -21,16 +21,13 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 
-import static chat.tamtam.bot.security.SecurityConstants.EXPIRATION_TIME;
-import static chat.tamtam.bot.security.SecurityConstants.HEADER_STRING;
-import static chat.tamtam.bot.security.SecurityConstants.SECRET;
-import static chat.tamtam.bot.security.SecurityConstants.TOKEN_PREFIX;
+import static chat.tamtam.bot.security.SecurityConstants.*;
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
 public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
-    private AuthenticationManager authenticationManager;
-    private SessionRepository sessionRepository;
-    private UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
+    private final SessionRepository sessionRepository;
+    private final UserRepository userRepository;
 
     public AuthorizationFilter(
             final AuthenticationManager authenticationManager,
@@ -62,13 +59,14 @@ public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(final HttpServletRequest request,
                                             final HttpServletResponse response,
                                             final FilterChain chain,
-                                            final Authentication auth) {
+                                            final Authentication authResult) {
         Date expireDate = new Date(System.currentTimeMillis() + EXPIRATION_TIME);
+        User principal = (User) authResult.getPrincipal();
         String token = TOKEN_PREFIX + JWT.create()
-                .withSubject(((User) auth.getPrincipal()).getUsername())
+                .withSubject(principal.getUsername())
                 .withExpiresAt(expireDate)
                 .sign(HMAC512(SECRET.getBytes()));
-        UserEntity user = userRepository.findByLogin(((User) auth.getPrincipal()).getUsername());
+        UserEntity user = userRepository.findByLogin(principal.getUsername());
         sessionRepository.save(new SessionEntity(token, user.getId(), user.getLogin(), expireDate));
         response.addHeader(HEADER_STRING, token);
     }

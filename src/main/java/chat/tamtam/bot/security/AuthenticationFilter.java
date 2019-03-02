@@ -20,8 +20,8 @@ import static chat.tamtam.bot.security.SecurityConstants.HEADER_STRING;
 import static chat.tamtam.bot.security.SecurityConstants.TOKEN_PREFIX;
 
 public class AuthenticationFilter extends BasicAuthenticationFilter {
-    private SessionRepository sessionRepository;
-    private UserDetailsServiceImpl userDetailsService;
+    private final SessionRepository sessionRepository;
+    private final UserDetailsServiceImpl userDetailsService;
 
     public AuthenticationFilter(
             final AuthenticationManager authManager,

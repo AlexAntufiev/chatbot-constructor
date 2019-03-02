@@ -6,12 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "BotSchema")
@@ -25,8 +20,7 @@ public class BotSchemaEntity {
     private Integer id;
 
     @Column(name = "userId")
-    @NonNull
-    private Integer userId;
+    private @NonNull Integer userId;
 
     @Column(name = "token")
     private String token;
