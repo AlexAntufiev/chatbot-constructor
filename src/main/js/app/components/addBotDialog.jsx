@@ -28,7 +28,7 @@ class AddBotDialog extends BaseDialog {
                 summary: intl.formatMessage({id: 'app.errormessage.errorsummary'}),
                 detail: intl.formatMessage({id: 'app.errormessage.fillname'})
             });
-            return;
+
         }
         //TODO: create bot request
     }

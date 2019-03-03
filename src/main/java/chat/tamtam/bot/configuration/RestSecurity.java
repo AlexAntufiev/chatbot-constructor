@@ -1,11 +1,5 @@
 package chat.tamtam.bot.configuration;
 
-import chat.tamtam.bot.controller.Endpoints;
-import chat.tamtam.bot.repository.SessionRepository;
-import chat.tamtam.bot.repository.UserRepository;
-import chat.tamtam.bot.security.AuthenticationFilter;
-import chat.tamtam.bot.security.AuthorizationFilter;
-import chat.tamtam.bot.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,6 +9,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import chat.tamtam.bot.controller.Endpoints;
+import chat.tamtam.bot.repository.SessionRepository;
+import chat.tamtam.bot.repository.UserRepository;
+import chat.tamtam.bot.security.AuthenticationFilter;
+import chat.tamtam.bot.security.AuthorizationFilter;
+import chat.tamtam.bot.service.UserDetailsServiceImpl;
 
 import static chat.tamtam.bot.security.SecurityConstants.SIGN_UP_URL;
 

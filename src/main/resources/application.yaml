@@ -46,6 +46,6 @@ spring:
 ---
 
 tamtam:
-    bot:
-      endpoints:
-        api_registration_url: /api/registration
+  bot:
+    endpoints:
+      api_registration_url: /api/registration
