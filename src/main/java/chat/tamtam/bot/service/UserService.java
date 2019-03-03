@@ -1,12 +1,13 @@
 package chat.tamtam.bot.service;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import chat.tamtam.bot.domain.UserAuthEntity;
 import chat.tamtam.bot.domain.UserEntity;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
@@ -25,7 +26,8 @@ public class UserService {
         }
         UserEntity user = new UserEntity(
                 userAuthEntity.getLogin(),
-                bCryptPasswordEncoder.encode(userAuthEntity.getPassword()));
+                bCryptPasswordEncoder.encode(userAuthEntity.getPassword())
+        );
         userRepository.save(user);
         return true;
     }

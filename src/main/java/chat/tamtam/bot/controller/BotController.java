@@ -1,9 +1,5 @@
 package chat.tamtam.bot.controller;
 
-import chat.tamtam.bot.security.SecurityConstants;
-import chat.tamtam.bot.service.BotService;
-import chat.tamtam.bot.service.UserService;
-import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import chat.tamtam.bot.security.SecurityConstants;
+import chat.tamtam.bot.service.BotService;
+import chat.tamtam.bot.service.UserService;
+import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
@@ -28,8 +29,10 @@ public class BotController {
     }
 
     @PostMapping(Endpoints.API_BOT_ADD)
-    public ResponseEntity<?> addBot(@RequestBody final String body,
-                                    @RequestHeader(name = SecurityConstants.HEADER_STRING) final String token) {
+    public ResponseEntity<?> addBot(
+            @RequestBody final String body,
+            @RequestHeader(name = SecurityConstants.HEADER_STRING) final String token
+    ) {
         return new ResponseEntity<>(null, null, HttpStatus.OK);
     }
 

@@ -1,10 +1,11 @@
 package chat.tamtam.bot.repository;
 
-import chat.tamtam.bot.domain.BotSchemaEntity;
+import java.util.List;
+
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import chat.tamtam.bot.domain.BotSchemaEntity;
 
 @Repository
 public interface BotSchemaRepository extends CrudRepository<BotSchemaEntity, Integer> {
