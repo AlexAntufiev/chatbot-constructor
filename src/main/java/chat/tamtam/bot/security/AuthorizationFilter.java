@@ -70,14 +70,15 @@ public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
             final HttpServletRequest request,
             final HttpServletResponse response,
             final FilterChain chain,
-            final Authentication auth
+            final Authentication authResult
     ) {
         Date expireDate = new Date(System.currentTimeMillis() + EXPIRATION_TIME);
+        User principal = (User) authResult.getPrincipal();
         String token = TOKEN_PREFIX + JWT.create()
-                .withSubject(((User) auth.getPrincipal()).getUsername())
+                .withSubject(principal.getUsername())
                 .withExpiresAt(expireDate)
                 .sign(HMAC512(SECRET.getBytes()));
-        UserEntity user = userRepository.findByLogin(((User) auth.getPrincipal()).getUsername());
+        UserEntity user = userRepository.findByLogin(principal.getUsername());
         sessionRepository.save(new SessionEntity(token, user.getId(), user.getLogin(), expireDate));
         response.addHeader(HEADER_STRING, token);
     }

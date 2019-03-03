@@ -42,10 +42,3 @@ spring:
     username: production
     password: production
     driverClassName: org.hsqldb.jdbcDriver
-
----
-
-tamtam:
-  bot:
-    endpoints:
-      api_registration_url: /api/registration

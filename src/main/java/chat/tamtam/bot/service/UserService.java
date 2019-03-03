@@ -17,7 +17,7 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public boolean addUser(final UserAuthEntity userAuthEntity) {
-        if (userRepository.findUserEntitiesByLogin(userAuthEntity.getLogin()).size() > 0) {
+        if (!userRepository.findUserEntitiesByLogin(userAuthEntity.getLogin()).isEmpty()) {
             return false;
         }
         //todo expand filters

@@ -20,4 +20,5 @@ out/
 /src/main/resources/templates/
 /src/main/resources/static/
 package-lock.json
+lombok.config
 .DS_Store
