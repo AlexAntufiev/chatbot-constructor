@@ -3,6 +3,7 @@ package chat.tamtam.bot.controller;
 public interface Endpoints {
     String API_LOGIN = "/api/login";
     String API_REGISTRATION = "/api/registration";
+    String API_BOT_INFO = "/api/bot/{id}";
     String API_BOT_LIST = "/api/bot/list";
     String API_BOT_ADD = "/api/bot/add";
     String API_BOT_DELETE = "/api/bot/delete";

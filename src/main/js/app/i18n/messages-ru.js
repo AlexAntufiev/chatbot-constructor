@@ -12,6 +12,9 @@ export default {
     'app.menu.signin': 'Вход',
     'app.menu.signup': 'Регистрация',
     'app.menu.logout': 'Выход',
+    'app.menu.settings': 'Настройки',
+    'app.menu.constructor': 'Конструктор',
+    'app.menu.statistic': 'Статистика',
 
     //Dialogs
     'app.dialog.name': 'Название',
@@ -20,6 +23,8 @@ export default {
     'app.dialog.token': 'Токен',
     'app.dialog.create': 'Создать',
     'app.dialog.close': 'Закрыть',
+    'app.dialog.save': 'Сохранить',
+    'app.dialog.cancel': 'Отменить',
     'app.dialog.login': 'Вход',
     'app.dialog.username': 'Логин',
     'app.dialog.password': 'Пароль',
@@ -29,12 +34,19 @@ export default {
     'app.dialog.password.medium': 'Нормальный',
     'app.dialog.password.strong': 'Сильный',
     'app.dialog.password.enter': 'Введите пароль',
+    'app.dialog.checksure': 'Вы уверены?',
 
     //Error messages
     'app.errormessage.errorsummary': 'Сообщение об ошибке',
     'app.errormessage.passwordnotmatch': 'Пароли не совпадают',
     'app.errormessage.fillallfields': 'Заполните все поля',
     'app.errormessage.fillname': 'Заполните имя',
+    'app.errormessage.servernotresponse': 'Сервер не доступен',
+    'app.errormessage.serverwrongresponse': 'Неверный ответ от сервера',
+
+    //Success messages
+    'app.successmessage.successsumary': 'Успешно',
+    'app.successmessage.successoperaton': 'Успешная операция',
 
     //Common
     'app.common.sigin.message': 'Необходима авторизация'
