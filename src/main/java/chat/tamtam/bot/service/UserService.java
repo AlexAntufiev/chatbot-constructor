@@ -17,17 +17,16 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public boolean addUser(final UserAuthEntity userAuthEntity) {
-        if (!userRepository.findUserEntitiesByLogin(userAuthEntity.getLogin()).isEmpty()) {
+        String login = userAuthEntity.getLogin();
+        if (!userRepository.findUserEntitiesByLogin(login).isEmpty()) {
             return false;
         }
         //todo expand filters
-        if (userAuthEntity.getLogin().isEmpty() || userAuthEntity.getPassword().isEmpty()) {
+        String password = userAuthEntity.getPassword();
+        if (login.isEmpty() || password.isEmpty()) {
             return false;
         }
-        UserEntity user = new UserEntity(
-                userAuthEntity.getLogin(),
-                bCryptPasswordEncoder.encode(userAuthEntity.getPassword())
-        );
+        UserEntity user = new UserEntity(login, bCryptPasswordEncoder.encode(password));
         userRepository.save(user);
         return true;
     }
