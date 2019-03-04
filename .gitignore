@@ -12,6 +12,7 @@ hs_err_pid*
 .idea
 .gradle
 *.iml
+*.pem
 build
 node_modules
 npm-debug.log
