@@ -26,6 +26,9 @@ public class BotSchemaEntity {
     @Column(name = "userId")
     private @NonNull Integer userId;
 
+    @Column(name = "name")
+    private @NonNull String name;
+
     @Column(name = "token")
     private String token;
 
