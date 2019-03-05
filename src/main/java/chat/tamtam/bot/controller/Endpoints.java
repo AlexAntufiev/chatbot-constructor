@@ -12,4 +12,6 @@ public interface Endpoints {
 
     String STATIC_INDEX = "/index.html";
     String STATIC_RESOURCES = "/assets/**";
+
+    String HEALTH = "/actuator/health";
 }

@@ -1,7 +1,8 @@
 #!/bin/bash
 
+app_name=chatbot-constructor
 path_to_jar="../build/libs/"
-jar_name="chatbot-constructor.jar"
+jar_name="${app_name}.jar"
 jar=${path_to_jar}
 jar+=${jar_name}
 
