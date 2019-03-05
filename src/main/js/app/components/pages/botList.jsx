@@ -2,51 +2,65 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {Card} from 'primereact/card';
 import {Button} from 'primereact/button';
-import AddBotDialog from 'app/components/addBotDialog';
 import * as routers from 'app/constants/routes';
 import {injectIntl} from 'react-intl';
 import {Redirect} from 'react-router-dom'
+import axios from 'axios';
+import * as ApiPoints from 'app/constants/apiPoints';
+import {Growl} from "primereact/growl";
+import * as AxiosMessages from 'app/utils/axiosMessages';
+import makeUrl from 'app/utils/makeUrl'
 
 class BotList extends React.Component {
     constructor(props) {
         super(props);
-        this.addBotDialog = React.createRef();
+        this.state = {bots: []};
         this.onAddBot = this.onAddBot.bind(this);
+        this.refreshBotList = this.refreshBotList.bind(this);
+    }
 
-        //Hardcoded values
-        //TODO: remove, when backend will be available
-        this.state = {
-            bots: [
-                {
-                    id: 1,
-                    name: 'bot 1',
-                    description: 'description for bot 1',
-                    img: '/assets/images/tmp/usercard.png'
-                },
-                {
-                    id: 2,
-                    name: 'bot 2',
-                    description: 'description for bot 2',
-                    img: '/assets/images/tmp/usercard.png'
-                },
-            ]
-        }
+    refreshBotList() {
+        axios.get(ApiPoints.BOT_LIST).then(res => {
+            this.setState({bots: res.data});
+        }).catch(() => {
+            AxiosMessages.serverNotResponse(this);
+        });
     }
 
     componentDidMount() {
-        //TODO: get list bots to this.state.bots
+        this.refreshBotList();
     }
 
     onAddBot() {
-        this.addBotDialog.current.getWrappedInstance().onShow();
+        const defaultName = 'Tam tam bot';
+
+        axios.post(ApiPoints.ADD_BOT,
+            {name: defaultName}
+        ).then(res => {
+            if (Number.isInteger(res.data.id) && res.status === 200) {
+                const url = makeUrl(routers.botDetail(), {id: res.data.id});
+                this.props.history.push(url);
+            } else {
+                AxiosMessages.serverErrorResponse(this);
+            }
+        }).catch(error => {
+            AxiosMessages.serverNotResponse(this);
+        });
     }
 
     createBotList() {
         const {intl} = this.props;
+        const self = this;
         return this.state.bots.map((bot) => {
             function removeBot() {
-                if (confirm("Are you sure about this?")) {
-                    //TODO: delete request
+                if (confirm(intl.formatMessage({id: 'app.dialog.checksure'}))) {
+                    axios.delete(ApiPoints.DELETE_BOT, {
+                        data: {
+                            id: bot.id
+                        }
+                    }).then(() => {
+                        self.refreshBotList();
+                    });
                 }
             }
 
@@ -66,7 +80,7 @@ class BotList extends React.Component {
 
             return (
                 <Card title={bot.name}
-                      style={{width: '280px', margin: '14px'}}
+                      style={{width: '280px', margin: '14px', overflow: 'hidden'}}
                       className="ui-card-shadow" footer={footer} header={header}>
                     <div>{bot.description}</div>
                 </Card>
@@ -83,10 +97,10 @@ class BotList extends React.Component {
 
         return (
             <div style={{display: 'flex', flexFlow: 'row wrap'}}>
+                <Growl ref={(el) => this.growl = el}/>
                 {bots}
                 <Button className="p-button-rounded" icon='pi pi-plus' label='' onClick={this.onAddBot}
                         style={{position: 'absolute', right: '16px', bottom: '16px', width: '70px', height: '70px'}}/>
-                <AddBotDialog ref={this.addBotDialog}/>
             </div>
         );
     }

@@ -8,7 +8,7 @@ import BotDetail from 'app/components/pages/botDetail';
 export default () => (
     <Switch>
         <Route exact path={routes.index()} component={HomePage}/>
-        <Route exact path={routes.botList() + ":id/"} component={BotDetail}/>
-        <Route exact path={routes.botList()} component={BotList}/>
+        <Route path={routes.botDetail()} component={BotDetail}/>
+        <Route path={routes.botList()} component={BotList}/>
     </Switch>
 );
