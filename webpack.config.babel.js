@@ -50,6 +50,14 @@ export default () => ({
                 use: [MiniCssExtractPlugin.loader, 'css-loader', 'less-loader']
             },
             {
+                test: /\.scss$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    "css-loader",
+                    "sass-loader"
+                ],
+            },
+            {
                 test: /\.(ico|png|gif|jpe?g)$/,
                 use: {
                     loader: 'file-loader',
@@ -68,7 +76,7 @@ export default () => ({
     },
     resolve: {
         extensions: ['.js', '.jsx'],
-        modules: ['node_modules', 'src/main/js'],
+        modules: ['node_modules', 'src/main/js', 'src/main/styles'],
         symlinks: false
     },
     plugins: [
