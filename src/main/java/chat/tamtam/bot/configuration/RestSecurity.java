@@ -1,12 +1,5 @@
 package chat.tamtam.bot.configuration;
 
-import chat.tamtam.bot.controller.Endpoints;
-import chat.tamtam.bot.repository.SessionRepository;
-import chat.tamtam.bot.repository.UserRepository;
-import chat.tamtam.bot.security.AuthenticationFilter;
-import chat.tamtam.bot.security.AuthorizationFilter;
-import chat.tamtam.bot.service.UserDetailsServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -16,25 +9,34 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import chat.tamtam.bot.controller.Endpoints;
+import chat.tamtam.bot.repository.SessionRepository;
+import chat.tamtam.bot.repository.UserRepository;
+import chat.tamtam.bot.security.AuthenticationFilter;
+import chat.tamtam.bot.security.AuthorizationFilter;
+import chat.tamtam.bot.service.UserDetailsServiceImpl;
+import lombok.AllArgsConstructor;
+
 import static chat.tamtam.bot.security.SecurityConstants.SIGN_UP_URL;
 
 @Configuration
 @EnableWebSecurity
+@AllArgsConstructor
 public class RestSecurity extends WebSecurityConfigurerAdapter {
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private SessionRepository sessionRepository;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final UserRepository userRepository;
+    private final SessionRepository sessionRepository;
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
+                .antMatchers(HttpMethod.POST, Endpoints.API_LOGIN).permitAll()
+                .antMatchers(HttpMethod.GET, Endpoints.STATIC_INDEX).permitAll()
+                .antMatchers(HttpMethod.GET, Endpoints.STATIC_RESOURCES).permitAll()
                 .antMatchers(Endpoints.API_LOGIN).permitAll()
+                .antMatchers(Endpoints.STATIC_INDEX).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(jwtAuthenticationFilter())

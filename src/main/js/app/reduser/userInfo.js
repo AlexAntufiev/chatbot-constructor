@@ -1,5 +1,5 @@
 const initialState = {
-    userId: 1
+    userId: null
 };
 
 export default function userInfo(state = initialState, action) {

@@ -1,9 +1,6 @@
 package chat.tamtam.bot.domain;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,7 +8,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.Date;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Entity
 @Table(name = "Session")
@@ -26,18 +27,14 @@ public class SessionEntity {
     private Integer id;
 
     @Column(name = "token")
-    @NonNull
-    private String token;
+    private @NonNull String token;
 
     @Column(name = "userId")
-    @NonNull
-    private Integer userId;
+    private @NonNull Integer userId;
 
     @Column(name = "login")
-    @NonNull
-    private String login;
+    private @NonNull String login;
 
     @Column(name = "expireDate")
-    @NonNull
-    private Date expireDate;
+    private @NonNull Date expireDate;
 }

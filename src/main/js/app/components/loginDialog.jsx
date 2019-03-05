@@ -26,7 +26,6 @@ export class LoginDialog extends BaseDialog {
                 summary: intl.formatMessage({id: 'app.errormessage.errorsummary'}),
                 detail: intl.formatMessage({id: 'app.errormessage.fillallfields'})
             });
-            return;
         }
         //TODO: Get request and check
     }
