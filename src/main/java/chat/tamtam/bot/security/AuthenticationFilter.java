@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,7 +19,6 @@ import chat.tamtam.bot.domain.SessionEntity;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.service.UserDetailsServiceImpl;
 
-import static chat.tamtam.bot.security.SecurityConstants.HEADER_STRING;
 import static chat.tamtam.bot.security.SecurityConstants.TOKEN_PREFIX;
 
 public class AuthenticationFilter extends BasicAuthenticationFilter {
@@ -41,7 +41,7 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
             final HttpServletResponse response,
             final FilterChain chain
     ) throws IOException, ServletException {
-        String header = request.getHeader(HEADER_STRING);
+        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (header == null || !header.startsWith(TOKEN_PREFIX)) {
             chain.doFilter(request, response);
@@ -54,7 +54,7 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(final HttpServletRequest request) {
-        String token = request.getHeader(HEADER_STRING);
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (token == null) {
             return null;
         }

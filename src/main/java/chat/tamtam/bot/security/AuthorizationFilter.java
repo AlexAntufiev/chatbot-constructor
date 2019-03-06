@@ -8,6 +8,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,7 +26,6 @@ import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.repository.UserRepository;
 
 import static chat.tamtam.bot.security.SecurityConstants.EXPIRATION_TIME;
-import static chat.tamtam.bot.security.SecurityConstants.HEADER_STRING;
 import static chat.tamtam.bot.security.SecurityConstants.SECRET;
 import static chat.tamtam.bot.security.SecurityConstants.TOKEN_PREFIX;
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
@@ -80,6 +80,6 @@ public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
                 .sign(HMAC512(SECRET.getBytes()));
         UserEntity user = userRepository.findByLogin(principal.getUsername());
         sessionRepository.save(new SessionEntity(token, user.getId(), user.getLogin(), expireDate));
-        response.addHeader(HEADER_STRING, token);
+        response.addHeader(HttpHeaders.AUTHORIZATION, token);
     }
 }
