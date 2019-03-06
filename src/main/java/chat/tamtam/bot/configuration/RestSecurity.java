@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import chat.tamtam.bot.configuration.swagger.SwaggerConfig;
 import chat.tamtam.bot.controller.Endpoints;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.repository.UserRepository;
@@ -16,8 +17,6 @@ import chat.tamtam.bot.security.AuthenticationFilter;
 import chat.tamtam.bot.security.AuthorizationFilter;
 import chat.tamtam.bot.service.UserDetailsServiceImpl;
 import lombok.AllArgsConstructor;
-
-import static chat.tamtam.bot.security.SecurityConstants.SIGN_UP_URL;
 
 @Configuration
 @EnableWebSecurity
@@ -31,9 +30,10 @@ public class RestSecurity extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().authorizeRequests()
-                .antMatchers(HttpMethod.POST, SIGN_UP_URL, Endpoints.API_LOGIN).permitAll()
-                .antMatchers(HttpMethod.GET, Endpoints.STATIC_INDEX, Endpoints.STATIC_RESOURCES).permitAll()
-                .antMatchers(Endpoints.API_LOGIN, Endpoints.STATIC_INDEX, Endpoints.HEALTH).permitAll()
+                .antMatchers(HttpMethod.POST, Endpoints.API_REGISTRATION, Endpoints.API_LOGIN).permitAll()
+                .antMatchers(HttpMethod.GET, Endpoints.STATIC_INDEX, Endpoints.STATIC_RESOURCES, Endpoints.HEALTH)
+                .permitAll()
+                .antMatchers(SwaggerConfig.swaggerUrls).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(jwtAuthenticationFilter())

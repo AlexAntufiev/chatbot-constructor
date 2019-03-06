@@ -2,6 +2,7 @@ package chat.tamtam.bot.controller;
 
 import java.util.NoSuchElementException;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import chat.tamtam.bot.domain.BotSchemaEntity;
-import chat.tamtam.bot.security.SecurityConstants;
 import chat.tamtam.bot.service.BotService;
 import chat.tamtam.bot.service.UserService;
 import lombok.AllArgsConstructor;
@@ -24,23 +24,23 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RestController
 @AllArgsConstructor
-@RequestMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = Endpoints.API_BOT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 public class BotController {
     private final UserService userService;
     private final BotService botService;
 
-    @GetMapping(path = Endpoints.API_BOT_LIST, consumes = MediaType.ALL_VALUE)
-    public ResponseEntity<?> botList(@RequestHeader(name = SecurityConstants.HEADER_STRING) final String authToken) {
+    @GetMapping(path = Endpoints.LIST, consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<?> botList(@RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken) {
         return new ResponseEntity<>(
                 botService.getList(userService.getUserIdByToken(authToken)),
                 HttpStatus.OK
         );
     }
 
-    @GetMapping(path = Endpoints.API_BOT_INFO, consumes = MediaType.ALL_VALUE)
+    @GetMapping(path = Endpoints.ID, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> getBotInfo(
             @PathVariable final Integer id,
-            @RequestHeader(name = SecurityConstants.HEADER_STRING) final String authToken
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
     ) {
         try {
             return new ResponseEntity<>(
@@ -53,10 +53,10 @@ public class BotController {
         }
     }
 
-    @PostMapping(Endpoints.API_BOT_ADD)
+    @PostMapping(Endpoints.ADD)
     public ResponseEntity<?> addBot(
             @RequestBody final BotSchemaEntity bot,
-            @RequestHeader(name = SecurityConstants.HEADER_STRING) final String authToken
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
     ) {
         try {
             return new ResponseEntity<>(botService.addBot(bot, userService.getUserIdByToken(authToken)), HttpStatus.OK);
@@ -66,10 +66,10 @@ public class BotController {
         }
     }
 
-    @DeleteMapping(Endpoints.API_BOT_DELETE)
+    @DeleteMapping(Endpoints.DELETE)
     public ResponseEntity<?> deleteBot(
             @RequestBody final BotSchemaEntity bot,
-            @RequestHeader(name = SecurityConstants.HEADER_STRING) final String authToken
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
     ) {
         if (bot.getId() != null) {
             try {
@@ -84,11 +84,11 @@ public class BotController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping(Endpoints.API_BOT_SAVE)
+    @PostMapping(Endpoints.ID_SAVE)
     public ResponseEntity<?> saveBot(
             @PathVariable final Integer id,
             @RequestBody final BotSchemaEntity bot,
-            @RequestHeader(name = SecurityConstants.HEADER_STRING) final String authToken
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
     ) {
         Integer userId = userService.getUserIdByToken(authToken);
         try {
@@ -100,12 +100,12 @@ public class BotController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping(Endpoints.API_BOT_CONNECT)
+    @PostMapping(Endpoints.ID_CONNECT)
     public ResponseEntity<?> connectBot(@PathVariable final Integer id) {
         return new ResponseEntity<>(null, null, HttpStatus.OK);
     }
 
-    @PostMapping(Endpoints.API_BOT_DISCONNECT)
+    @PostMapping(Endpoints.ID_DISCONNECT)
     public ResponseEntity<?> disconnectBot(@PathVariable final Integer id) {
         return new ResponseEntity<>(null, null, HttpStatus.OK);
     }

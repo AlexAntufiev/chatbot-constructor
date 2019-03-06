@@ -34,6 +34,13 @@ Add inspections:
 ## Run project
 `gradle bootRun`
 
+## Swagger
+
+Set development profile in application.yml: `spring.profiles.active=development`
+
+[Access to swagger]
+
 [java]: https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html
 [Node.js]: https://nodejs.org/en/download/
-[Download and install checkstyle plugin]: https://plugins.jetbrains.com/plugin/1065-checkstyle-idea 
+[Download and install checkstyle plugin]: https://plugins.jetbrains.com/plugin/1065-checkstyle-idea
+[Access to swagger]: http://localhost:8090/swagger-ui.html
