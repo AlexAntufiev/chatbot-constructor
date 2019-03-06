@@ -25,7 +25,7 @@ public class Launcher {
     }
 
     @Bean
-    @Profile(Profiles.development)
+    @Profile(Profiles.DEVELOPMENT)
     InitializingBean populateDatabase() {
         return () -> userService.addUser(new UserAuthEntity("admin", "admin"));
     }
