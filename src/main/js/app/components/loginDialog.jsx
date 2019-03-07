@@ -43,9 +43,6 @@ export class LoginDialog extends BaseDialog {
                 this.props.setUser(response.data.userId);
                 this.onHide();
             })
-            .catch(error => {
-                //todo catch and process
-            });
     }
 
     render() {
