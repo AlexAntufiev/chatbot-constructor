@@ -1,13 +1,13 @@
 package chat.tamtam.bot.security;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Date;
-
-import javax.servlet.FilterChain;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import chat.tamtam.bot.domain.SessionEntity;
+import chat.tamtam.bot.domain.UserAuthEntity;
+import chat.tamtam.bot.domain.UserAuthorizedEntity;
+import chat.tamtam.bot.domain.UserEntity;
+import chat.tamtam.bot.repository.SessionRepository;
+import chat.tamtam.bot.repository.UserRepository;
+import com.auth0.jwt.JWT;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,14 +16,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.auth0.jwt.JWT;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import chat.tamtam.bot.domain.SessionEntity;
-import chat.tamtam.bot.domain.UserAuthEntity;
-import chat.tamtam.bot.domain.UserEntity;
-import chat.tamtam.bot.repository.SessionRepository;
-import chat.tamtam.bot.repository.UserRepository;
+import javax.servlet.FilterChain;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Date;
 
 import static chat.tamtam.bot.security.SecurityConstants.EXPIRATION_TIME;
 import static chat.tamtam.bot.security.SecurityConstants.SECRET;
@@ -71,7 +69,7 @@ public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
             final HttpServletResponse response,
             final FilterChain chain,
             final Authentication authResult
-    ) {
+    ) throws IOException {
         Date expireDate = new Date(System.currentTimeMillis() + EXPIRATION_TIME);
         User principal = (User) authResult.getPrincipal();
         String token = TOKEN_PREFIX + JWT.create()
@@ -81,5 +79,13 @@ public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
         UserEntity user = userRepository.findByLogin(principal.getUsername());
         sessionRepository.save(new SessionEntity(token, user.getId(), user.getLogin(), expireDate));
         response.addHeader(HttpHeaders.AUTHORIZATION, token);
+        try {
+            response
+                    .getWriter()
+                    .write(new ObjectMapper()
+                                    .writeValueAsString(new UserAuthorizedEntity(user.getId())));
+        } catch (IOException iOE) {
+            throw iOE;
+        }
     }
 }

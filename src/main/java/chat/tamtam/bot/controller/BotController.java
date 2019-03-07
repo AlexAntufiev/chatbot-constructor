@@ -1,7 +1,10 @@
 package chat.tamtam.bot.controller;
 
-import java.util.NoSuchElementException;
-
+import chat.tamtam.bot.domain.BotSchemaEntity;
+import chat.tamtam.bot.service.BotService;
+import chat.tamtam.bot.service.UserService;
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,16 +18,14 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import chat.tamtam.bot.domain.BotSchemaEntity;
-import chat.tamtam.bot.service.BotService;
-import chat.tamtam.bot.service.UserService;
-import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import java.util.NoSuchElementException;
 
 @Log4j2
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = Endpoints.API_BOT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = Endpoints.API_BOT,
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE)
 public class BotController {
     private final UserService userService;
     private final BotService botService;

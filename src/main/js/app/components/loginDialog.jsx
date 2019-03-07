@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import {Button} from 'primereact/button';
 import {Dialog} from 'primereact/dialog';
 import {InputText} from 'primereact/inputtext';
@@ -6,6 +7,11 @@ import {Password} from 'primereact/password';
 import {Growl} from 'primereact/growl';
 import {BaseDialog} from 'app/components/baseDialog';
 import {FormattedMessage, injectIntl} from 'react-intl';
+import {apiLogin} from "../constants/routes";
+import {AUTHORIZATION, USER_ID} from "../constants/cookies";
+import {LOGIN} from "../constants/apiPoints";
+import {Cookies} from "react-cookie";
+import setUserInfo from "../actions/userInfo";
 
 export class LoginDialog extends BaseDialog {
     constructor(props) {
@@ -14,6 +20,7 @@ export class LoginDialog extends BaseDialog {
             password: '',
             username: ''
         };
+
         this.onLogin = this.onLogin.bind(this);
     }
 
@@ -27,7 +34,20 @@ export class LoginDialog extends BaseDialog {
                 detail: intl.formatMessage({id: 'app.errormessage.fillallfields'})
             });
         }
-        //TODO: Get request and check
+        let userInfo;
+        axios
+            .post(LOGIN, {login: this.state.username, password: this.state.password})
+            .then(function (response) {
+                const cookies = new Cookies();
+                cookies.set(AUTHORIZATION, response.headers[AUTHORIZATION]);
+                cookies.set(USER_ID, response.data.userId);
+                userInfo = response.data;
+                //todo change user info state to
+            })
+            .catch(function (error) {
+                //todo catch and process
+            });
+        this.onHide();
     }
 
     render() {
@@ -63,4 +83,12 @@ export class LoginDialog extends BaseDialog {
     }
 }
 
-export default injectIntl(LoginDialog, {withRef: true})
+const mapStateToProps = state => ({
+    user: state.userInfo
+});
+
+const mapDispatchToProps = dispatch => ({
+    setUser: userInfo => dispatch(setUserInfo(userInfo))
+});
+
+export default injectIntl(LoginDialog, {withRef: true});
