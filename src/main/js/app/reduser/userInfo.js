@@ -1,4 +1,4 @@
-import {USER_ID} from "../constants/cookies";
+import {USER_ID} from "app/constants/cookies";
 import {Cookies} from "react-cookie";
 
 const initialState = {
@@ -17,6 +17,7 @@ function fetchUserId() {
 
 export default function userInfo(state = initialState, action) {
     const newState = Object.assign({}, state);
+
     switch (action.type) {
         case 'SET_USER_INFO':
             newState.userId = action.payload;

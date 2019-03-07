@@ -1,10 +1,13 @@
 package chat.tamtam.bot.security;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import chat.tamtam.bot.controller.Endpoints;
 import chat.tamtam.bot.domain.SessionEntity;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.service.UserDetailsServiceImpl;
@@ -41,9 +45,20 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
             final HttpServletResponse response,
             final FilterChain chain
     ) throws IOException, ServletException {
-        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (header == null || !header.startsWith(TOKEN_PREFIX)) {
+        if (request.getCookies() != null) {
+            SessionEntity session = sessionRepository.findByToken(token);
+            Optional<Cookie> authCookie = Arrays.stream(request.getCookies())
+                    .filter(cookie -> cookie.getName().equals(SecurityConstants.COOKIE_AUTH))
+                    .findFirst();
+            if (session == null && authCookie.isPresent()) {
+                response.sendRedirect(Endpoints.API_LOGOUT);
+                return;
+            }
+        }
+
+        if (token == null || !token.startsWith(TOKEN_PREFIX)) {
             chain.doFilter(request, response);
             return;
         }

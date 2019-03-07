@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
 
 import chat.tamtam.bot.configuration.swagger.SwaggerConfig;
 import chat.tamtam.bot.controller.Endpoints;
@@ -15,6 +16,7 @@ import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.repository.UserRepository;
 import chat.tamtam.bot.security.AuthenticationFilter;
 import chat.tamtam.bot.security.AuthorizationFilter;
+import chat.tamtam.bot.security.SecurityConstants;
 import chat.tamtam.bot.service.UserDetailsServiceImpl;
 import lombok.AllArgsConstructor;
 
@@ -29,16 +31,32 @@ public class RestSecurity extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable().authorizeRequests()
-                .antMatchers(HttpMethod.POST, Endpoints.API_REGISTRATION, Endpoints.API_LOGIN).permitAll()
+        http.cors()
+                .and()
+                .csrf()
+                .disable()
+                .authorizeRequests()
+                .antMatchers(HttpMethod.POST, Endpoints.API_REGISTRATION, Endpoints.API_LOGIN)
+                .permitAll()
                 .antMatchers(HttpMethod.GET, Endpoints.STATIC_INDEX, Endpoints.STATIC_RESOURCES, Endpoints.HEALTH)
                 .permitAll()
-                .antMatchers(SwaggerConfig.SWAGGER_URLS).permitAll()
-                .anyRequest().authenticated()
+                .antMatchers(SwaggerConfig.SWAGGER_URLS)
+                .permitAll()
+                .anyRequest()
+                .authenticated()
+                .and()
+                .logout()
+                .addLogoutHandler(new CookieClearingLogoutHandler(
+                        SecurityConstants.COOKIE_AUTH,
+                        SecurityConstants.COOKIE_USER_ID
+                ))
+                .logoutSuccessUrl(Endpoints.STATIC_INDEX)
+                .logoutUrl(Endpoints.API_LOGOUT)
                 .and()
                 .addFilter(jwtAuthenticationFilter())
                 .addFilter(jwtAuthorizationFilter())
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Override

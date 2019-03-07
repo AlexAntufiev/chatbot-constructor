@@ -40,6 +40,7 @@ export class LoginDialog extends BaseDialog {
                 const cookies = new Cookies();
                 cookies.set(AUTHORIZATION, response.headers[AUTHORIZATION]);
                 cookies.set(USER_ID, response.data.userId);
+                axios.defaults.headers.common[AUTHORIZATION] = response.headers[AUTHORIZATION];
                 this.props.setUser(response.data.userId);
                 this.onHide();
             })

@@ -4,6 +4,11 @@ import {injectIntl} from 'react-intl';
 import RegisterDialog from 'app/components/registerDialog';
 import LoginDialog from 'app/components/loginDialog';
 import {Button} from 'primereact/button';
+import {LOGOUT} from "app/constants/apiPoints";
+import axios from "axios";
+import setUserInfo from "app/actions/userInfo";
+import {Cookies} from "react-cookie";
+import {AUTHORIZATION, USER_ID} from "app/constants/cookies";
 
 class AuthPanel extends React.Component {
     constructor(props) {
@@ -12,6 +17,7 @@ class AuthPanel extends React.Component {
         this.loginDialog = React.createRef();
         this.onShowRegistrationDialog = this.onShowRegistrationDialog.bind(this);
         this.onShowLoginDialog = this.onShowLoginDialog.bind(this);
+        this.onLogout = this.onLogout.bind(this);
     }
 
     onShowRegistrationDialog() {
@@ -22,12 +28,23 @@ class AuthPanel extends React.Component {
         this.loginDialog.current.getWrappedInstance().getWrappedInstance().onShow();
     }
 
+    onLogout() {
+        axios.post(LOGOUT).then(() => {
+            const cookies = new Cookies();
+            cookies.remove(AUTHORIZATION);
+            cookies.remove(USER_ID);
+
+            this.props.setUser(null);
+        });
+    }
+
     render() {
         const {intl} = this.props;
         if (this.props.isLogin) {
             return (
                 <span>
                 <Button label={intl.formatMessage({id: 'app.menu.logout'})} icon="pi pi-power-off"
+                        onClick={this.onLogout}
                         style={{marginRight: 12}}/>
             </span>
             );
@@ -45,6 +62,10 @@ class AuthPanel extends React.Component {
         }
     }
 }
+const mapDispatchToProps = dispatch => ({
+    setUser: userInfo => dispatch(setUserInfo(userInfo))
+});
+
 
 function mapStateToProps(state) {
     return {
@@ -53,4 +74,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(injectIntl(AuthPanel));
+export default connect(mapStateToProps, mapDispatchToProps)(injectIntl(AuthPanel));
