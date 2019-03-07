@@ -1,15 +1,16 @@
 package chat.tamtam.bot;
 
-import chat.tamtam.bot.configuration.Profiles;
-import chat.tamtam.bot.domain.UserAuthEntity;
-import chat.tamtam.bot.service.UserService;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+
+import chat.tamtam.bot.configuration.Profiles;
+import chat.tamtam.bot.domain.UserAuthEntity;
+import chat.tamtam.bot.service.UserService;
+import lombok.AllArgsConstructor;
 
 @SpringBootApplication
 @AllArgsConstructor

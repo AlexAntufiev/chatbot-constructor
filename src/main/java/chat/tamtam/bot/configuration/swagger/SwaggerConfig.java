@@ -1,9 +1,10 @@
 package chat.tamtam.bot.configuration.swagger;
 
-import chat.tamtam.bot.configuration.Profiles;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+
+import chat.tamtam.bot.configuration.Profiles;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
