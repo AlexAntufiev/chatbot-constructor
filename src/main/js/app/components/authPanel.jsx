@@ -19,7 +19,7 @@ class AuthPanel extends React.Component {
     }
 
     onShowLoginDialog() {
-        this.loginDialog.current.getWrappedInstance().onShow();
+        this.loginDialog.current.getWrappedInstance().getWrappedInstance().onShow();
     }
 
     render() {

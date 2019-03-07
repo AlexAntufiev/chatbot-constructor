@@ -42,15 +42,15 @@ class RegisterDialog extends BaseDialog {
         } else {
             axios
                 .post(REGISTRATION, {login: this.state.username, password: this.state.password})
-                .then(function (response) {
+                .then(response => {
                     if (response.status === 200) {
                         //todo authorize user after sign up
+                        this.onHide();
                     }
                 })
-                .catch(function (error) {
+                .catch(error => {
                     //todo catch and process
                 });
-            this.onHide();
         }
     }
 

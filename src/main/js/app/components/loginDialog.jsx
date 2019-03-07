@@ -11,6 +11,7 @@ import {apiLogin} from "../constants/routes";
 import {AUTHORIZATION, USER_ID} from "../constants/cookies";
 import {LOGIN} from "../constants/apiPoints";
 import {Cookies} from "react-cookie";
+import {connect} from "react-redux";
 import setUserInfo from "../actions/userInfo";
 
 export class LoginDialog extends BaseDialog {
@@ -34,20 +35,18 @@ export class LoginDialog extends BaseDialog {
                 detail: intl.formatMessage({id: 'app.errormessage.fillallfields'})
             });
         }
-        let userInfo;
         axios
             .post(LOGIN, {login: this.state.username, password: this.state.password})
-            .then(function (response) {
+            .then(response => {
                 const cookies = new Cookies();
                 cookies.set(AUTHORIZATION, response.headers[AUTHORIZATION]);
                 cookies.set(USER_ID, response.data.userId);
-                userInfo = response.data;
-                //todo change user info state to
+                this.props.setUser(response.data);
+                this.onHide();
             })
-            .catch(function (error) {
+            .catch(error => {
                 //todo catch and process
             });
-        this.onHide();
     }
 
     render() {
@@ -91,4 +90,8 @@ const mapDispatchToProps = dispatch => ({
     setUser: userInfo => dispatch(setUserInfo(userInfo))
 });
 
-export default injectIntl(LoginDialog, {withRef: true});
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps,
+    null,
+    {withRef: true})(injectIntl(LoginDialog, {withRef: true}));
