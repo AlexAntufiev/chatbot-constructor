@@ -7,9 +7,8 @@ import {Password} from 'primereact/password';
 import {Growl} from 'primereact/growl';
 import {BaseDialog} from 'app/components/baseDialog';
 import {FormattedMessage, injectIntl} from 'react-intl';
-import {apiLogin} from "../constants/routes";
-import {AUTHORIZATION, USER_ID} from "../constants/cookies";
-import {LOGIN} from "../constants/apiPoints";
+import {AUTHORIZATION, USER_ID} from "app/constants/cookies";
+import {LOGIN} from "app/constants/apiPoints";
 import {Cookies} from "react-cookie";
 import {connect} from "react-redux";
 import setUserInfo from "../actions/userInfo";
@@ -41,7 +40,7 @@ export class LoginDialog extends BaseDialog {
                 const cookies = new Cookies();
                 cookies.set(AUTHORIZATION, response.headers[AUTHORIZATION]);
                 cookies.set(USER_ID, response.data.userId);
-                this.props.setUser(response.data);
+                this.props.setUser(response.data.userId);
                 this.onHide();
             })
             .catch(error => {

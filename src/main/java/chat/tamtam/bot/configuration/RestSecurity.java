@@ -1,14 +1,5 @@
 package chat.tamtam.bot.configuration;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 import chat.tamtam.bot.configuration.swagger.SwaggerConfig;
 import chat.tamtam.bot.controller.Endpoints;
 import chat.tamtam.bot.repository.SessionRepository;
@@ -17,6 +8,14 @@ import chat.tamtam.bot.security.AuthenticationFilter;
 import chat.tamtam.bot.security.AuthorizationFilter;
 import chat.tamtam.bot.service.UserDetailsServiceImpl;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
@@ -33,7 +32,7 @@ public class RestSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, Endpoints.API_REGISTRATION, Endpoints.API_LOGIN).permitAll()
                 .antMatchers(HttpMethod.GET, Endpoints.STATIC_INDEX, Endpoints.STATIC_RESOURCES, Endpoints.HEALTH)
                 .permitAll()
-                .antMatchers(SwaggerConfig.swaggerUrls).permitAll()
+                .antMatchers(SwaggerConfig.SWAGGER_URL).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(jwtAuthenticationFilter())

@@ -79,13 +79,9 @@ public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
         UserEntity user = userRepository.findByLogin(principal.getUsername());
         sessionRepository.save(new SessionEntity(token, user.getId(), user.getLogin(), expireDate));
         response.addHeader(HttpHeaders.AUTHORIZATION, token);
-        try {
-            response
-                    .getWriter()
-                    .write(new ObjectMapper()
-                                    .writeValueAsString(new UserAuthorizedEntity(user.getId())));
-        } catch (IOException iOE) {
-            throw iOE;
-        }
+        response
+                .getWriter()
+                .write(new ObjectMapper()
+                        .writeValueAsString(new UserAuthorizedEntity(user.getId())));
     }
 }

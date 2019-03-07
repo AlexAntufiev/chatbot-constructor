@@ -7,8 +7,7 @@ import {Password} from 'primereact/password';
 import {Growl} from 'primereact/growl';
 import {BaseDialog} from 'app/components/baseDialog';
 import {FormattedMessage, injectIntl} from 'react-intl';
-import {apiRegistration} from "../constants/routes";
-import {REGISTRATION} from "../constants/apiPoints";
+import {REGISTRATION} from "app/constants/apiPoints";
 
 class RegisterDialog extends BaseDialog {
 
