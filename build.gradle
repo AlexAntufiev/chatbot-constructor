@@ -53,10 +53,15 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-engine:5.4.0"
 }
 
+task updateNpmDependences(type: NpmTask) {
+    args = ['install']
+}
+
 task webpack(type: NpmTask) {
     args = ['run', 'build']
 }
 
+webpack.dependsOn 'updateNpmDependences'
 processResources.dependsOn 'webpack'
 
 bootRun.dependsOn build

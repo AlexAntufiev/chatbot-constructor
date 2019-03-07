@@ -32,7 +32,7 @@ public class RestSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, Endpoints.API_REGISTRATION, Endpoints.API_LOGIN).permitAll()
                 .antMatchers(HttpMethod.GET, Endpoints.STATIC_INDEX, Endpoints.STATIC_RESOURCES, Endpoints.HEALTH)
                 .permitAll()
-                .antMatchers(SwaggerConfig.SWAGGER_URL).permitAll()
+                .antMatchers(SwaggerConfig.SWAGGER_URLS).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(jwtAuthenticationFilter())

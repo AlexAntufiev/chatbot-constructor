@@ -15,7 +15,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfig {
 
-    public static final String[] SWAGGER_URL = {
+    public static final String[] SWAGGER_URLS = {
             "/v2/api-docs",
             "/configuration/ui",
             "/configuration/security",

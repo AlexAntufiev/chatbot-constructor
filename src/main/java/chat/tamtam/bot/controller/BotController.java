@@ -25,7 +25,8 @@ import java.util.NoSuchElementException;
 @AllArgsConstructor
 @RequestMapping(path = Endpoints.API_BOT,
         consumes = MediaType.APPLICATION_JSON_VALUE,
-        produces = MediaType.APPLICATION_JSON_VALUE)
+        produces = MediaType.APPLICATION_JSON_VALUE
+)
 public class BotController {
     private final UserService userService;
     private final BotService botService;
