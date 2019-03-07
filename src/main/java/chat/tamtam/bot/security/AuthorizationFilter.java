@@ -1,13 +1,13 @@
 package chat.tamtam.bot.security;
 
-import chat.tamtam.bot.domain.SessionEntity;
-import chat.tamtam.bot.domain.UserAuthEntity;
-import chat.tamtam.bot.domain.UserAuthorizedEntity;
-import chat.tamtam.bot.domain.UserEntity;
-import chat.tamtam.bot.repository.SessionRepository;
-import chat.tamtam.bot.repository.UserRepository;
-import com.auth0.jwt.JWT;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Date;
+
+import javax.servlet.FilterChain;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,12 +16,15 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Date;
+import com.auth0.jwt.JWT;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import chat.tamtam.bot.domain.SessionEntity;
+import chat.tamtam.bot.domain.UserAuthEntity;
+import chat.tamtam.bot.domain.UserAuthorizedEntity;
+import chat.tamtam.bot.domain.UserEntity;
+import chat.tamtam.bot.repository.SessionRepository;
+import chat.tamtam.bot.repository.UserRepository;
 
 import static chat.tamtam.bot.security.SecurityConstants.EXPIRATION_TIME;
 import static chat.tamtam.bot.security.SecurityConstants.SECRET;

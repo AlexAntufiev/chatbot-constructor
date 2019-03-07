@@ -11,7 +11,7 @@ import {AUTHORIZATION, USER_ID} from "app/constants/cookies";
 import {LOGIN} from "app/constants/apiPoints";
 import {Cookies} from "react-cookie";
 import {connect} from "react-redux";
-import setUserInfo from "../actions/userInfo";
+import setUserInfo from "app/actions/userInfo";
 
 export class LoginDialog extends BaseDialog {
     constructor(props) {
