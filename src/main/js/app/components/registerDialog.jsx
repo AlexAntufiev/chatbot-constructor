@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import {Button} from 'primereact/button';
 import {Dialog} from 'primereact/dialog';
 import {InputText} from 'primereact/inputtext';
@@ -6,6 +7,7 @@ import {Password} from 'primereact/password';
 import {Growl} from 'primereact/growl';
 import {BaseDialog} from 'app/components/baseDialog';
 import {FormattedMessage, injectIntl} from 'react-intl';
+import {REGISTRATION} from "app/constants/apiPoints";
 
 class RegisterDialog extends BaseDialog {
 
@@ -37,8 +39,13 @@ class RegisterDialog extends BaseDialog {
                 detail: intl.formatMessage({id: 'app.errormessage.passwordnotmatch'})
             });
         } else {
-            //TODO: POST request /register
-            this.onHide();
+            axios
+                .post(REGISTRATION, {login: this.state.username, password: this.state.password})
+                .then(response => {
+                    if (response.status === 200) {
+                        this.onHide();
+                    }
+                })
         }
     }
 

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import chat.tamtam.bot.domain.SessionEntity;
 import chat.tamtam.bot.domain.UserAuthEntity;
+import chat.tamtam.bot.domain.UserAuthorizedEntity;
 import chat.tamtam.bot.domain.UserEntity;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.repository.UserRepository;
@@ -71,7 +72,7 @@ public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
             final HttpServletResponse response,
             final FilterChain chain,
             final Authentication authResult
-    ) {
+    ) throws IOException {
         Date expireDate = new Date(System.currentTimeMillis() + EXPIRATION_TIME);
         User principal = (User) authResult.getPrincipal();
         String token = TOKEN_PREFIX + JWT.create()
@@ -81,5 +82,9 @@ public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
         UserEntity user = userRepository.findByLogin(principal.getUsername());
         sessionRepository.save(new SessionEntity(token, user.getId(), user.getLogin(), expireDate));
         response.addHeader(HttpHeaders.AUTHORIZATION, token);
+        response
+                .getWriter()
+                .write(new ObjectMapper()
+                        .writeValueAsString(new UserAuthorizedEntity(user.getId())));
     }
 }
