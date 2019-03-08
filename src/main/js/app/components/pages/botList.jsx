@@ -17,11 +17,14 @@ class BotList extends React.Component {
         this.state = {bots: []};
         this.onAddBot = this.onAddBot.bind(this);
         this.refreshBotList = this.refreshBotList.bind(this);
+        this.createBotList = this.createBotList.bind(this);
     }
 
     refreshBotList() {
         axios.get(ApiPoints.BOT_LIST).then(res => {
-            this.setState({bots: res.data});
+            if (res.status === 200) {
+                this.setState({bots: res.data});
+            }
         }).catch(() => {
             AxiosMessages.serverNotResponse(this);
         });
@@ -51,6 +54,10 @@ class BotList extends React.Component {
     createBotList() {
         const {intl} = this.props;
         const self = this;
+        if (!Array.isArray(this.state.bots)) {
+            return null;
+        }
+
         return this.state.bots.map((bot) => {
             function removeBot() {
                 if (confirm(intl.formatMessage({id: 'app.dialog.checksure'}))) {

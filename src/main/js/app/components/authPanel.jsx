@@ -34,7 +34,10 @@ class AuthPanel extends React.Component {
             cookies.remove(AUTHORIZATION);
             cookies.remove(USER_ID);
 
-            this.props.setUser(null);
+            this.props.setUser({
+                userId: null,
+                token: null
+            });
         });
     }
 
@@ -62,6 +65,7 @@ class AuthPanel extends React.Component {
         }
     }
 }
+
 const mapDispatchToProps = dispatch => ({
     setUser: userInfo => dispatch(setUserInfo(userInfo))
 });

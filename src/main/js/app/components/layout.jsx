@@ -7,27 +7,28 @@ import Locale from 'app/components/locale';
 import {Menubar} from 'primereact/menubar';
 import {injectIntl} from 'react-intl';
 import {Cookies} from "react-cookie";
-import {AUTHORIZATION} from "app/constants/cookies";
-import axios from 'axios';
+import {AUTHORIZATION, USER_ID} from "app/constants/cookies";
+import setUserInfo from "app/actions/userInfo";
 
 class IndexLayout extends Component {
     constructor(props) {
         super(props);
-    }
 
-    componentDidMount() {
         const cookies = new Cookies();
-        axios.defaults.headers.common[AUTHORIZATION] = cookies.get(AUTHORIZATION);
+        this.props.setUser({
+            userId: cookies.get(USER_ID),
+            token: cookies.get(AUTHORIZATION)
+        });
     }
 
     render() {
         const {intl} = this.props;
 
         let menuItems = [{
-                label: intl.formatMessage({id: 'app.menu.home'}),
-                command: (event) => {
-                    this.props.history.push(routers.index())
-                }
+            label: intl.formatMessage({id: 'app.menu.home'}),
+            command: (event) => {
+                this.props.history.push(routers.index())
+            }
         }];
         if (this.props.isLogin) {
             menuItems.push({
@@ -55,11 +56,16 @@ class IndexLayout extends Component {
     }
 }
 
+const mapDispatchToProps = dispatch => ({
+    setUser: userInfo => dispatch(setUserInfo(userInfo))
+});
+
 function mapStateToProps(state) {
     return {
-        userId: state.userInfo.userId,
+        locale: state.locale.locale,
+        userInfo: state.userInfo,
         isLogin: state.userInfo.userId != null
     };
 }
 
-export default connect(mapStateToProps)(injectIntl(IndexLayout));
+export default connect(mapStateToProps, mapDispatchToProps)(injectIntl(IndexLayout));

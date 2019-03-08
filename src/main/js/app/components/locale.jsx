@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from "react-redux";
 import {SelectButton} from 'primereact/selectbutton';
 import setLocale from 'app/actions/locale'
+import {AUTHORIZATION} from "app/constants/cookies";
 
 class Locale extends React.Component {
     constructor(props) {

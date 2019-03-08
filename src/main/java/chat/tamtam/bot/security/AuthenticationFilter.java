@@ -47,6 +47,11 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
     ) throws IOException, ServletException {
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
 
+        if (token == null || !token.startsWith(TOKEN_PREFIX)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         if (request.getCookies() != null) {
             SessionEntity session = sessionRepository.findByToken(token);
             Optional<Cookie> authCookie = Arrays.stream(request.getCookies())
@@ -56,11 +61,6 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
                 response.sendRedirect(Endpoints.API_LOGOUT);
                 return;
             }
-        }
-
-        if (token == null || !token.startsWith(TOKEN_PREFIX)) {
-            chain.doFilter(request, response);
-            return;
         }
 
         UsernamePasswordAuthenticationToken authentication = getAuthentication(request);

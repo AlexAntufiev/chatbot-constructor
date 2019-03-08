@@ -9,7 +9,6 @@ import {BaseDialog} from 'app/components/baseDialog';
 import {FormattedMessage, injectIntl} from 'react-intl';
 import {AUTHORIZATION, USER_ID} from "app/constants/cookies";
 import {LOGIN} from "app/constants/apiPoints";
-import {Cookies} from "react-cookie";
 import {connect} from "react-redux";
 import setUserInfo from "app/actions/userInfo";
 
@@ -37,11 +36,10 @@ export class LoginDialog extends BaseDialog {
         axios
             .post(LOGIN, {login: this.state.username, password: this.state.password})
             .then(response => {
-                const cookies = new Cookies();
-                cookies.set(AUTHORIZATION, response.headers[AUTHORIZATION]);
-                cookies.set(USER_ID, response.data.userId);
-                axios.defaults.headers.common[AUTHORIZATION] = response.headers[AUTHORIZATION];
-                this.props.setUser(response.data.userId);
+                this.props.setUser({
+                    userId: response.data.userId,
+                    token: response.headers[AUTHORIZATION]
+                });
                 this.onHide();
             })
     }
