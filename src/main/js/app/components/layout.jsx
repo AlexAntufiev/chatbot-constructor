@@ -43,7 +43,7 @@ class IndexLayout extends Component {
             <div>
                 <div>
                     <Menubar model={menuItems}>
-                        <div style={{display: 'flex'}}>
+                        <div className="p-grid auth-locale-panel">
                             <AuthPanel/>
                             <Locale/>
                         </div>

@@ -18,11 +18,11 @@ class BotDetail extends React.Component {
             return (<Redirect to='/'/>);
         }
         return (
-            <div className="p-grid p-align-start p-align-stretch" style={{marginTop: '6px', flexWrap: 'nowrap'}}>
-                <div className="p-col" style={{flexBasis: '15%'}}>
+            <div className="p-grid p-align-start bot-detail-page">
+                <div className="p-col left-container">
                     <div className="box"><LeftMenu id={this.props.match.params.id} history={this.props.history}/></div>
                 </div>
-                <div className="p-col" style={{flexBasis: '60%'}}>
+                <div className="p-col central-container">
                     <div className="box">
                         <Switch>
                             <Route path={routes.botSettings()} component={BotSettings}/>
@@ -32,7 +32,7 @@ class BotDetail extends React.Component {
                         </Switch>
                     </div>
                 </div>
-                <div className="p-col" style={{flexBasis: '15%'}}>
+                <div className="p-col right-container">
                     <div className="box"></div>
                 </div>
             </div>

@@ -76,19 +76,18 @@ class BotList extends React.Component {
             );
 
             const footer = (
-                <span>
+                <span className="p-grid p-justify-between">
                     <Button label={intl.formatMessage({id: 'app.bot.edit'})} icon="pi pi-pencil"
                             onClick={() => this.props.history.push(routers.botList() + String(bot.id) + "/")}
-                            style={{marginRight: '6px'}}/>
+                            className={"p-col"}/>
                     <Button label={intl.formatMessage({id: 'app.bot.remove'})} icon="pi pi-times" onClick={removeBot}
-                            className="p-button-secondary"/>
+                            className={"p-col p-button-secondary"}/>
                 </span>
             );
 
             return (
                 <Card title={bot.name}
-                      style={{width: '280px', margin: '14px', overflow: 'hidden'}}
-                      className="ui-card-shadow" footer={footer} header={header}>
+                      className="ui-card-shadow bot_card p-col" footer={footer} header={header}>
                     <div>{bot.description}</div>
                 </Card>
             );
@@ -103,11 +102,10 @@ class BotList extends React.Component {
         const bots = this.createBotList();
 
         return (
-            <div style={{display: 'flex', flexFlow: 'row wrap'}}>
+            <div className={'p-grid'}>
                 <Growl ref={(el) => this.growl = el}/>
                 {bots}
-                <Button className="p-button-rounded" icon='pi pi-plus' label='' onClick={this.onAddBot}
-                        style={{position: 'absolute', right: '16px', bottom: '16px', width: '70px', height: '70px'}}/>
+                <Button className="p-button-rounded add-bot-button" icon='pi pi-plus' label='' onClick={this.onAddBot}/>
             </div>
         );
     }
