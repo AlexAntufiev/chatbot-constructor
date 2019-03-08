@@ -45,22 +45,20 @@ class AuthPanel extends React.Component {
         const {intl} = this.props;
         if (this.props.isLogin) {
             return (
-                <span>
-                <Button label={intl.formatMessage({id: 'app.menu.logout'})} icon="pi pi-power-off"
-                        onClick={this.onLogout}
-                        style={{marginRight: 12}}/>
-            </span>
+                <span className="auth-panel">
+                    <Button label={intl.formatMessage({id: 'app.menu.logout'})} icon="pi pi-power-off"
+                        onClick={this.onLogout}/>
+                </span>
             );
         } else {
             return (
-                <span>
-                <RegisterDialog ref={this.registrationDialog}/>
-                <LoginDialog ref={this.loginDialog}/>
-                <Button label={intl.formatMessage({id: 'app.menu.signin'})} onClick={this.onShowLoginDialog}
-                        style={{marginRight: 4}}/>
-                <Button label={intl.formatMessage({id: 'app.menu.signup'})} onClick={this.onShowRegistrationDialog}
-                        style={{marginRight: 12}}/>
-            </span>
+                <span className="auth-panel">
+                    <Button label={intl.formatMessage({id: 'app.menu.signin'})} onClick={this.onShowLoginDialog}/>
+                    <Button label={intl.formatMessage({id: 'app.menu.signup'})}
+                            onClick={this.onShowRegistrationDialog}/>
+                    <RegisterDialog ref={this.registrationDialog}/>
+                    <LoginDialog ref={this.loginDialog}/>
+                </span>
             );
         }
     }

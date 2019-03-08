@@ -58,15 +58,15 @@ export class LoginDialog extends BaseDialog {
         return (
             <div>
                 <Growl ref={(el) => this.growl = el}/>
-                <Dialog closable={false} footer={footer} visible={this.state.visible} style={{width: '300px'}}
+                <Dialog closable={false} footer={footer} visible={this.state.visible} className="dialog"
                         modal={true} onHide={this.onHide}>
-                <span className="p-float-label" style={{marginTop: '20px'}}>
+                <span className="p-float-label">
                     <InputText id="login-username" value={this.state.username}
                                onChange={(e) => this.setState({username: e.target.value})}
                                style={{overflow: 'hidden'}}/>
                     <label htmlFor="login-username"><FormattedMessage id='app.dialog.username'/></label>
                 </span>
-                    <span className="p-float-label" style={{marginTop: '20px'}}>
+                    <span className="p-float-label">
                     <Password id="login-password" feedback={false} value={this.state.password}
                               onChange={(e) => this.setState({password: e.target.value})}/>
                     <label htmlFor="login-password"><FormattedMessage id='app.dialog.password'/></label>

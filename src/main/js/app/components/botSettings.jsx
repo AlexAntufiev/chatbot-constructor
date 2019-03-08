@@ -76,20 +76,20 @@ class BotSettings extends Component {
     render() {
         const {intl} = this.props;
         return (
-            <div style={{marginTop: '6px'}}>
+            <div className="bot-settings-container">
                 <Growl ref={(el) => this.growl = el}/>
                 <span className="p-float-label">
                     <InputText id="in" value={this.state.name} onChange={(e) => this.setState({name: e.target.value})}/>
                     <label htmlFor="in"><FormattedMessage id='app.dialog.name'/></label>
                 </span>
-                <span className="p-float-label" style={{marginTop: '18px'}}>
+                <span className="p-float-label">
                     <InputText id="in" value={this.state.token}
                                onChange={(e) => this.setState({token: e.target.value})}/>
                     <label htmlFor="in"><FormattedMessage id='app.dialog.token'/></label>
                 </span>
-                <div style={{marginTop: '12px'}}>
+                <div className="bot-settings-container_form-buttons">
                     <Button label={intl.formatMessage({id: 'app.dialog.save'})} icon="pi pi-check"
-                            style={{marginRight: '6px'}} onClick={this.onSaveBot}/>
+                            onClick={this.onSaveBot}/>
                     <Button label={intl.formatMessage({id: 'app.dialog.cancel'})} icon="pi pi-times"
                             onClick={this.onResetBot}/>
                 </div>

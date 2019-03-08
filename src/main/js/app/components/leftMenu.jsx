@@ -43,7 +43,7 @@ class LeftMenu extends Component {
     render() {
 
         return (
-            <Menu model={this.state.items} style={{minHeight: '70vh'}}/>
+            <Menu model={this.state.items} className="left-menu"/>
         );
     }
 }
