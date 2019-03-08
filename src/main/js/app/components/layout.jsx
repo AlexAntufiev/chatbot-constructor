@@ -6,41 +6,43 @@ import AuthPanel from 'app/components/authPanel';
 import Locale from 'app/components/locale';
 import {Menubar} from 'primereact/menubar';
 import {injectIntl} from 'react-intl';
+import {Cookies} from "react-cookie";
+import {AUTHORIZATION, USER_ID} from "app/constants/cookies";
+import setUserInfo from "app/actions/userInfo";
 
 class IndexLayout extends Component {
     constructor(props) {
         super(props);
 
-        const {intl} = this.props;
-        this.state = {
-            items: [
-                {
-                    label: intl.formatMessage({id: 'app.menu.home'}),
-                    command: (event) => {
-                        this.props.history.push(routers.index())
-                    }
-                }
-            ]
-        };
-
-        if (this.props.isLogin) {
-            this.state.items.push(
-                {
-                    label: intl.formatMessage({id: 'app.menu.botlist'}),
-                    command: (event) => {
-                        this.props.history.push(routers.botList())
-                    }
-                });
-        }
+        const cookies = new Cookies();
+        this.props.setUser({
+            userId: cookies.get(USER_ID),
+            token: cookies.get(AUTHORIZATION)
+        });
     }
 
     render() {
         const {intl} = this.props;
 
+        let menuItems = [{
+            label: intl.formatMessage({id: 'app.menu.home'}),
+            command: (event) => {
+                this.props.history.push(routers.index())
+            }
+        }];
+        if (this.props.isLogin) {
+            menuItems.push({
+                label: intl.formatMessage({id: 'app.menu.botlist'}),
+                command: (event) => {
+                    this.props.history.push(routers.botList())
+                }
+            });
+        }
+
         return (
             <div>
                 <div>
-                    <Menubar model={this.state.items}>
+                    <Menubar model={menuItems}>
                         <div style={{display: 'flex'}}>
                             <AuthPanel/>
                             <Locale/>
@@ -54,11 +56,16 @@ class IndexLayout extends Component {
     }
 }
 
+const mapDispatchToProps = dispatch => ({
+    setUser: userInfo => dispatch(setUserInfo(userInfo))
+});
+
 function mapStateToProps(state) {
     return {
-        userId: state.userInfo.userId,
+        locale: state.locale.locale,
+        userInfo: state.userInfo,
         isLogin: state.userInfo.userId != null
     };
 }
 
-export default connect(mapStateToProps)(injectIntl(IndexLayout));
+export default connect(mapStateToProps, mapDispatchToProps)(injectIntl(IndexLayout));

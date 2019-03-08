@@ -74,10 +74,7 @@ class RegisterDialog extends BaseDialog {
                     <span className="p-float-label" style={{marginTop: '20px'}}>
                     <Password id="register-password" value={this.state.password}
                               onChange={(e) => this.setState({password: e.target.value})}
-                              weakLabel={intl.formatMessage({id: 'app.dialog.password.weak'})}
-                              mediumLabel={intl.formatMessage({id: 'app.dialog.password.medium'})}
-                              strongLabel={intl.formatMessage({id: 'app.dialog.password.strong'})}
-                              promptLabel={intl.formatMessage({id: 'app.dialog.password.enter'})}/>
+                              feedback={false}/>
                     <label htmlFor="register-password"><FormattedMessage id='app.dialog.password'/></label>
                 </span>
                     <span className="p-float-label" style={{marginTop: '20px'}}>

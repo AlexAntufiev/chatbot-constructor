@@ -2,6 +2,7 @@ package chat.tamtam.bot.controller;
 
 public interface Endpoints {
     String API_LOGIN = "/api/login";
+    String API_LOGOUT = "/api/logout";
     String API_REGISTRATION = "/api/registration";
     String API_BOT = "/api/bot";
     String ID = "/{id}";
