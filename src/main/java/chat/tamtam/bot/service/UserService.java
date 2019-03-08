@@ -21,7 +21,7 @@ public class UserService {
         if (!userRepository.findUserEntitiesByLogin(login).isEmpty()) {
             return false;
         }
-        //todo expand filters
+        // @todo #CC-4 expand filters on addUser action
         String password = userAuthEntity.getPassword();
         if (login.isEmpty() || password.isEmpty()) {
             return false;

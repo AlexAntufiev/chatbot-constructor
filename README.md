@@ -1,3 +1,5 @@
+[![PDD status](http://www.0pdd.com/svg?name=nms403/chatbot-constructor)](http://www.0pdd.com/p?name=nms403/chatbot-constructor)
+
 # START PROJECT
 
 ## Install Java 11

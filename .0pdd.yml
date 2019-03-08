@@ -1,0 +1,11 @@
+errors:
+  - nechaev.m.s@yandex.ru
+alerts:
+  github:
+    - nms403
+format:
+  - short-title
+  - title-length=100
+tags:
+  - pdd
+  - bug
