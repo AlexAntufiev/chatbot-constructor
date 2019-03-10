@@ -13,7 +13,7 @@ import chat.tamtam.bot.domain.BotSchemaEntity;
 public interface BotSchemaRepository extends CrudRepository<BotSchemaEntity, Integer> {
     List<BotSchemaEntity> findAllByUserId(Integer userId);
 
-    BotSchemaEntity findByUserIdAndId(Integer userId, Integer id);
+    BotSchemaEntity findByUserIdAndId(Integer userId, int id);
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
     void deleteByUserIdAndId(Integer userId, Integer id);

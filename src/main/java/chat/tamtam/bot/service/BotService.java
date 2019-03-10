@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class BotService {
     private final BotSchemaRepository botSchemaRepository;
+    private final UserService userService;
 
     public BotSchemaEntity addBot(final BotSchemaEntity bot, Integer userId) throws IllegalArgumentException {
         if (bot.getName().isEmpty() || bot.getId() != null) {
@@ -35,7 +36,8 @@ public class BotService {
         return botSchemaRepository.save(bot);
     }
 
-    public BotSchemaEntity getByUserIdAndId(Integer userId, Integer id) throws NoSuchElementException {
+    public BotSchemaEntity getBot(String authToken, int id) throws NoSuchElementException {
+        Integer userId = userService.getUserIdByToken(authToken);
         BotSchemaEntity bot = botSchemaRepository.findByUserIdAndId(userId, id);
         if (bot == null) {
             throw new NoSuchElementException("Does not exist bot with userId=" + userId + " and id=" + id);

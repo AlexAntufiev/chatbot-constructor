@@ -41,17 +41,14 @@ public class BotController {
     }
 
     @GetMapping(path = Endpoints.ID, consumes = MediaType.ALL_VALUE)
-    public ResponseEntity<?> getBotInfo(
-            @PathVariable final Integer id,
+    public ResponseEntity<?> getBot(
+            @PathVariable final int id,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
     ) {
         try {
-            return new ResponseEntity<>(
-                    botService.getByUserIdAndId(userService.getUserIdByToken(authToken), id),
-                    HttpStatus.OK
-            );
+            return new ResponseEntity<>(botService.getBot(authToken, id), HttpStatus.OK);
         } catch (NoSuchElementException e) {
-            log.error("getBotInfo {}", e.getMessage());
+            log.error(String.format("Get bot failed^ %s", e.getMessage()), e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
