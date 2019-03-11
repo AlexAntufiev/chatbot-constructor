@@ -17,4 +17,6 @@ public interface Endpoints {
     String STATIC_RESOURCES = "/assets/**";
 
     String HEALTH = "/actuator/health";
+
+    String TAM_BOT_WEBHOOK = "/tam/bot/{id}";
 }
