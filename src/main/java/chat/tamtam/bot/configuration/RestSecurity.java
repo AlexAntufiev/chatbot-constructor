@@ -47,6 +47,10 @@ public class RestSecurity extends WebSecurityConfigurerAdapter {
                 .anyRequest()
                 .authenticated()
                 .and()
+                .formLogin()
+                .loginPage(Endpoints.STATIC_INDEX)
+                .failureForwardUrl(Endpoints.STATIC_INDEX)
+                .and()
                 .logout()
                 .addLogoutHandler(new CookieClearingLogoutHandler(
                         SecurityConstants.COOKIE_AUTH,

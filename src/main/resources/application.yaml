@@ -6,9 +6,6 @@ spring:
     generate-ddl: true
     hibernate:
       ddl-auto: update
-  data:
-    rest:
-      base-path: /api
   servlet:
     multipart:
       max-file-size: 100MB

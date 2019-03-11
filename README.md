@@ -36,6 +36,12 @@ Add inspections:
 ## Run project
 `gradle bootRun`
 
+### Access to Chatbot Constructor
+
+## Main page
+
+[Main page]
+
 ## Swagger
 
 Set development profile in application.yml: `spring.profiles.active=development`
@@ -46,3 +52,4 @@ Set development profile in application.yml: `spring.profiles.active=development`
 [Node.js]: https://nodejs.org/en/download/
 [Download and install checkstyle plugin]: https://plugins.jetbrains.com/plugin/1065-checkstyle-idea
 [Access to swagger]: http://localhost:8090/swagger-ui.html
+[Main page]: http://localhost:8090
