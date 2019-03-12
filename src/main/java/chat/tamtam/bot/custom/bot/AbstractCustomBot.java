@@ -1,9 +1,9 @@
 package chat.tamtam.bot.custom.bot;
 
-import chat.tamtam.bot.domain.webhook.WebHookMessageEntity;
+import chat.tamtam.botapi.model.Message;
 
 public abstract class AbstractCustomBot {
-    public abstract void processMessage(WebHookMessageEntity message);
+    public abstract void processMessage(Message message);
 
     public abstract String getId();
 

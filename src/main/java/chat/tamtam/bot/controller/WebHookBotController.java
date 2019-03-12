@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import chat.tamtam.bot.domain.webhook.WebHookMessageEntity;
 import chat.tamtam.bot.service.WebHookBotService;
+import chat.tamtam.botapi.model.Message;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -25,15 +25,19 @@ import lombok.extern.log4j.Log4j2;
 public class WebHookBotController {
     private final WebHookBotService webHookBotService;
 
-    @PostMapping(Endpoints.TAM_BOT_ID)
+    @PostMapping(Endpoints.ID)
     public ResponseEntity<?> webHookMessage(
             @PathVariable final String id,
-            @RequestBody final WebHookMessageEntity message
+            @RequestBody final Message message
     ) {
         try {
             webHookBotService.submit(id, message);
         } catch (NoSuchElementException e) {
-            log.error("webHookMessage {}", e.getMessage());
+            log.error(String.format(
+                    "Webhook service can not submit message: [%s] to bot with id = [%s]",
+                    message,
+                    id
+            ), e.getMessage());
         } finally {
             return new ResponseEntity<>(HttpStatus.OK);
         }

@@ -52,11 +52,11 @@ Set development profile in application.yml: `spring.profiles.active=development`
 
 Download [ngrok]
 
-Start application in dev profile
+Start application in `development` profile
 
 `./ngrok http 8090`
 
-Make webhook subscription via [tamtam bot subscriptions] (https://{ngrok host}/tam/bot/581483330212)
+Make webhook subscription via [tamtam bot subscriptions] (`https://{ngrok_host}/tam/bot/581483330212`)
 
 Proceed to [reg bot]
 

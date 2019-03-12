@@ -42,7 +42,7 @@ public class RestSecurity extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers(SwaggerConfig.SWAGGER_URLS)
                 .permitAll()
-                .antMatchers(Endpoints.TAM_BOT_WEBHOOK + Endpoints.TAM_BOT_ID)
+                .antMatchers(HttpMethod.POST, Endpoints.TAM_BOT_WEBHOOK + Endpoints.ID)
                 .permitAll()
                 .anyRequest()
                 .authenticated()

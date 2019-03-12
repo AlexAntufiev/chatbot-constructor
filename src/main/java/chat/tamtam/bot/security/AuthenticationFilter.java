@@ -57,14 +57,15 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
             String accessToken = params[0];
             if (accessToken != null) {
                 SessionEntity session = sessionRepository.findByToken(accessToken);
-                if (session != null
-                        && session.getExpireDate().after(new Date(System.currentTimeMillis()))) {
-                    String token = TOKEN_PREFIX + JWT.create()
-                            .withExpiresAt(new Date(System.currentTimeMillis()))
-                            .sign(HMAC512(SECRET.getBytes()));
+                if (session != null && !session.isExpired()) {
+                    StringBuilder token = new StringBuilder()
+                            .append(TOKEN_PREFIX)
+                            .append(JWT.create()
+                                    .withExpiresAt(new Date(System.currentTimeMillis()))
+                                    .sign(HMAC512(SECRET.getBytes())));
                     SessionEntity newSession =
                             new SessionEntity(
-                                    token,
+                                    token.toString(),
                                     session.getUserId(),
                                     session.getLogin(),
                                     new Date(System.currentTimeMillis() + EXPIRATION_TIME)
@@ -72,7 +73,7 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
                     sessionRepository.save(newSession);
                     sessionRepository.removeByToken(accessToken);
                     response.addCookie(new Cookie(COOKIE_USER_ID, session.getUserId().toString()));
-                    response.addCookie(new Cookie(SecurityConstants.COOKIE_AUTH, token));
+                    response.addCookie(new Cookie(SecurityConstants.COOKIE_AUTH, token.toString()));
                     chain.doFilter(request, response);
                     return;
                 }
@@ -85,8 +86,7 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
                     .findFirst();
             if (authCookie.isPresent()) {
                 SessionEntity session = sessionRepository.findByToken(authCookie.get().getValue());
-                if (session == null
-                        || session.getExpireDate().before(new Date(System.currentTimeMillis()))) {
+                if (session == null || session.isExpired()) {
                     response.sendRedirect(Endpoints.API_LOGOUT);
                     return;
                 }
@@ -107,7 +107,7 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
         if (session == null) {
             return null;
         }
-        if (session.getExpireDate().before(new Date(System.currentTimeMillis()))) {
+        if (session.isExpired()) {
             sessionRepository.removeByToken(token);
             return null;
         }

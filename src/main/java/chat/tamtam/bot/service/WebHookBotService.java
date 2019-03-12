@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import chat.tamtam.bot.custom.bot.AbstractCustomBot;
 import chat.tamtam.bot.custom.bot.BotType;
 import chat.tamtam.bot.custom.bot.RegistrationBot;
-import chat.tamtam.bot.domain.webhook.WebHookMessageEntity;
+import chat.tamtam.botapi.model.Message;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -25,7 +25,8 @@ public class WebHookBotService {
 
     public void submit(
             final String botId,
-            final WebHookMessageEntity message) throws NoSuchElementException {
+            final Message message
+    ) throws NoSuchElementException {
         AbstractCustomBot bot = botMap
                 .get(typeMap.get(botId)
                         .orElseThrow(NoSuchElementException::new))
