@@ -38,9 +38,11 @@ spring:
 ---
 
 tamtam:
+  host: http://localhost:8090
   registration:
     bot:
       id: 581483330212
       token: JUeixE5Dr7WoBY3ajjfwr72ya1CR_zw6D25VlR0sgNI
       botType: Registration
+      onlyTrustedUsers: false
       trustedUsers: 555537636725, 574784047321, 590435433004, 575868018573

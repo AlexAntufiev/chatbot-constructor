@@ -3,6 +3,7 @@ package chat.tamtam.bot.security;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Optional;
 
 import javax.servlet.FilterChain;
@@ -18,12 +19,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import com.auth0.jwt.JWT;
+
 import chat.tamtam.bot.controller.Endpoints;
 import chat.tamtam.bot.domain.SessionEntity;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.service.UserDetailsServiceImpl;
 
+import static chat.tamtam.bot.security.SecurityConstants.COOKIE_USER_ID;
+import static chat.tamtam.bot.security.SecurityConstants.EXPIRATION_TIME;
+import static chat.tamtam.bot.security.SecurityConstants.SECRET;
 import static chat.tamtam.bot.security.SecurityConstants.TOKEN_PREFIX;
+import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
 public class AuthenticationFilter extends BasicAuthenticationFilter {
     private final SessionRepository sessionRepository;
@@ -45,21 +52,44 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
             final HttpServletResponse response,
             final FilterChain chain
     ) throws IOException, ServletException {
-        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-        if (token == null || !token.startsWith(TOKEN_PREFIX)) {
-            chain.doFilter(request, response);
-            return;
+        String[] params = request.getParameterValues(SecurityConstants.ACCESS_TOKEN_PARAM);
+        if (params != null) {
+            String accessToken = params[0];
+            if (accessToken != null) {
+                SessionEntity session = sessionRepository.findByToken(accessToken);
+                if (session != null
+                        && session.getExpireDate().after(new Date(System.currentTimeMillis()))) {
+                    String token = TOKEN_PREFIX + JWT.create()
+                            .withExpiresAt(new Date(System.currentTimeMillis()))
+                            .sign(HMAC512(SECRET.getBytes()));
+                    SessionEntity newSession =
+                            new SessionEntity(
+                                    token,
+                                    session.getUserId(),
+                                    session.getLogin(),
+                                    new Date(System.currentTimeMillis() + EXPIRATION_TIME)
+                            );
+                    sessionRepository.save(newSession);
+                    sessionRepository.removeByToken(accessToken);
+                    response.addCookie(new Cookie(COOKIE_USER_ID, session.getUserId().toString()));
+                    response.addCookie(new Cookie(SecurityConstants.COOKIE_AUTH, token));
+                    chain.doFilter(request, response);
+                    return;
+                }
+            }
         }
 
         if (request.getCookies() != null) {
-            SessionEntity session = sessionRepository.findByToken(token);
             Optional<Cookie> authCookie = Arrays.stream(request.getCookies())
                     .filter(cookie -> cookie.getName().equals(SecurityConstants.COOKIE_AUTH))
                     .findFirst();
-            if (session == null && authCookie.isPresent()) {
-                response.sendRedirect(Endpoints.API_LOGOUT);
-                return;
+            if (authCookie.isPresent()) {
+                SessionEntity session = sessionRepository.findByToken(authCookie.get().getValue());
+                if (session == null
+                        || session.getExpireDate().before(new Date(System.currentTimeMillis()))) {
+                    response.sendRedirect(Endpoints.API_LOGOUT);
+                    return;
+                }
             }
         }
 
@@ -75,6 +105,10 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
         }
         SessionEntity session = sessionRepository.findByToken(token);
         if (session == null) {
+            return null;
+        }
+        if (session.getExpireDate().before(new Date(System.currentTimeMillis()))) {
+            sessionRepository.removeByToken(token);
             return null;
         }
         UserDetails user = userDetailsService.loadUserByUsername(session.getLogin());

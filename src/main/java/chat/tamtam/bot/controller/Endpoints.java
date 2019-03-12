@@ -18,5 +18,6 @@ public interface Endpoints {
 
     String HEALTH = "/actuator/health";
 
-    String TAM_BOT_WEBHOOK = "/tam/bot/{id}";
+    String TAM_BOT_WEBHOOK = "/tam/bot";
+    String TAM_BOT_ID = "/{id}";
 }
