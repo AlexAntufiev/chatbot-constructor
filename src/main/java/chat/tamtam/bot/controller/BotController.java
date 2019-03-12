@@ -24,36 +24,23 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = Endpoints.API_BOT,
-        consumes = MediaType.APPLICATION_JSON_VALUE,
-        produces = MediaType.APPLICATION_JSON_VALUE
-)
+@RequestMapping(path = Endpoints.API_BOT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 public class BotController {
     private final UserService userService;
     private final BotService botService;
 
     @GetMapping(path = Endpoints.LIST, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> botList(@RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken) {
-        return new ResponseEntity<>(
-                botService.getList(userService.getUserIdByToken(authToken)),
-                HttpStatus.OK
-        );
+        return new ResponseEntity<>(botService.getList(userService.getUserIdByToken(authToken)), HttpStatus.OK);
     }
 
     @GetMapping(path = Endpoints.ID, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> getBotInfo(
-            @PathVariable final Integer id,
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
+            @PathVariable final Integer id, @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
     ) {
-        try {
-            return new ResponseEntity<>(
-                    botService.getByUserIdAndId(userService.getUserIdByToken(authToken), id),
-                    HttpStatus.OK
-            );
-        } catch (NoSuchElementException e) {
-            log.error("getBotInfo {}", e.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(botService.getByUserIdAndId(userService.getUserIdByToken(authToken), id),
+                HttpStatus.OK
+        );
     }
 
     @PostMapping(Endpoints.ADD)

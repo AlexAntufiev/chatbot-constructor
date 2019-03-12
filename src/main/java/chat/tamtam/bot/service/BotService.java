@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 
 import chat.tamtam.bot.domain.BotSchemaEntity;
+import chat.tamtam.bot.domain.exception.NoFoundEntityException;
 import chat.tamtam.bot.repository.BotSchemaRepository;
 import lombok.AllArgsConstructor;
 
@@ -38,7 +39,7 @@ public class BotService {
     public BotSchemaEntity getByUserIdAndId(Integer userId, Integer id) throws NoSuchElementException {
         BotSchemaEntity bot = botSchemaRepository.findByUserIdAndId(userId, id);
         if (bot == null) {
-            throw new NoSuchElementException("Does not exist bot with userId=" + userId + " and id=" + id);
+            throw new NoFoundEntityException("Does not exist bot with userId=" + userId + " and id=" + id);
         } else {
             return bot;
         }
