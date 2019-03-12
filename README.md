@@ -1,4 +1,5 @@
 [![PDD status](http://www.0pdd.com/svg?name=nms403/chatbot-constructor)](http://www.0pdd.com/p?name=nms403/chatbot-constructor)
+![Travis build](https://api.travis-ci.com/nms403/chatbot-constructor.svg?token=dnq2ScgSbGJxCsEgpypH&branch=master)
 
 # START PROJECT
 

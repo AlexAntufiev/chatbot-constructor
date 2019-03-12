@@ -13,7 +13,9 @@ sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
 checkstyle {
-    toolVersion '8.17'
+    toolVersion "8.17"
+    maxWarnings 0
+    maxErrors 0
 }
 
 bootJar {
