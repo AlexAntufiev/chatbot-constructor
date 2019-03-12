@@ -56,7 +56,7 @@ Start application in dev profile
 
 `./ngrok http 8090`
 
-Make webhook subscription via [tamtam bot subscriptions]
+Make webhook subscription via [tamtam bot subscriptions] (https://{ngrok host}/tam/bot/581483330212)
 
 Proceed to [reg bot]
 
