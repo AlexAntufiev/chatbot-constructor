@@ -17,10 +17,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-class BotServiceTest extends RunnableTestContext {
+class BotSchemeServiceTest extends RunnableTestContext {
 
     @Autowired
-    private BotService botService;
+    private BotSchemeService botSchemeService;
     @MockBean
     private UserService userService;
     @MockBean
@@ -35,16 +35,16 @@ class BotServiceTest extends RunnableTestContext {
     void getBot() {
         when(botSchemaRepository.findByUserIdAndId(eq(USER_ID), eq(BOT_ID)))
                 .thenReturn(BOT_SCHEMA_ENTITY);
-        BotSchemaEntity bot = botService.getBot(AUTH_TOKEN, BOT_ID);
-        assertNotNull(bot, "Bot entity must be return");
+        BotSchemaEntity bot = botSchemeService.getBot(AUTH_TOKEN, BOT_ID);
+        assertNotNull(bot, "BotScheme entity must be return");
         assertEquals(USER_ID, bot.getUserId(), "User id must be set");
-        assertEquals(BOT_NAME, bot.getName(), "Bot name must be set");
+        assertEquals(BOT_NAME, bot.getName(), "BotScheme name must be set");
     }
 
     @Test
     void getNullBot() {
         when(botSchemaRepository.findByUserIdAndId(eq(USER_ID), eq(BOT_ID)))
                 .thenReturn(null);
-        assertThrows(NoSuchElementException.class, () -> botService.getBot(AUTH_TOKEN, BOT_ID));
+        assertThrows(NoSuchElementException.class, () -> botSchemeService.getBot(AUTH_TOKEN, BOT_ID));
     }
 }

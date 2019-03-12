@@ -13,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import chat.tamtam.bot.configuration.Profiles;
 import chat.tamtam.bot.controller.Endpoints;
@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles(Profiles.TEST)
 @SpringBootTest
 @AutoConfigureMockMvc(secure = false)
-public class Bot {
+public class BotScheme {
 
     @Autowired
     private MockMvc mockMvc;
@@ -42,10 +42,13 @@ public class Bot {
     @Autowired
     private SessionRepository sessionRepository;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     // @todo #CC-31 unignore mockmvc test
     @Test
-    public void getBot() throws Exception {
-        String toJson = new Gson().toJson(BOT_SCHEMA_ENTITY);
+    public void getBotScheme() throws Exception {
+        String toJson = objectMapper.writeValueAsString(BOT_SCHEMA_ENTITY);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.put(HttpHeaders.AUTHORIZATION, Collections.singletonList(AUTH_TOKEN));
         mockMvc.perform(get(String.format(Endpoints.API_BOT + "/%s", USER_ID)).accept(MediaType.APPLICATION_JSON)

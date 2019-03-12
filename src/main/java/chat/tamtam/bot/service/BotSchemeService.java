@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class BotService {
+public class BotSchemeService {
     private final BotSchemaRepository botSchemaRepository;
     private final UserService userService;
 
