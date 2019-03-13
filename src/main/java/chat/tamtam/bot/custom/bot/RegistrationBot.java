@@ -66,14 +66,14 @@ public class RegistrationBot extends AbstractCustomBot {
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Value("${tamtam.registration.bot.onlyTrustedUsers:false}")
-    private boolean onlyTrustedUsers = false;
+    private boolean onlyTrustedUsers;
     @Getter
     @Value("${tamtam.registration.bot.id}")
     private String id;
     @Getter
     @Value("${tamtam.registration.bot.token}")
     private String token;
-    @Value("${tamtam.registration.bot.trustedUsers}")
+    @Value("${tamtam.registration.bot.trustedUsers:}#{T(java.util.Collections).emptySet()}")
     private Set<String> trustedUsers;
     @Value("${tamtam.host}")
     private String host;
@@ -133,11 +133,7 @@ public class RegistrationBot extends AbstractCustomBot {
         if (user != null) {
             return new NewMessageBody("Press to sign in", List.of(getAutoLoginButton(userId)));
         } else {
-            String response = new StringBuilder()
-                    .append("Login: ")
-                    .append(userId)
-                    .append(" not found\nTry '/reg' to create user")
-                    .toString();
+            String response = "Login: " + userId + " not found\nTry '/reg' to create user";
             return new NewMessageBody(response, null);
         }
     }
@@ -145,25 +141,17 @@ public class RegistrationBot extends AbstractCustomBot {
     private NewMessageBody registrate(final String userId) {
         UserEntity user = userRepository.findByLogin(userId);
         if (user == null) {
-            Long password = System.currentTimeMillis();
+            //@todo #CC-36 Improve password generation
+            String password = Math.random() + "_" + System.currentTimeMillis();
             user = new UserEntity(
                     userId,
-                    bCryptPasswordEncoder.encode(password.toString())
+                    bCryptPasswordEncoder.encode(password)
             );
             userRepository.save(user);
-            String response = new StringBuilder()
-                    .append("Login: ")
-                    .append(userId)
-                    .append("\nPassword: ")
-                    .append(password)
-                    .toString();
+            String response = "Login: " + userId + "\nPassword: " + password;
             return new NewMessageBody(response, List.of(getAutoLoginButton(userId)));
         }
-        String response = new StringBuilder()
-                .append("Login: ")
-                .append(userId)
-                .append("\nTry '/upd' to change password")
-                .toString();
+        String response = "Login: " + userId + "\nTry '/upd' to change password";
         return new NewMessageBody(response, List.of(getAutoLoginButton(userId)));
     }
 
@@ -172,18 +160,10 @@ public class RegistrationBot extends AbstractCustomBot {
         if (user != null) {
             userRepository.removeByLogin(userId);
             sessionRepository.removeAllByLogin(userId);
-            String response = new StringBuilder()
-                    .append("User with login: ")
-                    .append(userId)
-                    .append(" deleted")
-                    .toString();
+            String response = "User with login: " + userId + " deleted";
             return new NewMessageBody(response, null);
         }
-        String response = new StringBuilder()
-                .append("User with login: ")
-                .append(userId)
-                .append(" not found\nTry '/reg' to create user")
-                .toString();
+        String response = "User with login: " + userId + " not found\nTry '/reg' to create user";
         return new NewMessageBody(response, null);
     }
 
@@ -195,31 +175,20 @@ public class RegistrationBot extends AbstractCustomBot {
             }
             user.setPasswordHash(bCryptPasswordEncoder.encode(newPassword));
             userRepository.save(user);
-            String response = new StringBuilder()
-                    .append("Login: ")
-                    .append(userId)
-                    .append("\nPassword: ")
-                    .append(newPassword)
-                    .toString();
+            String response = "Login: " + userId + "\nPassword: " + newPassword;
             sessionRepository.removeAllByLogin(userId);
             return new NewMessageBody(response, List.of(getAutoLoginButton(userId)));
         }
-        String response = new StringBuilder()
-                .append("Login: ")
-                .append(userId)
-                .append(" not found\nTry '/reg' to create user")
-                .toString();
+        String response = "Login: " + userId + " not found\nTry '/reg' to create user";
         return new NewMessageBody(response, null);
     }
 
     private InlineKeyboardAttachmentRequest getAutoLoginButton(final String userId) {
         UserEntity user = userRepository.findByLogin(userId);
-        String tempAccessToken = new StringBuilder()
-                .append(TOKEN_PREFIX)
-                .append(JWT.create()
+        String tempAccessToken = TOKEN_PREFIX
+                + JWT.create()
                         .withExpiresAt(new Date())
-                        .sign(HMAC512(SECRET.getBytes())))
-                .toString();
+                        .sign(HMAC512(SECRET.getBytes()));
         SessionEntity sessionEntity =
                 new SessionEntity(
                         tempAccessToken,
@@ -228,13 +197,7 @@ public class RegistrationBot extends AbstractCustomBot {
                         new Date(System.currentTimeMillis() + EXPIRATION_TIME)
                 );
         sessionRepository.save(sessionEntity);
-        String tempAccessUrl = new StringBuilder()
-                .append(host)
-                .append("/?")
-                .append(SecurityConstants.AUTO_LOGIN_TEMP_ACCESS_TOKEN)
-                .append("=")
-                .append(tempAccessToken)
-                .toString();
+        String tempAccessUrl = host + "/?" + SecurityConstants.AUTO_LOGIN_TEMP_ACCESS_TOKEN + "=" + tempAccessToken;
         LinkButton button = new LinkButton(tempAccessUrl, "sign in", Intent.DEFAULT);
         return new InlineKeyboardAttachmentRequest(
                         new InlineKeyboardAttachmentRequestPayload(List.of(List.of(button))));
@@ -249,16 +212,13 @@ public class RegistrationBot extends AbstractCustomBot {
     @Bean
     public void subscribeRegBotOnAppReadyProduction() {
         try {
-            if (host == null) {
-                throw new NullPointerException("Can't read host property");
-            }
             url = host + Endpoints.TAM_BOT_WEBHOOK + "/" + id;
             SimpleQueryResult result = botAPI.subscribe(new SubscriptionRequestBody(url)).execute();
             if (!result.isSuccess()) {
-                throw new IllegalStateException("Can't subscribe bot with id:" + id);
+                log.debug("Can't subscribe bot with id:" + id);
             }
             subscribed = true;
-        } catch (NullPointerException | ClientException | APIException | IllegalStateException e) {
+        } catch (ClientException | APIException e) {
             log.error(String.format("Can't subscribe bot with id = [%s] via url = [%s]", id, url), e);
         }
     }
@@ -270,14 +230,11 @@ public class RegistrationBot extends AbstractCustomBot {
             return;
         }
         try {
-            if (url == null) {
-                throw new NullPointerException("Url is null");
-            }
             SimpleQueryResult result = botAPI.unsubscribe(url).execute();
             if (!result.isSuccess()) {
-                throw new IllegalStateException("Can't unsubscribe bot with id:" + id);
+                log.debug("Can't unsubscribe bot with id:" + id);
             }
-        } catch (ClientException | APIException | NullPointerException | IllegalStateException e) {
+        } catch (ClientException | APIException e) {
             log.error(String.format("Can't unsubscribe bot with id = [%s] via url = [%s]", id, url), e);
         }
     }

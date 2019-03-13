@@ -58,12 +58,10 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
             if (autoLoginTempAccessToken != null) {
                 SessionEntity temporarySession = sessionRepository.findByToken(autoLoginTempAccessToken);
                 if (temporarySession != null && !temporarySession.isExpired()) {
-                    String permanentAccessToken = new StringBuilder()
-                            .append(TOKEN_PREFIX)
-                            .append(JWT.create()
+                    String permanentAccessToken = TOKEN_PREFIX
+                            + JWT.create()
                                     .withExpiresAt(new Date())
-                                    .sign(HMAC512(SECRET.getBytes())))
-                            .toString();
+                                    .sign(HMAC512(SECRET.getBytes()));
                     SessionEntity permanentSession =
                             new SessionEntity(
                                     permanentAccessToken,
