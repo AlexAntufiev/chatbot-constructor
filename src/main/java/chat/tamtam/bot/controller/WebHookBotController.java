@@ -1,7 +1,5 @@
 package chat.tamtam.bot.controller;
 
-import java.util.NoSuchElementException;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,12 +30,12 @@ public class WebHookBotController {
     ) {
         try {
             webHookBotService.submit(id, message);
-        } catch (NoSuchElementException e) {
+        } catch (UnsupportedOperationException e) {
             log.error(String.format(
                     "Webhook service can not submit message: [%s] to bot with id = [%s]",
                     message,
                     id
-            ), e.getMessage());
+            ), e);
         } finally {
             return new ResponseEntity<>(HttpStatus.OK);
         }

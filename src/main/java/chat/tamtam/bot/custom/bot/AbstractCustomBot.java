@@ -3,11 +3,17 @@ package chat.tamtam.bot.custom.bot;
 import chat.tamtam.botapi.model.Message;
 
 public abstract class AbstractCustomBot {
-    public abstract void processMessage(Message message);
+    public void processMessage(Message message) {
+        throw new UnsupportedOperationException("from " + getType());
+    };
 
-    public abstract String getId();
+    public String getId() {
+        throw new UnsupportedOperationException("from " + getType());
+    };
 
     public abstract BotType getType();
 
-    public abstract String getToken();
+    public String getToken() {
+        throw new UnsupportedOperationException("from " + getType());
+    };
 }

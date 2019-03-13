@@ -52,28 +52,29 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
             final HttpServletResponse response,
             final FilterChain chain
     ) throws IOException, ServletException {
-        String[] params = request.getParameterValues(SecurityConstants.ACCESS_TOKEN_PARAM);
+        String[] params = request.getParameterValues(SecurityConstants.AUTO_LOGIN_TEMP_ACCESS_TOKEN);
         if (params != null) {
-            String accessToken = params[0];
-            if (accessToken != null) {
-                SessionEntity session = sessionRepository.findByToken(accessToken);
-                if (session != null && !session.isExpired()) {
-                    StringBuilder token = new StringBuilder()
+            String autoLoginTempAccessToken = params[0];
+            if (autoLoginTempAccessToken != null) {
+                SessionEntity temporarySession = sessionRepository.findByToken(autoLoginTempAccessToken);
+                if (temporarySession != null && !temporarySession.isExpired()) {
+                    String permanentAccessToken = new StringBuilder()
                             .append(TOKEN_PREFIX)
                             .append(JWT.create()
-                                    .withExpiresAt(new Date(System.currentTimeMillis()))
-                                    .sign(HMAC512(SECRET.getBytes())));
-                    SessionEntity newSession =
+                                    .withExpiresAt(new Date())
+                                    .sign(HMAC512(SECRET.getBytes())))
+                            .toString();
+                    SessionEntity permanentSession =
                             new SessionEntity(
-                                    token.toString(),
-                                    session.getUserId(),
-                                    session.getLogin(),
+                                    permanentAccessToken,
+                                    temporarySession.getUserId(),
+                                    temporarySession.getLogin(),
                                     new Date(System.currentTimeMillis() + EXPIRATION_TIME)
                             );
-                    sessionRepository.save(newSession);
-                    sessionRepository.removeByToken(accessToken);
-                    response.addCookie(new Cookie(COOKIE_USER_ID, session.getUserId().toString()));
-                    response.addCookie(new Cookie(SecurityConstants.COOKIE_AUTH, token.toString()));
+                    sessionRepository.save(permanentSession);
+                    sessionRepository.removeByToken(autoLoginTempAccessToken);
+                    response.addCookie(new Cookie(COOKIE_USER_ID, temporarySession.getUserId().toString()));
+                    response.addCookie(new Cookie(SecurityConstants.COOKIE_AUTH, permanentAccessToken.toString()));
                     chain.doFilter(request, response);
                     return;
                 }

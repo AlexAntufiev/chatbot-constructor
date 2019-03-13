@@ -75,14 +75,15 @@ public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
     ) throws IOException {
         Date expireDate = new Date(System.currentTimeMillis() + EXPIRATION_TIME);
         User principal = (User) authResult.getPrincipal();
-        StringBuilder token = new StringBuilder()
+        String token = new StringBuilder()
                 .append(TOKEN_PREFIX)
                 .append(JWT.create()
                         .withSubject(principal.getUsername())
                         .withExpiresAt(expireDate)
-                        .sign(HMAC512(SECRET.getBytes())));
+                        .sign(HMAC512(SECRET.getBytes())))
+                .toString();
         UserEntity user = userRepository.findByLogin(principal.getUsername());
-        sessionRepository.save(new SessionEntity(token.toString(), user.getId(), user.getLogin(), expireDate));
+        sessionRepository.save(new SessionEntity(token, user.getId(), user.getLogin(), expireDate));
         response.addHeader(HttpHeaders.AUTHORIZATION, token.toString());
         response
                 .getWriter()

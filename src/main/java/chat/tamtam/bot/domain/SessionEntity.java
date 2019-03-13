@@ -39,6 +39,6 @@ public class SessionEntity {
     private @NonNull Date expireDate;
 
     public boolean isExpired() {
-        return expireDate.before(new Date(System.currentTimeMillis()));
+        return expireDate.before(new Date());
     }
 }

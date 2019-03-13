@@ -6,5 +6,5 @@ public interface SecurityConstants {
     String TOKEN_PREFIX = "Astra";
     String COOKIE_AUTH = "authorization";
     String COOKIE_USER_ID = "userId";
-    String ACCESS_TOKEN_PARAM = "access_token";
+    String AUTO_LOGIN_TEMP_ACCESS_TOKEN = "access_token";
 }
