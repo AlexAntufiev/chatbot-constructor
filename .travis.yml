@@ -15,5 +15,9 @@ cache:
 before_install:
   - npm i -g npm@6.7.0
 
+branches:
+  only:
+    - master
+
 script:
   - ./gradlew clean build
