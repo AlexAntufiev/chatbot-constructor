@@ -96,7 +96,7 @@ public class RegistrationBot extends AbstractCustomBot {
                         .userId(message.getSender().getUserId())
                         .execute();
             }
-        } catch (APIException | ClientException | RuntimeException e) {
+        } catch (APIException | ClientException e) {
             log.error(String.format("Bot with id = [%s] can't process message", id), e);
         }
     }
