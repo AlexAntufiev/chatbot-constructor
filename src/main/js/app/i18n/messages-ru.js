@@ -35,6 +35,8 @@ export default {
     'app.dialog.password.strong': 'Сильный',
     'app.dialog.password.enter': 'Введите пароль',
     'app.dialog.checksure': 'Вы уверены?',
+    'app.dialog.connect': 'Подключить',
+    'app.dialog.disconnect': 'Отключить',
 
     //Error messages
     'app.errormessage.errorsummary': 'Сообщение об ошибке',
@@ -43,11 +45,13 @@ export default {
     'app.errormessage.fillname': 'Заполните имя',
     'app.errormessage.servernotresponse': 'Сервер не доступен',
     'app.errormessage.serverwrongresponse': 'Неверный ответ от сервера',
+    'app.successmessage.filltoken': 'Пустой токен',
     'errors.tam.service': 'Ошибка сервиса ТамТам',
     'errors.tam.bot.token.incorrect': 'Неправильный токен',
     'errors.tam.bot.token.empty': 'Пустой токен',
     'errors.tam.bot.subscribed.already': 'Бот уже подключен',
     'errors.tam.bot.unsubscribed.already': 'Бот уже отключен',
+    'errors.tam.bot.not.subscribed': "Бот не подключен",
 
     //Success messages
     'app.successmessage.successsumary': 'Успешно',

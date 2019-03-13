@@ -35,6 +35,8 @@ export default {
     'app.dialog.password.strong': 'Strong',
     'app.dialog.password.enter': 'Enter a password',
     'app.dialog.checksure': 'Are you sure?',
+    'app.dialog.connect': 'Connect',
+    'app.dialog.disconnect': 'Disconnect',
 
     //Error messages
     'app.errormessage.errorsummary': 'Error Message',
@@ -43,11 +45,13 @@ export default {
     'app.errormessage.fillname': 'Fill name',
     'app.errormessage.servernotresponse': 'Server not response',
     'app.errormessage.serverwrongresponse': 'Wrong server answer',
+    'app.successmessage.filltoken': 'Token is empty',
     'errors.tam.service': 'TamTam service error',
     'errors.tam.bot.token.incorrect': 'Incorrect bot token',
     'errors.tam.bot.token.empty': 'Empty bot token',
     'errors.tam.bot.subscribed.already': 'Bot is already subscribed',
     'errors.tam.bot.unsubscribed.already': 'Bot is already unsubscribed',
+    'errors.tam.bot.not.subscribed': "Bot not subscribed",
 
     //Success messages
     'app.successmessage.successsumary': 'Success',
