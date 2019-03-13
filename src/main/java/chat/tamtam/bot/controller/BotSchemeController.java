@@ -24,7 +24,8 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = Endpoints.API_BOT, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = Endpoints.API_BOT, consumes = MediaType.APPLICATION_JSON_VALUE, produces =
+        MediaType.APPLICATION_JSON_VALUE)
 public class BotSchemeController {
     private final UserService userService;
     private final BotSchemeService botSchemeService;
