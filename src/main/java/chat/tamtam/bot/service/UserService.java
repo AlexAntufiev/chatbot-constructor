@@ -31,7 +31,7 @@ public class UserService {
         return true;
     }
 
-    public Integer getUserIdByToken(final String token) {
+    public int getUserIdByToken(final String token) {
         return sessionRepository.findByToken(token).getUserId();
     }
 }

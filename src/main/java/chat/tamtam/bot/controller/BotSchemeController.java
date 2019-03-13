@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import chat.tamtam.bot.domain.BotSchemaEntity;
+import chat.tamtam.bot.domain.BotSchemeEntity;
 import chat.tamtam.bot.service.BotSchemeService;
 import chat.tamtam.bot.service.UserService;
 import lombok.AllArgsConstructor;
@@ -24,43 +24,31 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = Endpoints.API_BOT,
-        consumes = MediaType.APPLICATION_JSON_VALUE,
-        produces = MediaType.APPLICATION_JSON_VALUE
-)
+@RequestMapping(path = Endpoints.API_BOT, consumes = MediaType.APPLICATION_JSON_VALUE, produces =
+        MediaType.APPLICATION_JSON_VALUE)
 public class BotSchemeController {
     private final UserService userService;
     private final BotSchemeService botSchemeService;
 
     @GetMapping(path = Endpoints.LIST, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> botList(@RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken) {
-        return new ResponseEntity<>(
-                botSchemeService.getList(userService.getUserIdByToken(authToken)),
-                HttpStatus.OK
-        );
+        return new ResponseEntity<>(botSchemeService.getList(userService.getUserIdByToken(authToken)), HttpStatus.OK);
     }
 
     @GetMapping(path = Endpoints.ID, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> getBotScheme(
-            @PathVariable final int id,
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
+            @PathVariable final int id, @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
     ) {
-        try {
-            return new ResponseEntity<>(botSchemeService.getBot(authToken, id), HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            log.error(String.format("Get bot failed^ %s", e.getMessage()), e);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(botSchemeService.getBotScheme(authToken, id), HttpStatus.OK);
     }
 
     @PostMapping(Endpoints.ADD)
     public ResponseEntity<?> addBot(
-            @RequestBody final BotSchemaEntity bot,
+            @RequestBody final BotSchemeEntity bot,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
     ) {
         try {
-            return new ResponseEntity<>(
-                    botSchemeService.addBot(bot, userService.getUserIdByToken(authToken)),
+            return new ResponseEntity<>(botSchemeService.addBot(bot, userService.getUserIdByToken(authToken)),
                     HttpStatus.OK
             );
         } catch (IllegalArgumentException e) {
@@ -71,7 +59,7 @@ public class BotSchemeController {
 
     @DeleteMapping(Endpoints.DELETE)
     public ResponseEntity<?> deleteBot(
-            @RequestBody final BotSchemaEntity bot,
+            @RequestBody final BotSchemeEntity bot,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
     ) {
         if (bot.getId() != null) {
@@ -89,8 +77,7 @@ public class BotSchemeController {
 
     @PostMapping(Endpoints.ID_SAVE)
     public ResponseEntity<?> saveBot(
-            @PathVariable final Integer id,
-            @RequestBody final BotSchemaEntity bot,
+            @PathVariable final Integer id, @RequestBody final BotSchemeEntity bot,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
     ) {
         Integer userId = userService.getUserIdByToken(authToken);

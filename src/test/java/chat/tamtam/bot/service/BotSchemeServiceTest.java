@@ -1,14 +1,13 @@
 package chat.tamtam.bot.service;
 
-import java.util.NoSuchElementException;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import chat.tamtam.bot.RunnableTestContext;
-import chat.tamtam.bot.domain.BotSchemaEntity;
+import chat.tamtam.bot.domain.BotSchemeEntity;
+import chat.tamtam.bot.domain.exception.NoFoundEntityException;
 import chat.tamtam.bot.repository.BotSchemaRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,9 +32,8 @@ class BotSchemeServiceTest extends RunnableTestContext {
 
     @Test
     void getBot() {
-        when(botSchemaRepository.findByUserIdAndId(eq(USER_ID), eq(BOT_ID)))
-                .thenReturn(BOT_SCHEMA_ENTITY);
-        BotSchemaEntity bot = botSchemeService.getBot(AUTH_TOKEN, BOT_ID);
+        when(botSchemaRepository.findByUserIdAndId(eq(USER_ID), eq(BOT_ID))).thenReturn(BOT_SCHEMA_ENTITY);
+        BotSchemeEntity bot = botSchemeService.getBotScheme(AUTH_TOKEN, BOT_ID);
         assertNotNull(bot, "BotScheme entity must be return");
         assertEquals(USER_ID, bot.getUserId(), "User id must be set");
         assertEquals(BOT_NAME, bot.getName(), "BotScheme name must be set");
@@ -43,8 +41,7 @@ class BotSchemeServiceTest extends RunnableTestContext {
 
     @Test
     void getNullBot() {
-        when(botSchemaRepository.findByUserIdAndId(eq(USER_ID), eq(BOT_ID)))
-                .thenReturn(null);
-        assertThrows(NoSuchElementException.class, () -> botSchemeService.getBot(AUTH_TOKEN, BOT_ID));
+        when(botSchemaRepository.findByUserIdAndId(eq(USER_ID), eq(BOT_ID))).thenReturn(null);
+        assertThrows(NoFoundEntityException.class, () -> botSchemeService.getBotScheme(AUTH_TOKEN, BOT_ID));
     }
 }

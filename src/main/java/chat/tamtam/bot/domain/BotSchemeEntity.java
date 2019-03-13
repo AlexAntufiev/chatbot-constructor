@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 @Data
 @RequiredArgsConstructor
-public class BotSchemaEntity {
+public class BotSchemeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

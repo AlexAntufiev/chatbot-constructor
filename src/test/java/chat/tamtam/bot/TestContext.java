@@ -1,6 +1,6 @@
 package chat.tamtam.bot;
 
-import chat.tamtam.bot.domain.BotSchemaEntity;
+import chat.tamtam.bot.domain.BotSchemeEntity;
 
 public class TestContext {
 
@@ -12,9 +12,9 @@ public class TestContext {
     public static final String LOGIN_ADMIN = "ADMIN";
     public static final String PASSWORD_ADMIN = "ADMIN";
 
-    public static final BotSchemaEntity BOT_SCHEMA_ENTITY;
+    public static final BotSchemeEntity BOT_SCHEMA_ENTITY;
 
     static {
-        BOT_SCHEMA_ENTITY = new BotSchemaEntity(USER_ID, BOT_NAME);
+        BOT_SCHEMA_ENTITY = new BotSchemeEntity(USER_ID, BOT_NAME);
     }
 }

@@ -7,6 +7,6 @@ class LauncherTest extends RunnableTestContext {
 
     @Test
     void testRun() {
-        Assertions.assertDoesNotThrow(() -> Launcher.main(new String[] {}));
+        Assertions.assertDoesNotThrow(() -> Launcher.main(new String[]{}));
     }
 }

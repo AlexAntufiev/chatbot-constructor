@@ -7,13 +7,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import chat.tamtam.bot.domain.BotSchemaEntity;
+import chat.tamtam.bot.domain.BotSchemeEntity;
 
 @Repository
-public interface BotSchemaRepository extends CrudRepository<BotSchemaEntity, Integer> {
-    List<BotSchemaEntity> findAllByUserId(Integer userId);
+public interface BotSchemaRepository extends CrudRepository<BotSchemeEntity, Integer> {
+    List<BotSchemeEntity> findAllByUserId(Integer userId);
 
-    BotSchemaEntity findByUserIdAndId(Integer userId, int id);
+    BotSchemeEntity findByUserIdAndId(Integer userId, int id);
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
     void deleteByUserIdAndId(Integer userId, Integer id);
