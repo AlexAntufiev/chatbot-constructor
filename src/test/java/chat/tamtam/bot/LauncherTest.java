@@ -1,13 +1,12 @@
 package chat.tamtam.bot;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class LauncherTest {
+class LauncherTest extends RunnableTestContext {
 
     @Test
     void testRun() {
-        Launcher.main(new String[] {});
+        Assertions.assertDoesNotThrow(() -> Launcher.main(new String[]{}));
     }
 }
