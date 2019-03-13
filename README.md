@@ -49,8 +49,23 @@ Set development profile in application.yml: `spring.profiles.active=development`
 
 [Access to swagger]
 
+## Registration bot via ngrok in dev profile
+
+Download [ngrok]
+
+Start application in `development` profile
+
+`./ngrok http 8090`
+
+Make webhook subscription via [tamtam bot subscriptions] (`https://{ngrok_host}/tam/bot/581483330212`)
+
+Proceed to [reg bot]
+
 [java]: https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html
 [Node.js]: https://nodejs.org/en/download/
 [Download and install checkstyle plugin]: https://plugins.jetbrains.com/plugin/1065-checkstyle-idea
 [Access to swagger]: http://localhost:8090/swagger-ui.html
 [Main page]: http://localhost:8090
+[ngrok]: https://ngrok.com/download
+[tamtam bot subscriptions]: https://dev.tamtam.chat/#tag/subscriptions
+[reg bot]: https://tt.me/BuilderRegBot
