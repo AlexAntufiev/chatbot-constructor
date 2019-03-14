@@ -141,7 +141,7 @@ public class RegistrationBot extends AbstractCustomBot {
     private NewMessageBody registrate(final String userId) {
         UserEntity user = userRepository.findByLogin(userId);
         if (user == null) {
-            //@todo #CC-36 Improve password generation
+            // @todo #CC-36 Improve password generation
             String password = Math.random() + "_" + System.currentTimeMillis();
             user = new UserEntity(
                     userId,
