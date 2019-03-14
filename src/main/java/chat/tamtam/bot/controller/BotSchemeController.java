@@ -97,7 +97,6 @@ public class BotSchemeController {
             @PathVariable final Integer id,
             @RequestBody final BotTokenEntity tokenEntity
     ) {
-        ;
         return new ResponseEntity<>(
                 botSchemeService.connect(authToken, id, tokenEntity.getToken()),
                 HttpStatus.OK
