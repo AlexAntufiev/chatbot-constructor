@@ -29,7 +29,11 @@ public class TamBotEntity {
     @Column(name = "fullAvatarUrl")
     private String fullAvatarUrl;
 
-    public TamBotEntity(final @NotNull Integer userId, final @NotNull String token, final @NotNull UserWithPhoto userWithPhoto) {
+    public TamBotEntity(
+            final @NotNull Integer userId,
+            final @NotNull String token,
+            final @NotNull UserWithPhoto userWithPhoto
+    ) {
         id = new TamBotId(userWithPhoto.getUserId(), userId);
         this.token = token;
         name = userWithPhoto.getName();
