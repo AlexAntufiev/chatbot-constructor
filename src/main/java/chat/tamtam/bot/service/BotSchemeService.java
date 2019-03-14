@@ -116,6 +116,7 @@ public class BotSchemeService {
                     ).execute();
             if (result.isSuccess()) {
                 bot.setBotId(tamBot.getId().getBotId());
+                // @todo CC-52 wrap save operations into transaction
                 tamBotRepository.save(tamBot);
                 botSchemaRepository.save(bot);
                 return new BotSubscriptionSuccessEntity(tamBot);
@@ -168,6 +169,7 @@ public class BotSchemeService {
                     .execute();
             if (result.isSuccess()) {
                 bot.setBotId(null);
+                // @todo CC-52 wrap delete and save operations into transaction
                 tamBotRepository.deleteById(new TamBotId(bot.getBotId(), bot.getUserId()));
                 botSchemaRepository.save(bot);
                 return new BotSubscriptionSuccessEntity(tamBot);
