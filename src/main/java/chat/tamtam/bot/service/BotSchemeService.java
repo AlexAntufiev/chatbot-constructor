@@ -8,20 +8,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import chat.tamtam.bot.controller.Endpoints;
-import chat.tamtam.bot.domain.BotSchemaInfoEntity;
 import chat.tamtam.bot.domain.BotSchemeEntity;
+import chat.tamtam.bot.domain.TamBotEntity;
+import chat.tamtam.bot.domain.TamBotId;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
 import chat.tamtam.bot.domain.exception.TamBotSubscriptionException;
 import chat.tamtam.bot.domain.response.BotSubscriptionSuccessEntity;
-import chat.tamtam.bot.repository.BotSchemaInfoRepository;
 import chat.tamtam.bot.repository.BotSchemaRepository;
+import chat.tamtam.bot.repository.TamBotRepository;
 import chat.tamtam.botapi.TamTamBotAPI;
 import chat.tamtam.botapi.exceptions.APIException;
 import chat.tamtam.botapi.exceptions.ClientException;
 import chat.tamtam.botapi.model.SimpleQueryResult;
 import chat.tamtam.botapi.model.SubscriptionRequestBody;
 import chat.tamtam.botapi.model.UserWithPhoto;
-import io.micrometer.core.lang.Nullable;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BotSchemeService {
     private final @NonNull BotSchemaRepository botSchemaRepository;
-    private final @NonNull BotSchemaInfoRepository botSchemaInfoRepository;
+    private final @NonNull TamBotRepository tamBotRepository;
     private final @NonNull UserService userService;
 
     @Value("${tamtam.host}")
@@ -81,23 +81,12 @@ public class BotSchemeService {
         return botSchemaRepository.findAllByUserId(userId);
     }
 
-    @Nullable
-    public BotSchemaInfoEntity getBotSchemeInfo(final Long id) {
-        return botSchemaInfoRepository.findByBotId(id);
-    }
-
-    private BotSchemaInfoEntity fetchBotSchemaInfo(TamTamBotAPI tamTamBotAPI) throws ClientException, APIException {
+    private TamBotEntity fetchTamBot(
+            final TamTamBotAPI tamTamBotAPI,
+            final Integer userId,
+            final String token) throws ClientException, APIException {
         UserWithPhoto userWithPhoto = tamTamBotAPI.getMyInfo().execute();
-        BotSchemaInfoEntity botInfo = getBotSchemeInfo(userWithPhoto.getUserId());
-        if (botInfo == null) {
-            BotSchemaInfoEntity botSchemaInfoEntity = new BotSchemaInfoEntity(userWithPhoto);
-            botSchemaInfoRepository.save(botSchemaInfoEntity);
-            return botSchemaInfoEntity;
-        } else {
-            botInfo.update(userWithPhoto);
-            botSchemaInfoRepository.save(botInfo);
-            return botInfo;
-        }
+        return new TamBotEntity(userId, token, userWithPhoto);
     }
 
     public BotSubscriptionSuccessEntity connect(final String authToken, int id, final String botToken) {
@@ -110,7 +99,7 @@ public class BotSchemeService {
             );
         }
         BotSchemeEntity bot = getBotScheme(authToken, id);
-        if (bot.isConnected()) {
+        if (bot.getBotId() != null) {
             throw new TamBotSubscriptionException(
                     "Can't subscribe bot with id="
                             + id
@@ -120,18 +109,16 @@ public class BotSchemeService {
         }
         TamTamBotAPI tamTamBotAPI = TamTamBotAPI.create(botToken);
         try {
-            BotSchemaInfoEntity botInfo = fetchBotSchemaInfo(tamTamBotAPI);
-            String webHookUrl = host + Endpoints.TAM_BOT_WEBHOOK + "/" + bot.getId();
+            TamBotEntity tamBot = fetchTamBot(tamTamBotAPI, bot.getUserId(), botToken);
             SimpleQueryResult result = tamTamBotAPI
                     .subscribe(
-                            new SubscriptionRequestBody(webHookUrl)
+                            new SubscriptionRequestBody(host + Endpoints.TAM_BOT_WEBHOOK + "/" + bot.getId())
                     ).execute();
             if (result.isSuccess()) {
-                bot.setToken(botToken);
-                bot.setConnected(true);
-                bot.setWebHookUrl(webHookUrl);
+                bot.setBotId(tamBot.getId().getBotId());
+                tamBotRepository.save(tamBot);
                 botSchemaRepository.save(bot);
-                return new BotSubscriptionSuccessEntity(botInfo);
+                return new BotSubscriptionSuccessEntity(tamBot);
             } else {
                 throw new TamBotSubscriptionException(
                         "Can't subscribe bot with id="
@@ -164,7 +151,7 @@ public class BotSchemeService {
 
     public BotSubscriptionSuccessEntity disconnect(final String authToken, int id) {
         BotSchemeEntity bot = getBotScheme(authToken, id);
-        if (!bot.isConnected()) {
+        if (bot.getBotId() == null) {
             throw new TamBotSubscriptionException(
                     "Can't unsubscribe bot with id="
                             + id
@@ -172,16 +159,18 @@ public class BotSchemeService {
                     Errors.TAM_BOT_UNSUBSCRIBED_ALREADY
             );
         }
-        TamTamBotAPI tamTamBotAPI = TamTamBotAPI.create(bot.getToken());
+        TamBotEntity tamBot = tamBotRepository
+                .findById(new TamBotId(bot.getBotId(), bot.getUserId()));
+        TamTamBotAPI tamTamBotAPI = TamTamBotAPI.create(tamBot.getToken());
         try {
-            BotSchemaInfoEntity botInfo = fetchBotSchemaInfo(tamTamBotAPI);
             SimpleQueryResult result = tamTamBotAPI
-                    .unsubscribe(bot.getWebHookUrl())
+                    .unsubscribe(host + Endpoints.TAM_BOT_WEBHOOK + "/" + bot.getId())
                     .execute();
             if (result.isSuccess()) {
-                bot.setConnected(false);
+                bot.setBotId(null);
+                tamBotRepository.deleteById(new TamBotId(bot.getBotId(), bot.getUserId()));
                 botSchemaRepository.save(bot);
-                return new BotSubscriptionSuccessEntity(botInfo);
+                return new BotSubscriptionSuccessEntity(tamBot);
             } else {
                 throw new TamBotSubscriptionException(
                         "Can't unsubscribe bot with id="

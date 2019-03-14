@@ -1,6 +1,6 @@
 package chat.tamtam.bot.domain.response;
 
-import chat.tamtam.bot.domain.BotSchemaInfoEntity;
+import chat.tamtam.bot.domain.TamBotEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 public class BotSubscriptionSuccessEntity {
     private final Boolean success = true;
-    private BotSchemaInfoEntity info;
+    private TamBotEntity info;
 
-    public BotSubscriptionSuccessEntity(BotSchemaInfoEntity info) {
+    public BotSubscriptionSuccessEntity(TamBotEntity info) {
         this.info = info;
     }
 }
