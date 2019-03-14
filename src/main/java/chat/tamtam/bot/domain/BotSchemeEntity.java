@@ -34,4 +34,7 @@ public class BotSchemeEntity {
 
     @Column(name = "schema")
     private byte[] schema;
+
+    @Column(name = "connected")
+    private boolean connected = false;
 }

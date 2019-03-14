@@ -9,21 +9,35 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import chat.tamtam.bot.service.WebHookBotService;
 import chat.tamtam.botapi.model.Message;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @AllArgsConstructor
 @RestController
-@RequestMapping(path = Endpoints.TAM_BOT_WEBHOOK,
+@RequestMapping(path = Endpoints.TAM_CUSTOM_BOT_WEBHOOK,
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.ALL_VALUE)
-public class WebHookBotController {
+public class WebHookCustomBotController {
+    private final WebHookBotService webHookBotService;
+
     @PostMapping(Endpoints.ID)
     public ResponseEntity<?> webHookMessage(
             @PathVariable final String id,
             @RequestBody final Message message
     ) {
-        //should always respond HttpStatus.OK
-        return new ResponseEntity<>(HttpStatus.OK);
+        try {
+            webHookBotService.submit(id, message);
+        } catch (UnsupportedOperationException e) {
+            log.error(String.format(
+                    "Webhook service can not submit message: [%s] to bot with id = [%s]",
+                    message,
+                    id
+            ), e);
+        } finally {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
     }
 }

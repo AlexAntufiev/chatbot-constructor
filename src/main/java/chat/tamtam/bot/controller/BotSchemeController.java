@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import chat.tamtam.bot.domain.BotSchemeEntity;
+import chat.tamtam.bot.domain.BotTokenEntity;
 import chat.tamtam.bot.service.BotSchemeService;
 import chat.tamtam.bot.service.UserService;
 import lombok.AllArgsConstructor;
@@ -90,13 +91,22 @@ public class BotSchemeController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping(Endpoints.ID_CONNECT)
-    public ResponseEntity<?> connectBot(@PathVariable final Integer id) {
-        return new ResponseEntity<>(null, null, HttpStatus.OK);
+    @PostMapping(Endpoints.ID + Endpoints.TAM_CONNECT)
+    public ResponseEntity<?> connectBot(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable final Integer id,
+            @RequestBody final BotTokenEntity tokenEntity
+    ) {
+        botSchemeService.connect(authToken, id, tokenEntity);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping(Endpoints.ID_DISCONNECT)
-    public ResponseEntity<?> disconnectBot(@PathVariable final Integer id) {
-        return new ResponseEntity<>(null, null, HttpStatus.OK);
+    @PostMapping(path = Endpoints.ID + Endpoints.TAM_DISCONNECT, consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<?> disconnectBot(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable final Integer id
+    ) {
+        botSchemeService.disconnect(authToken, id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

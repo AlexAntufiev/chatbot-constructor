@@ -212,7 +212,7 @@ public class RegistrationBot extends AbstractCustomBot {
     @Bean
     public void subscribeRegBotOnAppReadyProduction() {
         try {
-            url = host + Endpoints.TAM_BOT_WEBHOOK + "/" + id;
+            url = host + Endpoints.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
             SimpleQueryResult result = botAPI.subscribe(new SubscriptionRequestBody(url)).execute();
             if (!result.isSuccess()) {
                 log.debug("Can't subscribe bot with id:" + id);

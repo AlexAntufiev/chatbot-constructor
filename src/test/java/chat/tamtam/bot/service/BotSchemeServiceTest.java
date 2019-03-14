@@ -7,7 +7,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import chat.tamtam.bot.RunnableTestContext;
 import chat.tamtam.bot.domain.BotSchemeEntity;
-import chat.tamtam.bot.domain.exception.NoFoundEntityException;
+import chat.tamtam.bot.domain.exception.NotFoundEntityException;
 import chat.tamtam.bot.repository.BotSchemaRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,6 +42,6 @@ class BotSchemeServiceTest extends RunnableTestContext {
     @Test
     void getNullBot() {
         when(botSchemaRepository.findByUserIdAndId(eq(USER_ID), eq(BOT_ID))).thenReturn(null);
-        assertThrows(NoFoundEntityException.class, () -> botSchemeService.getBotScheme(AUTH_TOKEN, BOT_ID));
+        assertThrows(NotFoundEntityException.class, () -> botSchemeService.getBotScheme(AUTH_TOKEN, BOT_ID));
     }
 }
