@@ -43,6 +43,11 @@ export default {
     'app.errormessage.fillname': 'Fill name',
     'app.errormessage.servernotresponse': 'Server not response',
     'app.errormessage.serverwrongresponse': 'Wrong server answer',
+    'errors.tam.service': 'TamTam service error',
+    'errors.tam.bot.token.incorrect': 'Incorrect bot token',
+    'errors.tam.bot.token.empty': 'Empty bot token',
+    'errors.tam.bot.subscribed.already': 'Bot is already subscribed',
+    'errors.tam.bot.unsubscribed.already': 'Bot is already unsubscribed',
 
     //Success messages
     'app.successmessage.successsumary': 'Success',

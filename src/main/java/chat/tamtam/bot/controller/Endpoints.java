@@ -10,13 +10,14 @@ public interface Endpoints {
     String ADD = "/add";
     String DELETE = "/delete";
     String ID_SAVE = "/{id}/save";
-    String ID_CONNECT = "/{id}/connect";
-    String ID_DISCONNECT = "/{id}/disconnect";
+    String TAM_CONNECT = "/tam/connect";
+    String TAM_DISCONNECT = "/tam/disconnect";
 
     String STATIC_INDEX = "/index.html";
     String STATIC_RESOURCES = "/assets/**";
 
     String HEALTH = "/actuator/health";
 
+    String TAM_CUSTOM_BOT_WEBHOOK = "/tam/custom/bot";
     String TAM_BOT_WEBHOOK = "/tam/bot";
 }

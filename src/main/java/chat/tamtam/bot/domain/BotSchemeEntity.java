@@ -26,11 +26,11 @@ public class BotSchemeEntity {
     @Column(name = "userId")
     private @NonNull Integer userId;
 
+    @Column(name = "botId")
+    private Long botId;
+
     @Column(name = "name")
     private @NonNull String name;
-
-    @Column(name = "token")
-    private String token;
 
     @Column(name = "schema")
     private byte[] schema;
