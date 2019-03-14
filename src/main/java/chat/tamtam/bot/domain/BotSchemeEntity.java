@@ -37,4 +37,7 @@ public class BotSchemeEntity {
 
     @Column(name = "connected")
     private boolean connected = false;
+
+    @Column(name = "webHookUrl")
+    private String webHookUrl;
 }

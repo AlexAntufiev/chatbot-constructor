@@ -97,8 +97,11 @@ public class BotSchemeController {
             @PathVariable final Integer id,
             @RequestBody final BotTokenEntity tokenEntity
     ) {
-        botSchemeService.connect(authToken, id, tokenEntity);
-        return new ResponseEntity<>(HttpStatus.OK);
+        ;
+        return new ResponseEntity<>(
+                botSchemeService.connect(authToken, id, tokenEntity.getToken()),
+                HttpStatus.OK
+        );
     }
 
     @PostMapping(path = Endpoints.ID + Endpoints.TAM_DISCONNECT, consumes = MediaType.ALL_VALUE)
@@ -106,7 +109,10 @@ public class BotSchemeController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable final Integer id
     ) {
-        botSchemeService.disconnect(authToken, id);
-        return new ResponseEntity<>(HttpStatus.OK);
+
+        return new ResponseEntity<>(
+                botSchemeService.disconnect(authToken, id),
+                HttpStatus.OK
+        );
     }
 }
