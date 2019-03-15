@@ -17,5 +17,5 @@ public class TamBotId implements Serializable {
     @Column(name = "botId", nullable = false)
     private Long botId;
     @Column(name = "userId", nullable = false)
-    private Integer userId;
+    private Long userId;
 }

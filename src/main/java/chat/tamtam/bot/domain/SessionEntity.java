@@ -30,7 +30,7 @@ public class SessionEntity {
     private @NonNull String token;
 
     @Column(name = "userId")
-    private @NonNull Integer userId;
+    private @NonNull Long userId;
 
     @Column(name = "login")
     private @NonNull String login;

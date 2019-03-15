@@ -9,7 +9,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
-import chat.tamtam.bot.domain.exception.TamBotSubscriptionException;
+import chat.tamtam.bot.domain.exception.TamBotException;
 import chat.tamtam.bot.domain.response.BotSubscriptionFailEntity;
 
 @RestControllerAdvice
@@ -19,8 +19,8 @@ public class ControllerHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleBadRequest(Exception ex, WebRequest request) {
         return handleExceptionInternal(ex, ex.getLocalizedMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
-    @ExceptionHandler(TamBotSubscriptionException.class)
-    public ResponseEntity<Object> handleBotSubscriptionException(TamBotSubscriptionException ex, WebRequest request) {
+    @ExceptionHandler(TamBotException.class)
+    public ResponseEntity<Object> handleBotSubscriptionException(TamBotException ex, WebRequest request) {
         return handleExceptionInternal(
                 ex,
                 new BotSubscriptionFailEntity(ex.getErrorKey()),

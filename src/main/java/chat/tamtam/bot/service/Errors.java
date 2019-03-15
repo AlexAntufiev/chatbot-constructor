@@ -6,4 +6,6 @@ public interface Errors {
     String TAM_BOT_TOKEN_EMPTY = "errors.tam.bot.token.empty";
     String TAM_BOT_SUBSCRIBED_ALREADY = "errors.tam.bot.subscribed.already";
     String TAM_BOT_UNSUBSCRIBED_ALREADY = "errors.tam.bot.unsubscribed.already";
+
+    String TAM_BOT_NOT_SUBSCRIBED = "errors.tam.bot.not.subscribed";
 }

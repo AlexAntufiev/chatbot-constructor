@@ -10,6 +10,8 @@ public interface Endpoints {
     String ADD = "/add";
     String DELETE = "/delete";
     String ID_SAVE = "/{id}/save";
+    String STATUS = "/status";
+
     String TAM_CONNECT = "/tam/connect";
     String TAM_DISCONNECT = "/tam/disconnect";
 

@@ -11,12 +11,12 @@ import chat.tamtam.bot.domain.BotSchemeEntity;
 
 @Repository
 public interface BotSchemaRepository extends CrudRepository<BotSchemeEntity, Integer> {
-    List<BotSchemeEntity> findAllByUserId(Integer userId);
+    List<BotSchemeEntity> findAllByUserId(Long userId);
 
-    BotSchemeEntity findByUserIdAndId(Integer userId, int id);
+    BotSchemeEntity findByUserIdAndId(Long userId, int id);
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-    void deleteByUserIdAndId(Integer userId, Integer id);
+    void deleteByUserIdAndId(Long userId, Integer id);
 
-    boolean existsByUserIdAndId(Integer userId, Integer id);
+    boolean existsByUserIdAndId(Long userId, Integer id);
 }

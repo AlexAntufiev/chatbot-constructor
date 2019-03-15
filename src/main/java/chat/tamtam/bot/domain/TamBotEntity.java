@@ -30,7 +30,7 @@ public class TamBotEntity {
     private String fullAvatarUrl;
 
     public TamBotEntity(
-            final @NotNull Integer userId,
+            final @NotNull Long userId,
             final @NotNull String token,
             final @NotNull UserWithPhoto userWithPhoto
     ) {

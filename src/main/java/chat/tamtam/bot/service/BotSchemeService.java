@@ -12,7 +12,7 @@ import chat.tamtam.bot.domain.BotSchemeEntity;
 import chat.tamtam.bot.domain.TamBotEntity;
 import chat.tamtam.bot.domain.TamBotId;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
-import chat.tamtam.bot.domain.exception.TamBotSubscriptionException;
+import chat.tamtam.bot.domain.exception.TamBotException;
 import chat.tamtam.bot.domain.response.BotSubscriptionSuccessEntity;
 import chat.tamtam.bot.repository.BotSchemaRepository;
 import chat.tamtam.bot.repository.TamBotRepository;
@@ -35,7 +35,7 @@ public class BotSchemeService {
     @Value("${tamtam.host}")
     private String host;
 
-    public BotSchemeEntity addBot(final BotSchemeEntity bot, Integer userId) throws IllegalArgumentException {
+    public BotSchemeEntity addBot(final BotSchemeEntity bot, Long userId) throws IllegalArgumentException {
         if (bot.getName().isEmpty() || bot.getId() != null) {
             throw new IllegalArgumentException("Invalid bot entity " + bot);
         }
@@ -45,7 +45,7 @@ public class BotSchemeService {
 
     public BotSchemeEntity saveBot(
             final BotSchemeEntity bot,
-            Integer userId,
+            Long userId,
             Integer id
     ) throws NoSuchElementException {
         if (!botSchemaRepository.existsByUserIdAndId(userId, id)) {
@@ -57,7 +57,7 @@ public class BotSchemeService {
     }
 
     public BotSchemeEntity getBotScheme(String authToken, int id) throws NotFoundEntityException {
-        Integer userId = userService.getUserIdByToken(authToken);
+        Long userId = userService.getUserIdByToken(authToken);
         BotSchemeEntity bot = botSchemaRepository.findByUserIdAndId(userId, id);
         if (bot == null) {
             throw new NotFoundEntityException("Does not exist bot with userId=" + userId + " and id=" + id);
@@ -66,7 +66,7 @@ public class BotSchemeService {
         }
     }
 
-    public void deleteByUserIdAndId(Integer userId, Integer id) throws NoSuchElementException {
+    public void deleteByUserIdAndId(Long userId, Integer id) throws NoSuchElementException {
         if (!botSchemaRepository.existsByUserIdAndId(userId, id)) {
             throw new NoSuchElementException("Does not exist bot with userId=" + userId + " and id=" + id);
         }
@@ -77,21 +77,35 @@ public class BotSchemeService {
         return false;
     }
 
-    public List<BotSchemeEntity> getList(final Integer userId) {
+    public List<BotSchemeEntity> getList(final Long userId) {
         return botSchemaRepository.findAllByUserId(userId);
     }
 
     private TamBotEntity fetchTamBot(
             final TamTamBotAPI tamTamBotAPI,
-            final Integer userId,
+            final Long userId,
             final String token) throws ClientException, APIException {
         UserWithPhoto userWithPhoto = tamTamBotAPI.getMyInfo().execute();
         return new TamBotEntity(userId, token, userWithPhoto);
     }
 
+    public TamBotEntity status(final String authToken, long tamBotId) {
+        long userId = userService.getUserIdByToken(authToken);
+        TamBotEntity tamBot = tamBotRepository.findById(new TamBotId(tamBotId, userId));
+        if (tamBot == null) {
+            throw new TamBotException(
+                    "Can't find tam bot info with id="
+                            + tamBotId
+                            + " cause entity does not exist",
+                    Errors.TAM_BOT_NOT_SUBSCRIBED
+            );
+        }
+        return tamBot;
+    }
+
     public BotSubscriptionSuccessEntity connect(final String authToken, int id, final String botToken) {
         if (StringUtils.isEmpty(botToken)) {
-            throw new TamBotSubscriptionException(
+            throw new TamBotException(
                     "Can't subscribe bot with id="
                             + id
                             + " cause bot is subscribed already",
@@ -100,7 +114,7 @@ public class BotSchemeService {
         }
         BotSchemeEntity bot = getBotScheme(authToken, id);
         if (bot.getBotId() != null) {
-            throw new TamBotSubscriptionException(
+            throw new TamBotException(
                     "Can't subscribe bot with id="
                             + id
                             + " cause bot is subscribed already",
@@ -121,7 +135,7 @@ public class BotSchemeService {
                 botSchemaRepository.save(bot);
                 return new BotSubscriptionSuccessEntity(tamBot);
             } else {
-                throw new TamBotSubscriptionException(
+                throw new TamBotException(
                         "Can't subscribe bot with id="
                                 + id
                                 + " cause success="
@@ -132,7 +146,7 @@ public class BotSchemeService {
         } catch (ClientException | APIException e) {
             if (!StringUtils.isEmpty(e.getMessage())
                     && e.getMessage().equals("API exception verify.token: Invalid access_token")) {
-                throw new TamBotSubscriptionException(
+                throw new TamBotException(
                         "Can't subscribe bot with id="
                                 + id
                                 + " cause "
@@ -140,7 +154,7 @@ public class BotSchemeService {
                         Errors.TAM_BOT_TOKEN_INCORRECT
                 );
             }
-            throw new TamBotSubscriptionException(
+            throw new TamBotException(
                     "Can't subscribe bot with id="
                             + id
                             + " cause "
@@ -153,7 +167,7 @@ public class BotSchemeService {
     public BotSubscriptionSuccessEntity disconnect(final String authToken, int id) {
         BotSchemeEntity bot = getBotScheme(authToken, id);
         if (bot.getBotId() == null) {
-            throw new TamBotSubscriptionException(
+            throw new TamBotException(
                     "Can't unsubscribe bot with id="
                             + id
                             + " cause bot was not subscribed",
@@ -174,7 +188,7 @@ public class BotSchemeService {
                 botSchemaRepository.save(bot);
                 return new BotSubscriptionSuccessEntity(tamBot);
             } else {
-                throw new TamBotSubscriptionException(
+                throw new TamBotException(
                         "Can't unsubscribe bot with id="
                                 + id
                                 + " cause success="
@@ -183,7 +197,7 @@ public class BotSchemeService {
                 );
             }
         } catch (ClientException | APIException e) {
-            throw new TamBotSubscriptionException(
+            throw new TamBotException(
                     "Can't unsubscribe bot with id="
                             + id
                             + " cause "
