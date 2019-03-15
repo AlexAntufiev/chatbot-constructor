@@ -45,7 +45,6 @@ export default {
     'app.errormessage.fillname': 'Заполните имя',
     'app.errormessage.servernotresponse': 'Сервер не доступен',
     'app.errormessage.serverwrongresponse': 'Неверный ответ от сервера',
-    'app.successmessage.filltoken': 'Пустой токен',
     'errors.tam.service': 'Ошибка сервиса ТамТам',
     'errors.tam.bot.token.incorrect': 'Неправильный токен',
     'errors.tam.bot.token.empty': 'Пустой токен',

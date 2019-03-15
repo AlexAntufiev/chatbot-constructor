@@ -45,7 +45,6 @@ export default {
     'app.errormessage.fillname': 'Fill name',
     'app.errormessage.servernotresponse': 'Server not response',
     'app.errormessage.serverwrongresponse': 'Wrong server answer',
-    'app.successmessage.filltoken': 'Token is empty',
     'errors.tam.service': 'TamTam service error',
     'errors.tam.bot.token.incorrect': 'Incorrect bot token',
     'errors.tam.bot.token.empty': 'Empty bot token',
