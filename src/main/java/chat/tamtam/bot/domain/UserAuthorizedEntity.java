@@ -9,5 +9,5 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor
 @RequiredArgsConstructor
 public class UserAuthorizedEntity {
-    private @NonNull Integer userId;
+    private @NonNull Long userId;
 }

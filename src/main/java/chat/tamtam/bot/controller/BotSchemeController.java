@@ -81,7 +81,7 @@ public class BotSchemeController {
             @PathVariable final Integer id, @RequestBody final BotSchemeEntity bot,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
     ) {
-        Integer userId = userService.getUserIdByToken(authToken);
+        Long userId = userService.getUserIdByToken(authToken);
         try {
             botSchemeService.saveBot(bot, userId, id);
         } catch (NoSuchElementException e) {
@@ -89,6 +89,17 @@ public class BotSchemeController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(path = Endpoints.ID + Endpoints.STATUS, consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<?> status(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable("id") final Long tamBotId
+    ) {
+        return new ResponseEntity<>(
+                botSchemeService.status(authToken, tamBotId),
+                HttpStatus.OK
+        );
     }
 
     @PostMapping(Endpoints.ID + Endpoints.TAM_CONNECT)

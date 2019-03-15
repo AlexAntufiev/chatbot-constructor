@@ -24,7 +24,7 @@ public class BotSchemeEntity {
     private Integer id;
 
     @Column(name = "userId")
-    private @NonNull Integer userId;
+    private @NonNull Long userId;
 
     @Column(name = "botId")
     private Long botId;
