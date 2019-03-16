@@ -55,6 +55,9 @@ export default {
     //Success messages
     'app.successmessage.successsumary': 'Успешно',
     'app.successmessage.successoperaton': 'Успешная операция',
+    'success.tam.bot.name.changed': 'Имя изменено',
+    'success.tam.bot.subscribed': 'Бот подключен',
+    'success.tam.bot.unsubscribed': 'Бот отключен',
 
     //Common
     'app.common.sigin.message': 'Необходима авторизация'

@@ -10,6 +10,7 @@ import {connect} from "react-redux";
 import {FormattedMessage, injectIntl} from "react-intl";
 
 class BotSettings extends Component {
+    // @todo #CC-19 show info about connected tam bot (name / icon)
     constructor(props) {
         super(props);
 
@@ -17,6 +18,7 @@ class BotSettings extends Component {
             name: '',
             token: '',
             connected: false,
+            botId: '',
             initialName: '',
             saveAjaxProcess: false,
             connectAjaxProcess: false,
@@ -49,6 +51,7 @@ class BotSettings extends Component {
                 const connected = !!res.data.botId;
                 this.setState({
                     name: res.data.name,
+                    botId: res.data.botId,
                     connected: connected,
                     initialName: res.data.name,
                 });
@@ -66,9 +69,12 @@ class BotSettings extends Component {
 
         let url;
         let data = {};
+        let successMessId;
         if (this.state.connected) {
+            successMessId = 'success.tam.bot.unsubscribed';
             url = makeUrl(ApiPoints.DISCONNECT_BOT, {id: this.props.match.params.id});
         } else {
+            successMessId = 'success.tam.bot.subscribed';
             url = makeUrl(ApiPoints.CONNECT_BOT, {id: this.props.match.params.id});
             data = {token: this.state.token};
         }
@@ -76,7 +82,7 @@ class BotSettings extends Component {
             this.setState({connectAjaxProcess: false});
             if (res.data.success) {
                 this.setState({connected: !this.state.connected});
-                AxiosMessages.successOperation(this);
+                AxiosMessages.successOperation(this, successMessId);
             } else {
                 AxiosMessages.serverErrorResponse(this, res.data.error);
             }
@@ -92,7 +98,7 @@ class BotSettings extends Component {
         axios.post(url, {name: this.state.name}).then((res) => {
             this.setState({saveAjaxProcess: false});
             if (res.status === 200) {
-                AxiosMessages.successOperation(this);
+                AxiosMessages.successOperation(this, 'success.tam.bot.name.changed');
                 this.setState({initialName: this.state.name,});
             } else {
                 AxiosMessages.serverErrorResponse(this);

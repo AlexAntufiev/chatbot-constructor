@@ -55,6 +55,9 @@ export default {
     //Success messages
     'app.successmessage.successsumary': 'Success',
     'app.successmessage.successoperaton': 'Success operation',
+    'success.tam.bot.name.changed': 'Name changed',
+    'success.tam.bot.subscribed': 'Bot subscribed',
+    'success.tam.bot.unsubscribed': 'Bot unsubscribed',
 
     //Common
     'app.common.sigin.message': 'Please, sign in'

@@ -91,6 +91,7 @@ export default () => ({
             filename: 'index.html',
             inject: false,
             template: HtmlWebpackTemplate,
+            favicon:  path.join(__dirname, 'src/main/resources/custom/images/favicon.png'),
             title: 'TamTam chatbot constructor'
         })
     ]
