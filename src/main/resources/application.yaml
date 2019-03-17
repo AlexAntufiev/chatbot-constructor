@@ -39,6 +39,8 @@ spring:
 
 tamtam:
   host: http://localhost:8090
+  channel:
+    listSizeTrashHold: 20
   registration:
     bot:
       id: 581483330212

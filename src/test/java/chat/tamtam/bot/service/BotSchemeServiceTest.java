@@ -32,8 +32,8 @@ class BotSchemeServiceTest extends RunnableTestContext {
 
     @Test
     void getBot() {
-        when(botSchemaRepository.findByUserIdAndId(eq(USER_ID), eq(BOT_ID))).thenReturn(BOT_SCHEMA_ENTITY);
-        BotSchemeEntity bot = botSchemeService.getBotScheme(AUTH_TOKEN, BOT_ID);
+        when(botSchemaRepository.findByUserIdAndId(eq(USER_ID), eq(BOT_SCHEME_ID))).thenReturn(BOT_SCHEME_ENTITY);
+        BotSchemeEntity bot = botSchemeService.getBotScheme(AUTH_TOKEN, BOT_SCHEME_ID);
         assertNotNull(bot, "BotScheme entity must be return");
         assertEquals(USER_ID, bot.getUserId(), "User id must be set");
         assertEquals(BOT_NAME, bot.getName(), "BotScheme name must be set");
@@ -41,7 +41,7 @@ class BotSchemeServiceTest extends RunnableTestContext {
 
     @Test
     void getNullBot() {
-        when(botSchemaRepository.findByUserIdAndId(eq(USER_ID), eq(BOT_ID))).thenReturn(null);
-        assertThrows(NotFoundEntityException.class, () -> botSchemeService.getBotScheme(AUTH_TOKEN, BOT_ID));
+        when(botSchemaRepository.findByUserIdAndId(eq(USER_ID), eq(BOT_SCHEME_ID))).thenReturn(null);
+        assertThrows(NotFoundEntityException.class, () -> botSchemeService.getBotScheme(AUTH_TOKEN, BOT_SCHEME_ID));
     }
 }

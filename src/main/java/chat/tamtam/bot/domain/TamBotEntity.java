@@ -1,6 +1,9 @@
 package chat.tamtam.bot.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -8,6 +11,7 @@ import javax.persistence.Table;
 import org.jetbrains.annotations.NotNull;
 
 import chat.tamtam.botapi.model.UserWithPhoto;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -40,5 +44,16 @@ public class TamBotEntity {
         username = userWithPhoto.getUsername();
         avatarUrl = userWithPhoto.getAvatarUrl();
         fullAvatarUrl = userWithPhoto.getFullAvatarUrl();
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Embeddable
+    public static class TamBotId implements Serializable {
+        @Column(name = "botId", nullable = false)
+        private Long botId;
+        @Column(name = "userId", nullable = false)
+        private Long userId;
     }
 }
