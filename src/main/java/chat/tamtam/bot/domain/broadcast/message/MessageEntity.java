@@ -11,12 +11,10 @@ import javax.persistence.Table;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 @Data
 @Entity
 @NoArgsConstructor
-@RequiredArgsConstructor
 @Table(name = "BroadcastMessage")
 public class MessageEntity {
     @Id
@@ -33,8 +31,6 @@ public class MessageEntity {
     private LocalDateTime firingTime;
     @Column(name = "text")
     private String text;
-    @Column(name = "payload")
-    private Object payload;
     @Column(name = "state")
     private int state;
     @Column(name = "error")
