@@ -9,3 +9,7 @@ export const BOT_LIST = API_POINT + "bot/list";
 export const DELETE_BOT = API_POINT + "bot/delete";
 export const BOT_INFO = API_POINT + "bot/:id";
 export const SAVE_BOT = API_POINT + "bot/:id/save";
+export const BOT_STATUS = API_POINT + "bot/:id/status";
+
+export const CONNECT_BOT = API_POINT + "bot/:id/tam/connect";
+export const DISCONNECT_BOT = API_POINT + "bot/:id/tam/disconnect";
