@@ -1,7 +1,6 @@
 package chat.tamtam.bot.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -9,19 +8,18 @@ import org.springframework.stereotype.Service;
 
 import chat.tamtam.bot.domain.BotSchemeEntity;
 import chat.tamtam.bot.domain.TamBotEntity;
-import chat.tamtam.bot.domain.chat.SelectedChatChannelEntity;
-import chat.tamtam.bot.domain.chat.TamChatEntity;
+import chat.tamtam.bot.domain.chatchannel.ChatChannelEntity;
+import chat.tamtam.bot.domain.chatchannel.SelectedChatChannelEntity;
 import chat.tamtam.bot.domain.exception.ChatChannelStoreException;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
 import chat.tamtam.bot.domain.exception.TamBotException;
+import chat.tamtam.bot.domain.response.ChatChannelListResponse;
 import chat.tamtam.bot.domain.response.SuccessResponse;
-import chat.tamtam.bot.domain.response.TamBotChatListResponse;
-import chat.tamtam.bot.repository.TamChatChannelRepository;
+import chat.tamtam.bot.repository.ChatChannelRepository;
 import chat.tamtam.botapi.TamTamBotAPI;
 import chat.tamtam.botapi.exceptions.APIException;
 import chat.tamtam.botapi.exceptions.ClientException;
 import chat.tamtam.botapi.model.Chat;
-import chat.tamtam.botapi.model.ChatAdminPermission;
 import chat.tamtam.botapi.model.ChatList;
 import chat.tamtam.botapi.model.ChatMember;
 import chat.tamtam.botapi.model.ChatStatus;
@@ -30,15 +28,17 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class TamChatChannelService {
-    private final TamChatChannelRepository tamChatChannelRepository;
+public class ChatChannelService {
+    private final ChatChannelRepository chatChannelRepository;
     private final BotSchemeService botSchemeService;
     private final TamBotService tamBotService;
 
-    @Value("${tamtam.chat.listSizeTrashHold:10}")
-    private int listSizeTrashHold;
+    @Value("${tamtam.chatChannel.listSizeThreshold:10}")
+    private int listSizeThreshold;
+    @Value("${tamtam.chatChannel.chatsFetchAmount:10}")
+    private int chatChannelsFetchAmount;
 
-    public TamBotChatListResponse getChatsWhereParticipant(
+    public ChatChannelListResponse getChatsWhereBotIsAdmin(
             final String authToken,
             int botSchemeId,
             final Long currentMarker
@@ -49,12 +49,16 @@ public class TamChatChannelService {
         try {
             final List<Chat> tamChatEntities = new ArrayList<>();
             Long marker = currentMarker;
-            while (tamChatEntities.size() < listSizeTrashHold) {
-                ChatList chatList = tamTamBotAPI.getChats().marker(marker).count(1).execute();
+            while (tamChatEntities.size() < listSizeThreshold) {
+                ChatList chatList = tamTamBotAPI
+                        .getChats()
+                        .marker(marker)
+                        .count(chatChannelsFetchAmount)
+                        .execute();
                 marker = chatList.getMarker();
                 chatList.getChats().forEach(chat -> {
                     // @todo #CC-63 enable ownerId check when it will be available
-                    if (/*chat.getOwnerId() != null
+                    if (/*chatChannel.getOwnerId() != null
                             &&*/ chat.getStatus() == ChatStatus.ACTIVE
                             && chat.getType() == ChatType.CHANNEL) {
 
@@ -65,7 +69,7 @@ public class TamChatChannelService {
                     break;
                 }
             }
-            return new TamBotChatListResponse(tamChatEntities, marker);
+            return new ChatChannelListResponse(tamChatEntities, marker);
         } catch (ClientException | APIException e) {
             throw new TamBotException(
                     "Can't fetch chats where tam bot with id="
@@ -76,100 +80,100 @@ public class TamChatChannelService {
         }
     }
 
-    public SuccessResponse storeChannel(
+    public SuccessResponse storeChatChannel(
             final String authToken,
             int botSchemeId,
             final SelectedChatChannelEntity selectedChannel
     ) {
-        if (selectedChannel.getChat() == null) {
+        if (selectedChannel.getChatChannel() == null) {
             throw new ChatChannelStoreException(
-                    "Empty chat",
-                    Errors.CHATS_SELECTED_EMPTY,
-                    Collections.emptyList()
+                    "Empty chatChannel",
+                    Errors.CHATCHANNEL_SELECTED_EMPTY,
+                    null
             );
         }
         BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
         TamTamBotAPI tamTamBotAPI = TamTamBotAPI.create(tamBot.getToken());
         try {
-            Chat chat = tamTamBotAPI.getChat(selectedChannel.getChat()).execute();
-            ChatMember chatMember = tamTamBotAPI.getMembership(selectedChannel.getChat()).execute();
+            Chat chat = tamTamBotAPI.getChat(selectedChannel.getChatChannel()).execute();
+            ChatMember chatMember = tamTamBotAPI.getMembership(selectedChannel.getChatChannel()).execute();
             if (chat.getType() != ChatType.CHANNEL) {
                 throw new ChatChannelStoreException(
-                        "Can't store chat with id="
-                                + selectedChannel.getChat()
-                                + "cause it is not chat",
-                        Errors.CHATS_NOT_CHANNEL,
-                        Collections.singletonList(selectedChannel.getChat())
+                        "Can't store chatChannel with id="
+                                + selectedChannel.getChatChannel()
+                                + "cause it is not chatChannel",
+                        Errors.CHAT_NOT_CHANNEL,
+                        selectedChannel.getChatChannel()
                 );
             }
-            if (chatMember.getPermissions() == null
-                    || !chatMember.getPermissions().contains(ChatAdminPermission.WRITE)) {
+            if (chatMember.getPermissions() == null) {
                 throw new ChatChannelStoreException(
-                        "Can't store chat with id="
-                                + selectedChannel.getChat()
+                        "Can't store chatChannel with id="
+                                + selectedChannel.getChatChannel()
                                 + "cause tam bot with id="
                                 + botScheme.getBotId()
                                 + " has insufficient permissions",
-                        Errors.CHATS_PERMISSIONS_ERROR,
-                        Collections.singletonList(selectedChannel.getChat())
+                        Errors.CHATCHANNEL_PERMISSIONS_ERROR,
+                        selectedChannel.getChatChannel()
                 );
             }
-            TamChatEntity chatChannelEntity = new TamChatEntity(
+            ChatChannelEntity chatChannelEntity = new ChatChannelEntity(
                     botSchemeId,
                     botScheme.getBotId(),
                     chat
             );
-            tamChatChannelRepository.save(chatChannelEntity);
+            chatChannelRepository.save(chatChannelEntity);
             return new SuccessResponse();
         } catch (ClientException | APIException e) {
             throw new ChatChannelStoreException(
-                    "Can't store chat with id="
-                            + selectedChannel.getChat()
+                    "Can't store chatChannel with id="
+                            + selectedChannel.getChatChannel()
                             + " cause"
                             + e.getLocalizedMessage(),
                     Errors.SERVICE_ERROR,
-                    Collections.emptyList()
+                    selectedChannel.getChatChannel()
             );
         }
     }
 
-    public Iterable<TamChatEntity> getChannels(
+    public Iterable<ChatChannelEntity> getChatChannels(
             final String authToken,
             int botSchemeId
     ) {
         BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
-        return tamChatChannelRepository
+        return chatChannelRepository
                 .findAllByIdBotSchemeIdAndIdTamBotId(
                         botScheme.getId(),
                         tamBot.getId().getBotId()
                 );
     }
 
-    public TamChatEntity getChannel(
+    public ChatChannelEntity getChatChannel(
             final String authToken,
             int botSchemeId,
             long chatId
     ) {
         BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
-        TamChatEntity tamChannel = tamChatChannelRepository
+        ChatChannelEntity chatChannel = chatChannelRepository
                 .findByIdBotSchemeIdAndIdTamBotIdAndIdChatId(
                         botScheme.getId(),
                         botScheme.getBotId(),
                         chatId
                 );
-        if (tamChannel == null) {
+        if (chatChannel == null) {
             throw new NotFoundEntityException(
-                    "Can't find chat for id="
+                    "Can't find chatChannel for id="
                             + chatId
                             + " where botSchemeId="
-                            + botScheme.getBotId()
+                            + botScheme.getId()
                             + " and tamBotId="
-                            + botScheme.getBotId()
+                            + botScheme.getBotId(),
+                    Errors.CHATCHANNEL_NOT_EXIST
             );
         }
-        return tamChannel;
+        return chatChannel;
     }
 }

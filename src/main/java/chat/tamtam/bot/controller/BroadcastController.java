@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import chat.tamtam.bot.domain.chat.SelectedChatChannelEntity;
+import chat.tamtam.bot.domain.chatchannel.SelectedChatChannelEntity;
+import chat.tamtam.bot.service.ChatChannelService;
 import chat.tamtam.bot.service.TamBotService;
-import chat.tamtam.bot.service.TamChatChannelService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -28,13 +28,13 @@ import lombok.extern.log4j.Log4j2;
 )
 public class BroadcastController {
     private final TamBotService tamBotService;
-    private final TamChatChannelService tamChatChannelService;
+    private final ChatChannelService chatChannelService;
 
     @GetMapping(
             path = {
-                    Endpoints.ID + Endpoints.TAM_CHANNELS + Endpoints.PARTICIPANT
+                    Endpoints.ID + Endpoints.TAM_CHATCHANNEL + Endpoints.ADMIN
                             + Endpoints.LIST + Endpoints.TAM_MARKER,
-                    Endpoints.ID + Endpoints.TAM_CHANNELS + Endpoints.PARTICIPANT + Endpoints.LIST
+                    Endpoints.ID + Endpoints.TAM_CHATCHANNEL + Endpoints.ADMIN + Endpoints.LIST
             },
             consumes = MediaType.ALL_VALUE
     )
@@ -44,25 +44,25 @@ public class BroadcastController {
             @PathVariable(required = false) final Long marker
     ) {
         return new ResponseEntity<>(
-                tamChatChannelService.getChatsWhereParticipant(authToken, botSchemeId, marker),
+                chatChannelService.getChatsWhereBotIsAdmin(authToken, botSchemeId, marker),
                 HttpStatus.OK
         );
     }
 
-    @PostMapping(Endpoints.ID + Endpoints.TAM_CHANNELS + Endpoints.STORE)
+    @PostMapping(Endpoints.ID + Endpoints.TAM_CHATCHANNEL + Endpoints.STORE)
     public ResponseEntity<?> storeChannel(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final Integer botSchemeId,
             @RequestBody final SelectedChatChannelEntity selectedChannel
     ) {
         return new ResponseEntity<>(
-                tamChatChannelService.storeChannel(authToken, botSchemeId, selectedChannel),
+                chatChannelService.storeChatChannel(authToken, botSchemeId, selectedChannel),
                 HttpStatus.OK
         );
     }
 
     @GetMapping(
-            path = Endpoints.ID + Endpoints.TAM_CHANNELS + Endpoints.LIST,
+            path = Endpoints.ID + Endpoints.TAM_CHATCHANNEL + Endpoints.LIST,
             consumes = MediaType.ALL_VALUE
     )
     public ResponseEntity<?> getChannels(
@@ -70,22 +70,22 @@ public class BroadcastController {
             @PathVariable("id") final Integer botSchemeId
     ) {
         return new ResponseEntity<>(
-                tamChatChannelService.getChannels(authToken, botSchemeId),
+                chatChannelService.getChatChannels(authToken, botSchemeId),
                 HttpStatus.OK
         );
     }
 
     @GetMapping(
-            path = Endpoints.ID + Endpoints.TAM_CHANNELS + Endpoints.CHANNEL_ID,
+            path = Endpoints.ID + Endpoints.TAM_CHATCHANNEL + Endpoints.CHATCHANNEL_ID,
             consumes = MediaType.ALL_VALUE
     )
     public ResponseEntity<?> getChannel(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final Integer botSchemeId,
-            @PathVariable("chat_id") final Long channelId
+            @PathVariable("chatchannel_id") final Long channelId
     ) {
         return new ResponseEntity<>(
-                tamChatChannelService.getChannel(authToken, botSchemeId, channelId),
+                chatChannelService.getChatChannel(authToken, botSchemeId, channelId),
                 HttpStatus.OK
         );
     }

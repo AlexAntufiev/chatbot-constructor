@@ -40,7 +40,8 @@ spring:
 tamtam:
   host: http://localhost:8090
   chat:
-    listSizeTrashHold: 20
+    listSizeThreshold: 20
+    chatsFetchAmount: 20
   registration:
     bot:
       id: 581483330212
