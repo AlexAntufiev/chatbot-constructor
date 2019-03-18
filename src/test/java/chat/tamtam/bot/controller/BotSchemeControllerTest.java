@@ -27,10 +27,10 @@ class BotSchemeControllerTest extends RunnableTestContext {
     @Test
     @SuppressWarnings("CastToConcreteClass")
     public void getBotScheme() {
-        Mockito.when(botSchemeService.getBotScheme(ArgumentMatchers.anyString(), eq(BOT_ID)))
-                .thenReturn(BOT_SCHEMA_ENTITY);
+        Mockito.when(botSchemeService.getBotScheme(ArgumentMatchers.anyString(), eq(BOT_SCHEME_ID)))
+                .thenReturn(BOT_SCHEME_ENTITY);
 
-        ResponseEntity<?> responseEntity = botSchemeController.getBotScheme(BOT_ID, AUTH_TOKEN);
+        ResponseEntity<?> responseEntity = botSchemeController.getBotScheme(BOT_SCHEME_ID, AUTH_TOKEN);
 
         assertNotNull(responseEntity, "Controller must be return object");
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode(), "Status code must be return");

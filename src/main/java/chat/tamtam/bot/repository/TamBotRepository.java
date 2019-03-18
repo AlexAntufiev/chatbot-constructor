@@ -5,12 +5,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import chat.tamtam.bot.domain.TamBotEntity;
-import chat.tamtam.bot.domain.TamBotId;
 
 @Repository
 public interface TamBotRepository extends CrudRepository<TamBotEntity, Integer> {
-    TamBotEntity findById(TamBotId tamBotId);
+    TamBotEntity findById(TamBotEntity.Id id);
 
     @Transactional
-    void deleteById(TamBotId tamBotId);
+    void deleteById(TamBotEntity.Id id);
 }

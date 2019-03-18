@@ -5,11 +5,11 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-public class BotSubscriptionFailEntity {
+public class FailResponse {
     private final Boolean success = false;
     private String error;
 
-    public BotSubscriptionFailEntity(String error) {
+    public FailResponse(String error) {
         this.error = error;
     }
 }

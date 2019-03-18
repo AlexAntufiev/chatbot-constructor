@@ -6,11 +6,10 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-public class BotSubscriptionSuccessEntity {
-    private final Boolean success = true;
+public class BotSubscriptionSuccessResponse extends SuccessResponse {
     private TamBotEntity info;
 
-    public BotSubscriptionSuccessEntity(TamBotEntity info) {
+    public BotSubscriptionSuccessResponse(TamBotEntity info) {
         this.info = info;
     }
 }

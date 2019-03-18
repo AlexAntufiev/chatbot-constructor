@@ -29,7 +29,7 @@ public class TestDatabase extends TestContext {
     public InitializingBean initializeTestDatabase() {
 
         return () -> {
-            botSchemaRepository.save(BOT_SCHEMA_ENTITY);
+            botSchemaRepository.save(BOT_SCHEME_ENTITY);
 
             userService.addUser(new UserAuthEntity(LOGIN_ADMIN, PASSWORD_ADMIN));
 
