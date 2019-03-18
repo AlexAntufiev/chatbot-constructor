@@ -21,13 +21,13 @@ public class MessageEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private Long id;
-    @Column(name = "botSchemeId")
+    @Column(name = "botSchemeId", nullable = false)
     private Integer botSchemeId;
-    @Column(name = "tamBotId")
+    @Column(name = "tamBotId", nullable = false)
     private Long tamBotId;
-    @Column(name = "chatChannelId")
+    @Column(name = "chatChannelId", nullable = false)
     private Long chatChannelId;
-    @Column(name = "firingTime")
+    @Column(name = "firingTime", nullable = false)
     private LocalDateTime firingTime;
     @Column(name = "text")
     private String text;
