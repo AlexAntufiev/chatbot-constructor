@@ -87,7 +87,7 @@ class BotList extends React.Component {
 
             return (
                 <Card title={bot.name}
-                      className="ui-card-shadow bot_card p-col" footer={footer} header={header}>
+                      className="ui-card-shadow card-container p-col" footer={footer} header={header}>
                     <div>{bot.description}</div>
                 </Card>
             );

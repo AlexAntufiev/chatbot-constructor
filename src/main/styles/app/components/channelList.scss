@@ -1,0 +1,10 @@
+.channel-list-element {
+  flex-basis: 200px;
+  margin: 10px;
+  flex-grow: 0;
+  overflow: hidden;
+}
+
+.channel-list-element .p-card-title {
+  font-size: 14px;
+}

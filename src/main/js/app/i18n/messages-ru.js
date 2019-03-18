@@ -15,6 +15,7 @@ export default {
     'app.menu.settings': 'Настройки',
     'app.menu.constructor': 'Конструктор',
     'app.menu.statistic': 'Статистика',
+    'app.menu.broadcasting': 'Рассылка',
 
     //Dialogs
     'app.dialog.name': 'Название',
@@ -43,7 +44,7 @@ export default {
     'app.errormessage.passwordnotmatch': 'Пароли не совпадают',
     'app.errormessage.fillallfields': 'Заполните все поля',
     'app.errormessage.fillname': 'Заполните имя',
-    'app.errormessage.servernotresponse': 'Сервер не доступен',
+    'app.errormessage.servernotresponse': 'Сервер недоступен',
     'app.errormessage.serverwrongresponse': 'Неверный ответ от сервера',
     'errors.tam.service': 'Ошибка сервиса ТамТам',
     'errors.tam.bot.token.incorrect': 'Неправильный токен',

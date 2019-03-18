@@ -8,6 +8,8 @@ import {Growl} from "primereact/growl";
 import * as AxiosMessages from 'app/utils/axiosMessages';
 import {connect} from "react-redux";
 import {FormattedMessage, injectIntl} from "react-intl";
+import ChannelList from "app/components/channelList";
+import * as BotSchemeService from "app/services/botSchemeService"
 
 class BotSettings extends Component {
     // @todo #CC-19 show info about connected tam bot (name / icon)
@@ -67,29 +69,28 @@ class BotSettings extends Component {
     onConnectButtonBot() {
         this.setState({connectAjaxProcess: true});
 
-        let url;
-        let data = {};
-        let successMessId;
-        if (this.state.connected) {
-            successMessId = 'success.tam.bot.unsubscribed';
-            url = makeUrl(ApiPoints.DISCONNECT_BOT, {id: this.props.match.params.id});
-        } else {
-            successMessId = 'success.tam.bot.subscribed';
-            url = makeUrl(ApiPoints.CONNECT_BOT, {id: this.props.match.params.id});
-            data = {token: this.state.token};
-        }
-        axios.post(url, data).then(res => {
+        function callbackSuccess(res) {
             this.setState({connectAjaxProcess: false});
             if (res.data.success) {
+                let successMessId;
+                if (this.state.connected) {
+                    successMessId = 'success.tam.bot.unsubscribed';
+                } else {
+                    successMessId = 'success.tam.bot.subscribed';
+                }
+
                 this.setState({connected: !this.state.connected});
                 AxiosMessages.successOperation(this, successMessId);
             } else {
                 AxiosMessages.serverErrorResponse(this, res.data.error);
             }
-        }).catch(() => {
-            this.setState({connectAjaxProcess: false});
-            AxiosMessages.serverNotResponse(this);
-        });
+        }
+
+        if (this.state.connected) {
+            BotSchemeService.disconnect(this.props.match.params.id, callbackSuccess, null, this);
+        } else {
+            BotSchemeService.connect(this.props.match.params.id, this.state.token, callbackSuccess, null, this);
+        }
     }
 
     onSaveBot() {
@@ -115,7 +116,7 @@ class BotSettings extends Component {
         const saveDisabled = this.state.name === this.state.initialName
             || this.state.name.trim() === ''
             || this.state.saveAjaxProcess;
-        const connectDisabled = !this.state.connected  && this.state.token.trim() === ''
+        const connectDisabled = !this.state.connected && this.state.token.trim() === ''
             || this.state.connectAjaxProcess;
 
         let connectButtonLabel;
@@ -146,6 +147,10 @@ class BotSettings extends Component {
                     </span>
                     <Button label={connectButtonLabel} disabled={connectDisabled} icon="pi pi-wifi"
                             onClick={this.onConnectButtonBot}/>
+                </div>
+                <div>
+                    <h3>Select channels</h3>
+                    <ChannelList/>
                 </div>
             </div>);
     }

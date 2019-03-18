@@ -15,6 +15,7 @@ export default {
     'app.menu.settings': 'Settings',
     'app.menu.constructor': 'Constructor',
     'app.menu.statistic': 'Statistic',
+    'app.menu.broadcasting': 'Broadcasting',
 
     //Dialogs
     'app.dialog.name': 'Name',
