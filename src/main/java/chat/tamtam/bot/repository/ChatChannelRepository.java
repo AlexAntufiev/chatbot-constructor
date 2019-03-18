@@ -1,5 +1,7 @@
 package chat.tamtam.bot.repository;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +15,19 @@ public interface ChatChannelRepository extends CrudRepository<ChatChannelEntity,
     );
 
     ChatChannelEntity findByIdBotSchemeIdAndIdTamBotIdAndIdChatId(
+            int botSchemeId,
+            long tamBotId,
+            long chatId
+    );
+
+    boolean existsByIdBotSchemeIdAndIdTamBotIdAndIdChatId(
+            int botSchemeId,
+            long tamBotId,
+            long chatId
+    );
+
+    @Transactional
+    Integer removeByIdBotSchemeIdAndIdTamBotIdAndIdChatId(
             int botSchemeId,
             long tamBotId,
             long chatId

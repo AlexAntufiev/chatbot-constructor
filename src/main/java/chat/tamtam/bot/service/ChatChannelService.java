@@ -172,9 +172,37 @@ public class ChatChannelService {
                             + botScheme.getId()
                             + " and tamBotId="
                             + botScheme.getBotId(),
-                    Errors.CHATCHANNEL_NOT_EXIST
+                    Errors.CHATCHANNEL_DOES_NOT_EXIST
             );
         }
         return new ChatChannelSuccessResponse(chatChannel);
+    }
+
+    public SuccessResponse removeChatChannel(
+            final String authToken,
+            int botSchemeId,
+            long chatChannelId
+    ) {
+        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
+        int amount = chatChannelRepository
+                .removeByIdBotSchemeIdAndIdTamBotIdAndIdChatId(
+                        botScheme.getId(),
+                        tamBot.getId().getBotId(),
+                        chatChannelId
+                );
+        if (amount == 0) {
+            throw new NotFoundEntityException(
+                    "Can't delete chatchannel with id="
+                            + chatChannelId
+                            + " for botSchemeId="
+                            + botSchemeId
+                            + " and tamBotId="
+                            + tamBot.getId().getBotId()
+                            + " cause does not exist",
+                    Errors.CHATCHANNEL_DOES_NOT_EXIST
+            );
+        }
+        return new SuccessResponse();
     }
 }
