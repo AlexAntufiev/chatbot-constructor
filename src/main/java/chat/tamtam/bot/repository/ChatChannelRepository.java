@@ -27,7 +27,7 @@ public interface ChatChannelRepository extends CrudRepository<ChatChannelEntity,
     );
 
     @Transactional
-    Integer removeByIdBotSchemeIdAndIdTamBotIdAndIdChatId(
+    void removeByIdBotSchemeIdAndIdTamBotIdAndIdChatId(
             int botSchemeId,
             long tamBotId,
             long chatId

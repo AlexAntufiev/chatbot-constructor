@@ -81,7 +81,7 @@ public class ChatChannelService {
         }
     }
 
-    public SuccessResponse storeChatChannel(
+    public SuccessResponse saveChatChannel(
             final String authToken,
             int botSchemeId,
             final SelectedChatChannelEntity selectedChatChannel
@@ -185,13 +185,12 @@ public class ChatChannelService {
     ) {
         BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
-        int amount = chatChannelRepository
-                .removeByIdBotSchemeIdAndIdTamBotIdAndIdChatId(
-                        botScheme.getId(),
+        if (!chatChannelRepository
+                .existsByIdBotSchemeIdAndIdTamBotIdAndIdChatId(
+                        botSchemeId,
                         tamBot.getId().getBotId(),
                         chatChannelId
-                );
-        if (amount == 0) {
+                )) {
             throw new NotFoundEntityException(
                     "Can't delete chatchannel with id="
                             + chatChannelId
@@ -203,6 +202,12 @@ public class ChatChannelService {
                     Errors.CHATCHANNEL_DOES_NOT_EXIST
             );
         }
+        chatChannelRepository
+                .removeByIdBotSchemeIdAndIdTamBotIdAndIdChatId(
+                        botScheme.getId(),
+                        tamBot.getId().getBotId(),
+                        chatChannelId
+                );
         return new SuccessResponse();
     }
 }

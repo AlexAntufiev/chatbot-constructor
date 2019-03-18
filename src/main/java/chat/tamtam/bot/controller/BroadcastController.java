@@ -49,14 +49,14 @@ public class BroadcastController {
         );
     }
 
-    @PostMapping(Endpoints.ID + Endpoints.TAM_CHATCHANNEL + Endpoints.STORE)
-    public ResponseEntity<?> storeChatChannel(
+    @PostMapping(Endpoints.ID + Endpoints.TAM_CHATCHANNEL + Endpoints.SAVE)
+    public ResponseEntity<?> saveChatChannel(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final Integer botSchemeId,
             @RequestBody final SelectedChatChannelEntity selectedChannel
     ) {
         return new ResponseEntity<>(
-                chatChannelService.storeChatChannel(authToken, botSchemeId, selectedChannel),
+                chatChannelService.saveChatChannel(authToken, botSchemeId, selectedChannel),
                 HttpStatus.OK
         );
     }

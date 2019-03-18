@@ -75,7 +75,7 @@ public class BotSchemeController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping(Endpoints.ID_SAVE)
+    @PostMapping(Endpoints.ID + Endpoints.SAVE)
     public ResponseEntity<?> saveBot(
             @PathVariable final Integer id, @RequestBody final BotSchemeEntity bot,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
