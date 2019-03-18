@@ -84,9 +84,9 @@ public class ChatChannelService {
     public SuccessResponse storeChatChannel(
             final String authToken,
             int botSchemeId,
-            final SelectedChatChannelEntity selectedChannel
+            final SelectedChatChannelEntity selectedChatChannel
     ) {
-        if (selectedChannel.getChatChannel() == null) {
+        if (selectedChatChannel.getChatChannel() == null) {
             throw new ChatChannelStoreException(
                     "Empty chatChannel",
                     Errors.CHATCHANNEL_SELECTED_EMPTY,
@@ -97,26 +97,26 @@ public class ChatChannelService {
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
         TamTamBotAPI tamTamBotAPI = TamTamBotAPI.create(tamBot.getToken());
         try {
-            Chat chat = tamTamBotAPI.getChat(selectedChannel.getChatChannel()).execute();
-            ChatMember chatMember = tamTamBotAPI.getMembership(selectedChannel.getChatChannel()).execute();
+            Chat chat = tamTamBotAPI.getChat(selectedChatChannel.getChatChannel()).execute();
+            ChatMember chatMember = tamTamBotAPI.getMembership(selectedChatChannel.getChatChannel()).execute();
             if (chat.getType() != ChatType.CHANNEL) {
                 throw new ChatChannelStoreException(
                         "Can't store chatChannel with id="
-                                + selectedChannel.getChatChannel()
+                                + selectedChatChannel.getChatChannel()
                                 + "cause it is not chatChannel",
                         Errors.CHAT_NOT_CHANNEL,
-                        selectedChannel.getChatChannel()
+                        selectedChatChannel.getChatChannel()
                 );
             }
             if (chatMember.getPermissions() == null) {
                 throw new ChatChannelStoreException(
                         "Can't store chatChannel with id="
-                                + selectedChannel.getChatChannel()
+                                + selectedChatChannel.getChatChannel()
                                 + "cause tam bot with id="
                                 + botScheme.getBotId()
                                 + " has insufficient permissions",
                         Errors.CHATCHANNEL_PERMISSIONS_ERROR,
-                        selectedChannel.getChatChannel()
+                        selectedChatChannel.getChatChannel()
                 );
             }
             ChatChannelEntity chatChannelEntity = new ChatChannelEntity(
@@ -129,11 +129,11 @@ public class ChatChannelService {
         } catch (ClientException | APIException e) {
             throw new ChatChannelStoreException(
                     "Can't store chatChannel with id="
-                            + selectedChannel.getChatChannel()
+                            + selectedChatChannel.getChatChannel()
                             + " cause"
                             + e.getLocalizedMessage(),
                     Errors.SERVICE_ERROR,
-                    selectedChannel.getChatChannel()
+                    selectedChatChannel.getChatChannel()
             );
         }
     }
