@@ -40,7 +40,7 @@ public class TamBotService {
                     Errors.TAM_BOT_NOT_SUBSCRIBED
             );
         }
-        TamBotEntity tamBot = tamBotRepository.findById(new TamBotEntity.TamBotId(tamBotId, userId));
+        TamBotEntity tamBot = tamBotRepository.findById(new TamBotEntity.Id(tamBotId, userId));
         if (tamBot == null) {
             throw new NotFoundEntityException(
                     "Can't find tam bot with id="
@@ -76,7 +76,7 @@ public class TamBotService {
             );
         }
         TamBotEntity tamBot = tamBotRepository.findById(
-                new TamBotEntity.TamBotId(botScheme.getBotId(), botScheme.getUserId())
+                new TamBotEntity.Id(botScheme.getBotId(), botScheme.getUserId())
         );
         if (tamBot == null) {
             throw new NotFoundEntityException(
@@ -159,7 +159,7 @@ public class TamBotService {
             );
         }
         TamBotEntity tamBot = tamBotRepository
-                .findById(new TamBotEntity.TamBotId(bot.getBotId(), bot.getUserId()));
+                .findById(new TamBotEntity.Id(bot.getBotId(), bot.getUserId()));
         TamTamBotAPI tamTamBotAPI = TamTamBotAPI.create(tamBot.getToken());
         try {
             SimpleQueryResult result = tamTamBotAPI
@@ -168,7 +168,7 @@ public class TamBotService {
             if (result.isSuccess()) {
                 bot.setBotId(null);
                 // @todo #CC-52 wrap delete and save operations into transaction
-                tamBotRepository.deleteById(new TamBotEntity.TamBotId(bot.getBotId(), bot.getUserId()));
+                tamBotRepository.deleteById(new TamBotEntity.Id(bot.getBotId(), bot.getUserId()));
                 botSchemaRepository.save(bot);
                 return new BotSubscriptionSuccessResponse(tamBot);
             } else {

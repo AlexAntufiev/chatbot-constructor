@@ -11,7 +11,9 @@ public interface Errors {
 
     String TAM_BOT_NOT_SUBSCRIBED = "errors.tam.bot.not.subscribed";
 
-    String CHANNELS_SELECTED_EMPTY = "errors.channel.selected.empty";
-    String CHANNELS_PERMISSIONS_ERROR = "errors.channel.permission";
-    String CHANNELS_SELECTED_NOT_EXIST = "errors.channel.not.exist";
+    String CHATS_SELECTED_EMPTY = "errors.chat.selected.empty";
+    String CHATS_PERMISSIONS_ERROR = "errors.chat.permission";
+    String CHATS_SELECTED_NOT_EXIST = "errors.chat.not.exist";
+    String CHATS_NOT_CHANNEL = "errors.not.chat";
+
 }

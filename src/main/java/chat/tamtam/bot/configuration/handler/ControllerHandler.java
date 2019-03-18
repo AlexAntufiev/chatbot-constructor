@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import chat.tamtam.bot.domain.exception.ChannelStoreException;
+import chat.tamtam.bot.domain.exception.ChatChannelStoreException;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
 import chat.tamtam.bot.domain.exception.TamBotException;
 import chat.tamtam.bot.domain.response.FailResponse;
-import chat.tamtam.bot.domain.response.TamBotChannelsFailResponse;
+import chat.tamtam.bot.domain.response.TamChatFailResponse;
 
 @RestControllerAdvice
 public class ControllerHandler extends ResponseEntityExceptionHandler {
@@ -32,10 +32,10 @@ public class ControllerHandler extends ResponseEntityExceptionHandler {
         );
     }
 
-    public ResponseEntity<Object> handleChannelsStoreException(ChannelStoreException ex, WebRequest request) {
+    public ResponseEntity<Object> handleChannelsStoreException(ChatChannelStoreException ex, WebRequest request) {
         return handleExceptionInternal(
                 ex,
-                new TamBotChannelsFailResponse(ex.getErrorKey(), ex.getChannels()),
+                new TamChatFailResponse(ex.getErrorKey(), ex.getChat()),
                 new HttpHeaders(),
                 HttpStatus.OK,
                 request

@@ -39,7 +39,7 @@ spring:
 
 tamtam:
   host: http://localhost:8090
-  channel:
+  chat:
     listSizeTrashHold: 20
   registration:
     bot:

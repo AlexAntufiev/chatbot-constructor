@@ -23,7 +23,7 @@ public class TestContext {
     public static final String TAM_BOT_USERNAME = "TAM_BOT_USERNAME";
     public static final String TAM_BOT_TOKEN = "TAM_BOT_TOKEN";
 
-    public static final TamBotEntity.TamBotId TAM_BOT_ID_ENTITY;
+    public static final TamBotEntity.Id TAM_BOT_ID_ENTITY;
     public static final TamBotEntity TAM_BOT_ENTITY;
     public static final UserWithPhoto USER_WITH_PHOTO;
 
@@ -38,7 +38,7 @@ public class TestContext {
                 TAM_BOT_NAME,
                 TAM_BOT_USERNAME
         );
-        TAM_BOT_ID_ENTITY = new TamBotEntity.TamBotId(TAM_BOT_ID, USER_ID);
+        TAM_BOT_ID_ENTITY = new TamBotEntity.Id(TAM_BOT_ID, USER_ID);
         TAM_BOT_ENTITY = new TamBotEntity(
                 USER_ID,
                 TAM_BOT_TOKEN,

@@ -1,4 +1,4 @@
-package chat.tamtam.bot.domain.channel;
+package chat.tamtam.bot.domain.chat;
 
 import java.io.Serializable;
 
@@ -17,9 +17,9 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @NoArgsConstructor
-public class TamChannelEntity {
+public class TamChatEntity {
     @EmbeddedId
-    private ChannelId channelId;
+    private Id id;
     @Column(name = "type", nullable = false)
     private ChatType type;
     @Column(name = "title")
@@ -29,12 +29,12 @@ public class TamChannelEntity {
     @Column(name = "link")
     private String link;
 
-    public TamChannelEntity(
+    public TamChatEntity(
             final @NotNull Integer botSchemeId,
             final @NotNull Long tamBotId,
             final @NotNull Chat chat
     ) {
-        channelId = new ChannelId(chat.getChatId(), botSchemeId, tamBotId);
+        id = new Id(chat.getChatId(), botSchemeId, tamBotId);
         type = chat.getType();
         title = chat.getTitle();
         if (chat.getIcon() != null) {
@@ -49,7 +49,7 @@ public class TamChannelEntity {
     @NoArgsConstructor
     @AllArgsConstructor
     @Embeddable
-    public static class ChannelId implements Serializable {
+    public static class Id implements Serializable {
         @Column(name = "chatId", nullable = false)
         private Long chatId;
         @Column(name = "botSchemeId", nullable = false)

@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TamBotEntity {
     @EmbeddedId
-    private TamBotId id;
+    private Id id;
     @Column(name = "token", nullable = false)
     private String token;
     @Column(name = "name", nullable = false)
@@ -38,7 +38,7 @@ public class TamBotEntity {
             final @NotNull String token,
             final @NotNull UserWithPhoto userWithPhoto
     ) {
-        id = new TamBotId(userWithPhoto.getUserId(), userId);
+        id = new Id(userWithPhoto.getUserId(), userId);
         this.token = token;
         name = userWithPhoto.getName();
         username = userWithPhoto.getUsername();
@@ -50,7 +50,7 @@ public class TamBotEntity {
     @NoArgsConstructor
     @AllArgsConstructor
     @Embeddable
-    public static class TamBotId implements Serializable {
+    public static class Id implements Serializable {
         @Column(name = "botId", nullable = false)
         private Long botId;
         @Column(name = "userId", nullable = false)

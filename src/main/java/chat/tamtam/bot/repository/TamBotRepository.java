@@ -8,8 +8,8 @@ import chat.tamtam.bot.domain.TamBotEntity;
 
 @Repository
 public interface TamBotRepository extends CrudRepository<TamBotEntity, Integer> {
-    TamBotEntity findById(TamBotEntity.TamBotId tamBotId);
+    TamBotEntity findById(TamBotEntity.Id id);
 
     @Transactional
-    void deleteById(TamBotEntity.TamBotId tamBotId);
+    void deleteById(TamBotEntity.Id id);
 }

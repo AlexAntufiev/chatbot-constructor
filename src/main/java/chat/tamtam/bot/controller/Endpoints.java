@@ -15,8 +15,8 @@ public interface Endpoints {
     String TAM_CONNECT = "/tam/connect";
     String TAM_DISCONNECT = "/tam/disconnect";
 
-    String TAM_CHANNELS = "/tam/channel";
-    String CHANNEL_ID = "/{channel_id}";
+    String TAM_CHANNELS = "/tam/chat";
+    String CHANNEL_ID = "/{chat_id}";
     String PARTICIPANT = "/participant";
     String TAM_MARKER = "/{marker}";
     String STORE = "/store";
