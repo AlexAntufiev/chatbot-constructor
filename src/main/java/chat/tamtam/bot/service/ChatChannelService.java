@@ -13,7 +13,8 @@ import chat.tamtam.bot.domain.chatchannel.SelectedChatChannelEntity;
 import chat.tamtam.bot.domain.exception.ChatChannelStoreException;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
 import chat.tamtam.bot.domain.exception.TamBotException;
-import chat.tamtam.bot.domain.response.ChatChannelListResponse;
+import chat.tamtam.bot.domain.response.ChatChannelListSuccessResponse;
+import chat.tamtam.bot.domain.response.ChatChannelSuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponse;
 import chat.tamtam.bot.repository.ChatChannelRepository;
 import chat.tamtam.botapi.TamTamBotAPI;
@@ -38,7 +39,7 @@ public class ChatChannelService {
     @Value("${tamtam.chatChannel.chatsFetchAmount:10}")
     private int chatChannelsFetchAmount;
 
-    public ChatChannelListResponse getChatsWhereBotIsAdmin(
+    public ChatChannelListSuccessResponse getChatsWhereBotIsAdmin(
             final String authToken,
             int botSchemeId,
             final Long currentMarker
@@ -69,10 +70,10 @@ public class ChatChannelService {
                     break;
                 }
             }
-            return new ChatChannelListResponse(tamChatEntities, marker);
+            return new ChatChannelListSuccessResponse<>(tamChatEntities, marker);
         } catch (ClientException | APIException e) {
             throw new TamBotException(
-                    "Can't fetch chats where tam bot with id="
+                    "Can't fetch chatChannels where tam bot with id="
                             + botScheme.getBotId()
                             + "is participant",
                     Errors.TAM_SERVICE_ERROR
@@ -137,20 +138,20 @@ public class ChatChannelService {
         }
     }
 
-    public Iterable<ChatChannelEntity> getChatChannels(
+    public ChatChannelListSuccessResponse getChatChannels(
             final String authToken,
             int botSchemeId
     ) {
         BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
-        return chatChannelRepository
-                .findAllByIdBotSchemeIdAndIdTamBotId(
-                        botScheme.getId(),
-                        tamBot.getId().getBotId()
-                );
+        return new ChatChannelListSuccessResponse<>(
+                chatChannelRepository
+                        .findAllByIdBotSchemeIdAndIdTamBotId(botScheme.getId(), tamBot.getId().getBotId()),
+                null
+        );
     }
 
-    public ChatChannelEntity getChatChannel(
+    public ChatChannelSuccessResponse getChatChannel(
             final String authToken,
             int botSchemeId,
             long chatId
@@ -174,6 +175,6 @@ public class ChatChannelService {
                     Errors.CHATCHANNEL_NOT_EXIST
             );
         }
-        return chatChannel;
+        return new ChatChannelSuccessResponse(chatChannel);
     }
 }
