@@ -12,8 +12,12 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-before_install:
-  - npm i -g npm@6.7.0
+deploy:
+  provider: script
+  script: cp ./build/libs/chatbot-constructor.jar ./docker/chatbot-constructor.jar && ./scipts/deploy.sh ./docker/
+  skip_cleanup: true
+  on:
+    branch: travis
 
 branches:
   only:
