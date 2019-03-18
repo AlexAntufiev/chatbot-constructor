@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import chat.tamtam.bot.domain.BotTokenEntity;
+import chat.tamtam.bot.domain.bot.BotTokenEntity;
 import chat.tamtam.bot.service.TamBotService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;

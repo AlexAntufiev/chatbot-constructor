@@ -6,8 +6,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import chat.tamtam.bot.domain.BotSchemeEntity;
-import chat.tamtam.bot.domain.TamBotEntity;
+import chat.tamtam.bot.domain.bot.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.chatchannel.ChatChannelEntity;
 import chat.tamtam.bot.domain.chatchannel.SelectedChatChannelEntity;
 import chat.tamtam.bot.domain.exception.ChatChannelStoreException;

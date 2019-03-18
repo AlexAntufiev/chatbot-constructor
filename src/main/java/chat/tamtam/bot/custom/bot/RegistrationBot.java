@@ -19,8 +19,8 @@ import com.auth0.jwt.JWT;
 
 import chat.tamtam.bot.configuration.Profiles;
 import chat.tamtam.bot.controller.Endpoints;
-import chat.tamtam.bot.domain.SessionEntity;
-import chat.tamtam.bot.domain.UserEntity;
+import chat.tamtam.bot.domain.session.SessionEntity;
+import chat.tamtam.bot.domain.user.UserEntity;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.repository.UserRepository;
 import chat.tamtam.bot.security.SecurityConstants;

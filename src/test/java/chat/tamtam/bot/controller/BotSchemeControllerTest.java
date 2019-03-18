@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import chat.tamtam.bot.RunnableTestContext;
-import chat.tamtam.bot.domain.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.service.BotSchemeService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

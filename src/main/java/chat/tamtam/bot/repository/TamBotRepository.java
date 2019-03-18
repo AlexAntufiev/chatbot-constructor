@@ -4,7 +4,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import chat.tamtam.bot.domain.TamBotEntity;
+import chat.tamtam.bot.domain.bot.TamBotEntity;
 
 @Repository
 public interface TamBotRepository extends CrudRepository<TamBotEntity, Integer> {

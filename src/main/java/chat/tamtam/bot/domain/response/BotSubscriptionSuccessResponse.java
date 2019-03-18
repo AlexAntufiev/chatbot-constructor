@@ -1,6 +1,6 @@
 package chat.tamtam.bot.domain.response;
 
-import chat.tamtam.bot.domain.TamBotEntity;
+import chat.tamtam.bot.domain.bot.TamBotEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
