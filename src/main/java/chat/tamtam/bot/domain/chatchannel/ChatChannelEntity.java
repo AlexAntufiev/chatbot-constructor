@@ -74,11 +74,11 @@ public class ChatChannelEntity {
     }
 
     private static void setOption(int options, boolean condition, ChatChannelOption option) {
-        options |= condition ? option.value : 0;
+        options |= condition ? option.getValue() : 0;
     }
 
     private boolean hasOption(ChatChannelOption option) {
-        return (options & option.value) == 1;
+        return (options & option.getValue()) == 1;
     }
 
     @Data

@@ -131,8 +131,8 @@ public class BroadcastMessageService {
         if (!localDateTime.isBefore(broadcastMessage.getFiringTime())) {
             throw new CreateBroadcastMessageException(
                     "Can't create broadCastMessage cause firing time in past="
-                            + broadcastMessage.getFiringTime() +
-                            " and local time="
+                            + broadcastMessage.getFiringTime()
+                            + " and local time="
                             + localDateTime,
                     Errors.BROADCAST_MESSAGE_FIRING_TIME_IS_IN_PAST
             );
@@ -143,7 +143,7 @@ public class BroadcastMessageService {
         broadcastMessage.setBotSchemeId(botScheme.getId());
         broadcastMessage.setTamBotId(tamBot.getId().getBotId());
         broadcastMessage.setChatChannelId(chatChannel.getId().getChatId());
-        broadcastMessage.setState(BroadcastMessageState.SCHEDULED.value);
+        broadcastMessage.setState(BroadcastMessageState.SCHEDULED.getValue());
         return new BroadcastMessageSuccessResponse(broadcastMessageRepository.save(broadcastMessage));
     }
 }
