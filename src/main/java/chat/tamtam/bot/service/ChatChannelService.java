@@ -81,7 +81,7 @@ public class ChatChannelService {
         }
     }
 
-    public SuccessResponse storeChatChannel(
+    public SuccessResponse saveChatChannel(
             final String authToken,
             int botSchemeId,
             final SelectedChatChannelEntity selectedChatChannel
@@ -172,9 +172,42 @@ public class ChatChannelService {
                             + botScheme.getId()
                             + " and tamBotId="
                             + botScheme.getBotId(),
-                    Errors.CHATCHANNEL_NOT_EXIST
+                    Errors.CHATCHANNEL_DOES_NOT_EXIST
             );
         }
         return new ChatChannelSuccessResponse(chatChannel);
+    }
+
+    public SuccessResponse removeChatChannel(
+            final String authToken,
+            int botSchemeId,
+            long chatChannelId
+    ) {
+        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
+        if (!chatChannelRepository
+                .existsByIdBotSchemeIdAndIdTamBotIdAndIdChatId(
+                        botSchemeId,
+                        tamBot.getId().getBotId(),
+                        chatChannelId
+                )) {
+            throw new NotFoundEntityException(
+                    "Can't delete chatchannel with id="
+                            + chatChannelId
+                            + " for botSchemeId="
+                            + botSchemeId
+                            + " and tamBotId="
+                            + tamBot.getId().getBotId()
+                            + " cause does not exist",
+                    Errors.CHATCHANNEL_DOES_NOT_EXIST
+            );
+        }
+        chatChannelRepository
+                .removeByIdBotSchemeIdAndIdTamBotIdAndIdChatId(
+                        botScheme.getId(),
+                        tamBot.getId().getBotId(),
+                        chatChannelId
+                );
+        return new SuccessResponse();
     }
 }

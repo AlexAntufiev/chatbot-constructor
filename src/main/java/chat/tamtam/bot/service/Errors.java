@@ -13,7 +13,7 @@ public interface Errors {
 
     String CHATCHANNEL_SELECTED_EMPTY = "errors.chatChannel.selected.empty";
     String CHATCHANNEL_PERMISSIONS_ERROR = "errors.chatChannel.permission";
-    String CHATCHANNEL_NOT_EXIST = "errors.chatChannel.not.exist";
+    String CHATCHANNEL_DOES_NOT_EXIST = "errors.chatChannel.not.exist";
     String CHAT_NOT_CHANNEL = "errors.not.chatChannel";
 
 }

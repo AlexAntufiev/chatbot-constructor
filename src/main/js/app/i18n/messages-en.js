@@ -50,7 +50,11 @@ export default {
     'errors.tam.bot.token.empty': 'Empty bot token',
     'errors.tam.bot.subscribed.already': 'Bot is already subscribed',
     'errors.tam.bot.unsubscribed.already': 'Bot is already unsubscribed',
-    'errors.tam.bot.not.subscribed': "Bot not subscribed",
+    'errors.tam.bot.not.subscribed': 'Bot not subscribed',
+    'errors.chatChannel.selected.empty': 'Provided channel id is empty',
+    'errors.chatChannel.permission': 'This channel has insufficient permissions',
+    'errors.chatChannel.not.exist': 'This channel does not exist',
+    'errors.not.chatChannel': 'This is not channel',
 
     //Success messages
     'app.successmessage.successsumary': 'Success',

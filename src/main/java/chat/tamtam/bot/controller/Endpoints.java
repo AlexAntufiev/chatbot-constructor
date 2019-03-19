@@ -9,7 +9,7 @@ public interface Endpoints {
     String LIST = "/list";
     String ADD = "/add";
     String DELETE = "/delete";
-    String ID_SAVE = "/{id}/save";
+    String SAVE = "/save";
     String STATUS = "/status";
 
     String TAM_CONNECT = "/tam/connect";
@@ -19,7 +19,6 @@ public interface Endpoints {
     String CHATCHANNEL_ID = "/{chatchannel_id}";
     String ADMIN = "/admin";
     String TAM_MARKER = "/{marker}";
-    String STORE = "/store";
 
     String STATIC_INDEX = "/index.html";
     String STATIC_RESOURCES = "/assets/**";
