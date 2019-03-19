@@ -5,11 +5,10 @@ import {Button} from 'primereact/button';
 import * as routers from 'app/constants/routes';
 import {injectIntl} from 'react-intl';
 import {Redirect} from 'react-router-dom'
-import axios from 'axios';
-import * as ApiPoints from 'app/constants/apiPoints';
 import {Growl} from "primereact/growl";
 import * as AxiosMessages from 'app/utils/axiosMessages';
 import makeUrl from 'app/utils/makeUrl'
+import * as BotSchemeService from "app/service/botScheme"
 
 class BotList extends React.Component {
     constructor(props) {
@@ -21,13 +20,12 @@ class BotList extends React.Component {
     }
 
     refreshBotList() {
-        axios.get(ApiPoints.BOT_LIST).then(res => {
+        const self = this;
+        BotSchemeService.getList((res) => {
             if (res.status === 200) {
-                this.setState({bots: res.data});
+                self.setState({bots: res.data});
             }
-        }).catch(() => {
-            AxiosMessages.serverNotResponse(this);
-        });
+        }, null, this);
     }
 
     componentDidMount() {
@@ -36,19 +34,16 @@ class BotList extends React.Component {
 
     onAddBot() {
         const defaultName = 'Tam tam bot';
+        const self = this;
 
-        axios.post(ApiPoints.ADD_BOT,
-            {name: defaultName}
-        ).then(res => {
+        BotSchemeService.addBot(defaultName, (res) => {
             if (Number.isInteger(res.data.id) && res.status === 200) {
                 const url = makeUrl(routers.botDetail(), {id: res.data.id});
-                this.props.history.push(url);
+                self.props.history.push(url);
             } else {
-                AxiosMessages.serverErrorResponse(this);
+                AxiosMessages.serverErrorResponse(self);
             }
-        }).catch(error => {
-            AxiosMessages.serverNotResponse(this);
-        });
+        }, null, this);
     }
 
     createBotList() {
@@ -61,13 +56,7 @@ class BotList extends React.Component {
         return this.state.bots.map((bot) => {
             function removeBot() {
                 if (confirm(intl.formatMessage({id: 'app.dialog.checksure'}))) {
-                    axios.delete(ApiPoints.DELETE_BOT, {
-                        data: {
-                            id: bot.id
-                        }
-                    }).then(() => {
-                        self.refreshBotList();
-                    });
+                    BotSchemeService.removeBot(bot.id, () => self.refreshBotList(), null, self);
                 }
             }
 

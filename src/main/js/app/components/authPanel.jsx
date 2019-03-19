@@ -4,11 +4,10 @@ import {injectIntl} from 'react-intl';
 import RegisterDialog from 'app/components/registerDialog';
 import LoginDialog from 'app/components/loginDialog';
 import {Button} from 'primereact/button';
-import {LOGOUT} from "app/constants/apiPoints";
-import axios from "axios";
 import setUserInfo from "app/actions/userInfo";
 import {Cookies} from "react-cookie";
 import {AUTHORIZATION, USER_ID} from "app/constants/cookies";
+import * as UserService from "app/service/user"
 
 class AuthPanel extends React.Component {
     constructor(props) {
@@ -29,16 +28,16 @@ class AuthPanel extends React.Component {
     }
 
     onLogout() {
-        axios.post(LOGOUT).then(() => {
+        const self = this;
+        UserService.logout((res) => {
             const cookies = new Cookies();
             cookies.remove(AUTHORIZATION);
             cookies.remove(USER_ID);
-
-            this.props.setUser({
+            self.props.setUser({
                 userId: null,
                 token: null
             });
-        });
+        }, null, this);
     }
 
     render() {

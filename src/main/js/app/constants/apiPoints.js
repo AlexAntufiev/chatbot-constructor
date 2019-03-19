@@ -13,3 +13,7 @@ export const BOT_STATUS = API_POINT + "bot/:id/status";
 
 export const CONNECT_BOT = API_POINT + "bot/:id/tam/connect";
 export const DISCONNECT_BOT = API_POINT + "bot/:id/tam/disconnect";
+
+export const BOT_CHANNELS_LIST = API_POINT + "bot/:id/tam/chatchannel/list";
+export const BOT_STORE_CHANNEL = API_POINT + "bot/:id/tam/chatchannel/store";
+export const BOT_WHERE_ADMIN_LIST = API_POINT + "bot/:id/tam/chatchannel/admin/list";
