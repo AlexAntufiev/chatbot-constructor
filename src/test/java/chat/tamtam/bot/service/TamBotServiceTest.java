@@ -7,8 +7,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import chat.tamtam.bot.RunnableTestContext;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
+import chat.tamtam.bot.domain.exception.ChatBotConstructorException;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
-import chat.tamtam.bot.domain.exception.TamBotException;
 import chat.tamtam.bot.repository.TamBotRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,9 +39,9 @@ public class TamBotServiceTest extends RunnableTestContext {
                 .thenReturn(BOT_SCHEME_ENTITY);
 
         assertThrows(
-                TamBotException.class,
+                ChatBotConstructorException.class,
                 () -> tamBotService.status(AUTH_TOKEN, BOT_SCHEME_ID),
-                "Should throws TamBotException"
+                "Should throws ChatBotConstructorException"
         );
 
         when(botSchemeService.getBotScheme(eq(AUTH_TOKEN), eq(BOT_SCHEME_ID)))

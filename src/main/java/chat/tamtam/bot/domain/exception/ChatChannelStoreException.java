@@ -2,7 +2,7 @@ package chat.tamtam.bot.domain.exception;
 
 import lombok.Getter;
 
-public class ChatChannelStoreException extends TamBotException {
+public class ChatChannelStoreException extends ChatBotConstructorException {
     @Getter
     private final Long chatChannel;
 

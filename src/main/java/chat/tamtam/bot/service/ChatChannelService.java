@@ -10,9 +10,9 @@ import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.chatchannel.ChatChannelEntity;
 import chat.tamtam.bot.domain.chatchannel.SelectedChatChannelEntity;
+import chat.tamtam.bot.domain.exception.ChatBotConstructorException;
 import chat.tamtam.bot.domain.exception.ChatChannelStoreException;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
-import chat.tamtam.bot.domain.exception.TamBotException;
 import chat.tamtam.bot.domain.response.ChatChannelListSuccessResponse;
 import chat.tamtam.bot.domain.response.ChatChannelSuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponse;
@@ -72,7 +72,7 @@ public class ChatChannelService {
             }
             return new ChatChannelListSuccessResponse<>(tamChatEntities, marker);
         } catch (ClientException | APIException e) {
-            throw new TamBotException(
+            throw new ChatBotConstructorException(
                     "Can't fetch chatChannels where tam bot with id="
                             + botScheme.getBotId()
                             + "is participant",
@@ -124,6 +124,7 @@ public class ChatChannelService {
                     botScheme.getBotId(),
                     chat
             );
+            chatChannelEntity.setOptions(chat, chatMember);
             chatChannelRepository.save(chatChannelEntity);
             return new SuccessResponse();
         } catch (ClientException | APIException e) {
@@ -209,5 +210,31 @@ public class ChatChannelService {
                         chatChannelId
                 );
         return new SuccessResponse();
+    }
+
+    public ChatChannelEntity getChatChannel(
+            final BotSchemeEntity botScheme,
+            final TamBotEntity tamBot,
+            long chatChannelId
+    ) {
+        ChatChannelEntity chatChannel =
+                chatChannelRepository
+                        .findByIdBotSchemeIdAndIdTamBotIdAndIdChatId(
+                                botScheme.getId(),
+                                tamBot.getId().getBotId(),
+                                chatChannelId
+                        );
+        if (chatChannel == null) {
+            throw new NotFoundEntityException(
+                    "Can't find chatchannel with id="
+                            + chatChannelId
+                            + " and botSchemeId="
+                            + botScheme.getId()
+                            + " and tamBotId="
+                            + tamBot.getId().getBotId(),
+                    Errors.CHATCHANNEL_DOES_NOT_EXIST
+            );
+        }
+        return chatChannel;
     }
 }

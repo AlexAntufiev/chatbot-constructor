@@ -13,7 +13,11 @@ public interface Errors {
 
     String CHATCHANNEL_SELECTED_EMPTY = "errors.chatChannel.selected.empty";
     String CHATCHANNEL_PERMISSIONS_ERROR = "errors.chatChannel.permission";
-    String CHATCHANNEL_DOES_NOT_EXIST = "errors.chatChannel.not.exist";
+    String CHATCHANNEL_DOES_NOT_EXIST = "errors.chatChannel.does.not.exist";
     String CHAT_NOT_CHANNEL = "errors.not.chatChannel";
+
+    String BROADCAST_MESSAGE_DOES_NOT_EXIST = "errors.broadcast.message.does.not.exist";
+    String BROADCAST_MESSAGE_FIRING_TIME_IS_IN_PAST = "errors.broadcast.message.firing.time.is.in.past";
+    String BROADCAST_MESSAGE_FIRING_TIME_IS_NULL = "errors.broadcast.message.firing.time.is.null";
 
 }

@@ -53,8 +53,11 @@ export default {
     'errors.tam.bot.not.subscribed': "Бот не подключен",
     'errors.chatChannel.selected.empty': 'Id канала не указан',
     'errors.chatChannel.permission': 'У канала недостаточно прав',
-    'errors.chatChannel.not.exist': 'Канал не существует',
+    'errors.chatChannel.does.not.exist': 'Канал не существует',
     'errors.not.chatChannel': 'Это не канал',
+    'errors.broadcast.message.does.not.exist': 'Сообщения не существует',
+    'errors.broadcast.message.firing.time.is.in.past': 'Время для отправки прошло',
+    'errors.broadcast.message.firing.time.is.null': 'Время для отправки не установлено',
 
     //Success messages
     'app.successmessage.successsumary': 'Успешно',

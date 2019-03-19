@@ -20,6 +20,9 @@ public interface Endpoints {
     String ADMIN = "/admin";
     String TAM_MARKER = "/{marker}";
 
+    String MESSAGE = "/message";
+    String MESSAGE_ID = "/{message_id}";
+
     String STATIC_INDEX = "/index.html";
     String STATIC_RESOURCES = "/assets/**";
 

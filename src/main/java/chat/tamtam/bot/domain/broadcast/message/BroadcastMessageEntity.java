@@ -16,10 +16,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @Table(name = "BroadcastMessage")
-public class MessageEntity {
+public class BroadcastMessageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Long id;
     @Column(name = "botSchemeId", nullable = false)
     private Integer botSchemeId;
@@ -32,7 +32,7 @@ public class MessageEntity {
     @Column(name = "text")
     private String text;
     @Column(name = "state")
-    private int state;
+    private Byte state;
     @Column(name = "error")
     private String error;
 }
