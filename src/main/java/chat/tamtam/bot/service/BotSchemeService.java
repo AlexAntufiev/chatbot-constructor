@@ -1,12 +1,12 @@
 package chat.tamtam.bot.service;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
+import chat.tamtam.bot.domain.response.BotListSuccessResponse;
 import chat.tamtam.bot.repository.BotSchemaRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -59,7 +59,7 @@ public class BotSchemeService {
         return false;
     }
 
-    public List<BotSchemeEntity> getList(final Long userId) {
-        return botSchemaRepository.findAllByUserId(userId);
+    public BotListSuccessResponse getList(final Long userId) {
+        return new BotListSuccessResponse(botSchemaRepository.findAllByUserId(userId));
     }
 }

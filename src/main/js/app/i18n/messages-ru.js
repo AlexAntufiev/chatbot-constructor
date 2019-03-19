@@ -6,6 +6,9 @@ export default {
     'app.bot.edit': 'Редактировать',
     'app.bot.remove': 'Удалить',
 
+    //Bot detail
+    'app.bot.detail.select.channels': 'Выберите каналы',
+
     //Menu
     'app.menu.home': 'Домой',
     'app.menu.botlist': 'Список ботов',
@@ -38,6 +41,8 @@ export default {
     'app.dialog.checksure': 'Вы уверены?',
     'app.dialog.connect': 'Подключить',
     'app.dialog.disconnect': 'Отключить',
+    'app.dialog.append': 'Добавить',
+    'app.dialog.refresh': 'Обновить',
 
     //Error messages
     'app.errormessage.errorsummary': 'Сообщение об ошибке',

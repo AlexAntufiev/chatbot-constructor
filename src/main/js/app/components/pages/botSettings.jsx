@@ -38,8 +38,6 @@ class BotSettings extends Component {
         TamBotService.getTamBot(this.props.match.params.id, (res) => {
             if (self.state.connected) {
                 self.setState({token: res.data.token});
-            } else {
-                AxiosMessages.serverErrorResponse(self, res.data.error);
             }
         }, null, this)
     }
@@ -47,19 +45,15 @@ class BotSettings extends Component {
     refreshBotInfo() {
         const self = this;
         BotSchemeService.getBotScheme(this.props.match.params.id, (res) => {
-            if (res.status === 200) {
-                const connected = !!res.data.botId;
-                self.setState({
-                    name: res.data.name,
-                    botId: res.data.botId,
-                    connected: connected,
-                    initialName: res.data.name,
-                });
-                if (connected) {
-                    self.refreshToken(res.data.botId);
-                }
-            } else {
-                AxiosMessages.serverErrorResponse(self);
+            const connected = !!res.data.botId;
+            self.setState({
+                name: res.data.name,
+                botId: res.data.botId,
+                connected: connected,
+                initialName: res.data.name,
+            });
+            if (connected) {
+                self.refreshToken(res.data.botId);
             }
         }, null, this);
     }
@@ -70,24 +64,24 @@ class BotSettings extends Component {
 
         function callbackSuccess(res) {
             self.setState({connectAjaxProcess: false});
-            if (res.data.success) {
-                let successMessId;
-                if (self.state.connected) {
-                    successMessId = 'success.tam.bot.unsubscribed';
-                } else {
-                    successMessId = 'success.tam.bot.subscribed';
-                }
-                self.setState({connected: !self.state.connected});
-                AxiosMessages.successOperation(self, successMessId);
+            let successMessId;
+            if (self.state.connected) {
+                successMessId = 'success.tam.bot.unsubscribed';
             } else {
-                AxiosMessages.serverErrorResponse(self, res.data.error);
+                successMessId = 'success.tam.bot.subscribed';
             }
+            self.setState({connected: !self.state.connected});
+            AxiosMessages.successOperation(self, successMessId);
         }
 
         if (this.state.connected) {
-            BotSchemeService.disconnect(this.props.match.params.id, callbackSuccess, null, this);
+            BotSchemeService.disconnect(this.props.match.params.id, callbackSuccess, () => {
+                self.setState({connectAjaxProcess: false});
+            }, this);
         } else {
-            BotSchemeService.connect(this.props.match.params.id, this.state.token, callbackSuccess, null, this);
+            BotSchemeService.connect(this.props.match.params.id, this.state.token, callbackSuccess, () => {
+                self.setState({connectAjaxProcess: false});
+            }, this);
         }
     }
 
@@ -98,12 +92,8 @@ class BotSettings extends Component {
         BotSchemeService.saveBot(this.props.match.params.id, self.state.name,
             (res) => {
                 self.setState({saveAjaxProcess: false});
-                if (res.status === 200) {
-                    AxiosMessages.successOperation(self, 'success.tam.bot.name.changed');
-                    self.setState({initialName: self.state.name});
-                } else {
-                    AxiosMessages.serverErrorResponse(self);
-                }
+                self.setState({initialName: self.state.name});
+                AxiosMessages.successOperation(self, 'success.tam.bot.name.changed');
             }, (error) => {
                 self.setState({saveAjaxProcess: false});
             }, this);
@@ -148,10 +138,10 @@ class BotSettings extends Component {
                             onClick={this.onConnectButtonBot}/>
                 </div>
                 {this.state.connected &&
-                    <div>
-                        <h3>Select channels</h3>
-                        <ChannelList botSchemeId={this.props.match.params.id}/>
-                    </div>
+                <div>
+                    <h3><FormattedMessage id='app.bot.detail.select.channels'/></h3>
+                    <ChannelList botSchemeId={this.props.match.params.id}/>
+                </div>
                 }
             </div>);
     }

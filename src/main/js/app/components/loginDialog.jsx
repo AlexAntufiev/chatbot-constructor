@@ -40,7 +40,7 @@ export class LoginDialog extends BaseDialog {
                 token: res.headers[AUTHORIZATION]
             });
             self.onHide();
-        });
+        }, null, this);
     }
 
     render() {

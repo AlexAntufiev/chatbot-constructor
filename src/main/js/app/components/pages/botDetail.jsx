@@ -3,12 +3,12 @@ import {connect} from 'react-redux';
 import {Redirect} from 'react-router-dom';
 import LeftMenu from 'app/components/leftMenu';
 import {Route, Switch} from 'react-router';
-import BotSettings from 'app/components/botSettings';
+import BotSettings from 'app/components/pages/botSettings';
 import * as routes from 'app/constants/routes';
-import BotConstructor from "app/components/botConstructor";
-import BotStatistic from "app/components/botStatistic";
-import BotBroadcasting from "app/components/botBroadcasting";
-import BotBroadcastingDetail from "app/components/botBroadcastingDetail"
+import BotConstructor from "app/components/pages/botConstructor";
+import BotStatistic from "app/components/pages/botStatistic";
+import BotBroadcasting from "app/components/pages/botBroadcasting";
+import BotBroadcastingDetail from "app/components/pages/botBroadcastingDetail"
 
 class BotDetail extends React.Component {
     constructor(props) {

@@ -46,7 +46,7 @@ class AuthPanel extends React.Component {
             return (
                 <span className="auth-panel">
                     <Button label={intl.formatMessage({id: 'app.menu.logout'})} icon="pi pi-power-off"
-                        onClick={this.onLogout}/>
+                            onClick={this.onLogout}/>
                 </span>
             );
         } else {

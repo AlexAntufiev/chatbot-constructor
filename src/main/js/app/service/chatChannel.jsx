@@ -13,7 +13,12 @@ export function getTamChatsWhereAdmin(botSchemeId, callbackSuccess, callbackFail
     handleRequest(axios.get(url), callbackSuccess, callbackFail, context);
 }
 
-export function storeChannel(botSchemeId, chatId,  callbackSuccess, callbackFail, context) {
-    const url = makeUrl(ApiPoints.BOT_STORE_CHANNEL, {id: botSchemeId});
+export function saveChannel(botSchemeId, chatId, callbackSuccess, callbackFail, context) {
+    const url = makeUrl(ApiPoints.BOT_SAVE_CHANNEL, {id: botSchemeId});
     handleRequest(axios.post(url, {chatChannel: chatId}), callbackSuccess, callbackFail, context);
+}
+
+export function deleteChannel(botSchemeId, chatId, callbackSuccess, callbackFail, context) {
+    const url = makeUrl(ApiPoints.BOT_DELETE_CHANNEL, {id: botSchemeId, chatId: chatId});
+    handleRequest(axios.post(url), callbackSuccess, callbackFail, context);
 }
