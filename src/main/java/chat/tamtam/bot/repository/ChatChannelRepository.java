@@ -1,9 +1,10 @@
 package chat.tamtam.bot.repository;
 
-import javax.transaction.Transactional;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import chat.tamtam.bot.domain.chatchannel.ChatChannelEntity;
 
@@ -26,7 +27,7 @@ public interface ChatChannelRepository extends CrudRepository<ChatChannelEntity,
             long chatId
     );
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
     void removeByIdBotSchemeIdAndIdTamBotIdAndIdChatId(
             int botSchemeId,
             long tamBotId,
