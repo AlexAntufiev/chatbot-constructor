@@ -45,9 +45,13 @@ class BotBroadcasting extends Component {
                 <Button label={intl.formatMessage({id: 'app.bot.edit'})} icon="pi pi-pencil"
                         className={"p-col"} onClick={() => this.onChannelClick(channel.id.chatId)}/>
             );
+            const header = (
+                channel.iconUrl && <img src={channel.iconUrl} className="channel-list-element_image"/>
+            );
             return (
-                <Card title={channel.title}
-                      className="ui-card-shadow card-container p-col" footer={footer}>
+                <Card title={channel.title} header={header}
+                      className="ui-card-shadow channel-list-element p-col" footer={footer}>
+                    {channel.description}
                 </Card>
             );
         })
@@ -57,7 +61,7 @@ class BotBroadcasting extends Component {
         const botList = this.getChatChannelsList();
 
         return (
-            <div className="p-grid bot-broadcasting_list">
+            <div className="p-grid p-align-start bot-broadcasting_list">
                 <Growl ref={(el) => this.growl = el}/>
                 {botList}
             </div>);

@@ -20,12 +20,16 @@ class ChannelList extends React.Component {
 
     componentDidMount() {
         const self = this;
-
         ChatChannelService.getChannels(this.props.botSchemeId, (res) => {
+
             let channels = {};
             res.data.chatChannels.forEach((channel) => {
-                channel.chat_id = channel.id.chatId;
-                channels[channel.id.chatId] = channel;
+                channels[channel.id.chatId] = {
+                    chat_id: channel.id.chatId,
+                    title: channel.title,
+                    description: channel.description,
+                    icon: channel.iconUrl
+                };
             });
             self.setState({userChannels: channels});
         }, null, this);
@@ -36,9 +40,15 @@ class ChannelList extends React.Component {
         this.setState({ajaxRefreshProcess: true});
         ChatChannelService.getTamChatsWhereAdmin(this.props.botSchemeId, (res) => {
             let channels = {};
+
             res.data.chatChannels.forEach((channel) => {
                 if (!(channel.chat_id in self.state.userChannels)) {
-                    channels[channel.chat_id] = channel;
+                    channels[channel.chat_id] = {
+                        chat_id: channel.chat_id,
+                        title: channel.title,
+                        description: channel.description,
+                        icon: ('icon' in channel) ? channel.icon.url : null
+                    };
                 }
             });
             self.setState({
@@ -67,14 +77,23 @@ class ChannelList extends React.Component {
         const {intl} = this.props;
         let renderedAvailableChannels = [];
         for (let chat_id in this.state.availableChannels) {
+            const currChannel = this.state.availableChannels[chat_id];
             const footer = (
                 <span>
                     <Button label={intl.formatMessage({id: 'app.dialog.append'})} icon="pi pi-angle-up"
-                            onClick={() => append(this.state.availableChannels[chat_id])}/>
+                            onClick={() => append(currChannel)}/>
                 </span>
             );
-            renderedAvailableChannels.push(<Card title={this.state.availableChannels[chat_id].title} footer={footer}
-                                                 className={"p-col channel-list-element"}/>);
+            const header = (
+                currChannel.icon && <img src={currChannel.icon} className="channel-list-element_image"/>
+            );
+            renderedAvailableChannels.push(
+                <Card title={currChannel.title} footer={footer}
+                      header={header}
+                      className={"p-col channel-list-element"}>
+                    {currChannel.description}
+                </Card>
+            );
         }
         return renderedAvailableChannels;
     }
@@ -100,14 +119,23 @@ class ChannelList extends React.Component {
         const {intl} = this.props;
         let renderedUserChannels = [];
         for (let chat_id in this.state.userChannels) {
+            const currChannel = this.state.userChannels[chat_id];
             const footer = (
                 <span>
                     <Button label={intl.formatMessage({id: 'app.bot.remove'})} className={'p-button-secondary'}
-                            onClick={() => remove(this.state.userChannels[chat_id])} icon="pi pi-times"/>
+                            onClick={() => remove(currChannel)} icon="pi pi-times"/>
                 </span>
             );
-            renderedUserChannels.push(<Card footer={footer} title={this.state.userChannels[chat_id].title}
-                                            className={"p-col channel-list-element"}/>);
+            const header = (
+                currChannel.icon && <img src={currChannel.icon} className="channel-list-element_image"/>
+            );
+            renderedUserChannels.push(
+                <Card footer={footer} title={currChannel.title}
+                      header={header}
+                      className={"p-col channel-list-element"}>
+                    {currChannel.description}
+                </Card>
+            );
         }
         return renderedUserChannels;
     }
@@ -120,12 +148,12 @@ class ChannelList extends React.Component {
         return (
             <div>
                 <Growl ref={(el) => this.growl = el}/>
-                <div className={"p-grid"}>
+                <div className={"p-grid p-align-start"}>
                     {userChannels}
                 </div>
                 <Button label={intl.formatMessage({id: 'app.dialog.refresh'})} disabled={this.state.ajaxRefreshProcess}
                         className="channel-list_refresh-button" icon="pi pi-refresh" onClick={this.refreshChannels}/>
-                <div className={"p-grid"}>
+                <div className={"p-grid p-align-start"}>
                     {availableChannels}
                 </div>
             </div>

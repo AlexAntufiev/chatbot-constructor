@@ -15,20 +15,13 @@ export default function handleRequest(request, callbackSuccess, callbackFail, co
         }
 
         if (res.data.success) {
-            if (!!callbackSuccess) {
-                callbackSuccess(res);
-            }
+            callbackSuccess && callbackSuccess(res);
         } else {
-            if (!!callbackFail) {
-                callbackFail(res);
-            }
-            if (!!context) {
-                AxiosMessages.serverErrorResponse(context, res.data.error);
-            }
+            callbackFail && callbackFail(res);
+            context && AxiosMessages.serverErrorResponse(context, res.data.error);
         }
+
     }).catch((error) => {
-        if (!!context) {
-            AxiosMessages.serverNotResponse(context)
-        }
+        context && AxiosMessages.serverNotResponse(context)
     });
 }
