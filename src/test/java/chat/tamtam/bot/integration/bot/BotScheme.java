@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import chat.tamtam.bot.configuration.Profiles;
-import chat.tamtam.bot.controller.Endpoints;
+import chat.tamtam.bot.controller.Endpoint;
 import chat.tamtam.bot.repository.BotSchemaRepository;
 import chat.tamtam.bot.repository.SessionRepository;
 
@@ -51,7 +51,7 @@ public class BotScheme {
         String toJson = objectMapper.writeValueAsString(BOT_SCHEME_ENTITY);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.put(HttpHeaders.AUTHORIZATION, Collections.singletonList(AUTH_TOKEN));
-        mockMvc.perform(get(String.format(Endpoints.API_BOT + "/%s", USER_ID)).accept(MediaType.APPLICATION_JSON)
+        mockMvc.perform(get(String.format(Endpoint.API_BOT + "/%s", USER_ID)).accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.ALL)
                 .headers(httpHeaders))
                 .andDo(MockMvcResultHandlers.print())

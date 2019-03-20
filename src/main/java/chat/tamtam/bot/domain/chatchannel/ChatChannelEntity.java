@@ -1,8 +1,6 @@
 package chat.tamtam.bot.domain.chatchannel;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -51,9 +49,9 @@ public class ChatChannelEntity {
 
     public void setOptions(final Chat chat, final ChatMember chatMember) {
         int opts = 0;
-        setOption(opts, chat.getType() == ChatType.CHANNEL, ChatChannelOption.CHANNEL);
+        opts = ChatChannelOption.setOption(opts, chat.getType() == ChatType.CHANNEL, ChatChannelOption.CHANNEL);
         if (chatMember.getPermissions() != null) {
-            setOption(
+            opts = ChatChannelOption.setOption(
                     opts,
                     chatMember.getPermissions().contains(ChatAdminPermission.WRITE),
                     ChatChannelOption.WRITABLE
@@ -62,24 +60,6 @@ public class ChatChannelEntity {
         options = opts;
     }
 
-    public Set<ChatChannelOption> getOptions() {
-        Set<ChatChannelOption> optionsSet = new HashSet<>();
-        if (hasOption(ChatChannelOption.CHANNEL)) {
-            optionsSet.add(ChatChannelOption.CHANNEL);
-        }
-        if (hasOption(ChatChannelOption.WRITABLE)) {
-            optionsSet.add(ChatChannelOption.WRITABLE);
-        }
-        return optionsSet;
-    }
-
-    private static void setOption(int options, boolean condition, ChatChannelOption option) {
-        options |= condition ? option.getValue() : 0;
-    }
-
-    private boolean hasOption(ChatChannelOption option) {
-        return (options & option.getValue()) == 1;
-    }
 
     @Data
     @NoArgsConstructor

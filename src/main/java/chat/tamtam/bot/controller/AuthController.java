@@ -18,7 +18,7 @@ import lombok.AllArgsConstructor;
 public class AuthController {
     private final UserService userService;
 
-    @PostMapping(Endpoints.API_REGISTRATION)
+    @PostMapping(Endpoint.API_REGISTRATION)
     public ResponseEntity<?> registration(@RequestBody final UserAuthEntity userAuthEntity) {
         boolean done = userService.addUser(userAuthEntity);
         if (done) {

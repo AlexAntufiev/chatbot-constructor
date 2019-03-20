@@ -1,20 +1,21 @@
 package chat.tamtam.bot.service;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
+import chat.tamtam.bot.domain.broadcast.message.NewBroadcastMessage;
 import chat.tamtam.bot.domain.chatchannel.ChatChannelEntity;
 import chat.tamtam.bot.domain.exception.CreateBroadcastMessageException;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
-import chat.tamtam.bot.domain.response.BroadcastMessageListSuccessReponse;
-import chat.tamtam.bot.domain.response.BroadcastMessageSuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponse;
+import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
 import chat.tamtam.bot.repository.BroadcastMessageRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -26,14 +27,12 @@ public class BroadcastMessageService {
     private final TamBotService tamBotService;
     private final ChatChannelService chatChannelService;
 
-    public SuccessResponse getBroadcastMessage(
-            final String authToken,
-            int botSchemeId,
-            long chatChannelId,
-            long broadcastMessageId
+    public BroadcastMessageEntity getBroadcastMessage(
+            final BotSchemeEntity botScheme,
+            final TamBotEntity tamBot,
+            final Long chatChannelId,
+            final Long broadcastMessageId
     ) {
-        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
-        TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
         ChatChannelEntity chatChannel = chatChannelService.getChatChannel(botScheme, tamBot, chatChannelId);
         BroadcastMessageEntity broadcastMessage =
                 broadcastMessageRepository
@@ -44,6 +43,7 @@ public class BroadcastMessageService {
                                 broadcastMessageId
                         );
         if (broadcastMessage == null) {
+            // @todo #CC-63 Wrap all exception's messages into string format pattern
             throw new NotFoundEntityException(
                     "Can't find broadcastMessage with id="
                             + broadcastMessageId
@@ -53,10 +53,27 @@ public class BroadcastMessageService {
                             + tamBot.getId().getBotId()
                             + " and chatChannelId"
                             + chatChannel.getId().getChatId(),
-                    Errors.BROADCAST_MESSAGE_DOES_NOT_EXIST
+                    Error.BROADCAST_MESSAGE_DOES_NOT_EXIST
             );
         }
-        return new BroadcastMessageSuccessResponse(broadcastMessage);
+        return broadcastMessage;
+    }
+
+    public SuccessResponse getBroadcastMessage(
+            final String authToken,
+            int botSchemeId,
+            long chatChannelId,
+            long broadcastMessageId
+    ) {
+        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
+        BroadcastMessageEntity broadcastMessage = getBroadcastMessage(
+                botScheme,
+                tamBot,
+                chatChannelId,
+                broadcastMessageId
+        );
+        return new SuccessResponseWrapper<>(broadcastMessage);
     }
 
     public SuccessResponse getBroadcastMessages(
@@ -74,7 +91,7 @@ public class BroadcastMessageService {
                                 tamBot.getId().getBotId(),
                                 chatChannel.getId().getChatId()
                         );
-        return new BroadcastMessageListSuccessReponse(broadcastMessages);
+        return new SuccessResponseWrapper<>(broadcastMessages);
     }
 
     public SuccessResponse removeBroadcastMessage(
@@ -85,65 +102,61 @@ public class BroadcastMessageService {
     ) {
         BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
-        ChatChannelEntity chatChannel = chatChannelService.getChatChannel(botScheme, tamBot, chatChannelId);
-        if (!broadcastMessageRepository
-                .existsByBotSchemeIdAndTamBotIdAndChatChannelIdAndId(
-                        botScheme.getId(),
-                        tamBot.getId().getBotId(),
-                        chatChannel.getId().getChatId(),
-                        broadcastMessageId
-                )) {
-            throw new NotFoundEntityException(
-                    "Can't find broadcastMessage with id="
-                            + broadcastMessageId
-                            + " and botSchemeId="
-                            + botScheme.getId()
-                            + " and tamBotId="
-                            + tamBot.getId().getBotId()
-                            + " and chatChannelId"
-                            + chatChannel.getId().getChatId(),
-                    Errors.BROADCAST_MESSAGE_DOES_NOT_EXIST
-            );
-        }
-        broadcastMessageRepository
-                .deleteByBotSchemeIdAndTamBotIdAndChatChannelIdAndId(
-                        botScheme.getId(),
-                        tamBot.getId().getBotId(),
-                        chatChannel.getId().getChatId(),
-                        broadcastMessageId
-                );
-        return new SuccessResponse();
+        BroadcastMessageEntity broadcastMessage = getBroadcastMessage(
+                botScheme,
+                tamBot,
+                chatChannelId,
+                broadcastMessageId
+        );
+        broadcastMessage.setState(BroadcastMessageState.DELETED);
+        return new SuccessResponseWrapper<>(broadcastMessage);
     }
 
     public SuccessResponse addBroadcastMessage(
             final String authToken,
             int botSchemeId,
             long chatChannelId,
-            final BroadcastMessageEntity broadcastMessage
+            final NewBroadcastMessage newBroadcastMessage
     ) {
-        if (broadcastMessage.getFiringTime() == null) {
-            throw new CreateBroadcastMessageException(
-                    "Can't create broadCastMessage cause firing time is null",
-                    Errors.BROADCAST_MESSAGE_FIRING_TIME_IS_NULL
-            );
-        }
-        LocalDateTime localDateTime = LocalDateTime.now();
-        if (!localDateTime.isBefore(broadcastMessage.getFiringTime())) {
-            throw new CreateBroadcastMessageException(
-                    "Can't create broadCastMessage cause firing time in past="
-                            + broadcastMessage.getFiringTime()
-                            + " and local time="
-                            + localDateTime,
-                    Errors.BROADCAST_MESSAGE_FIRING_TIME_IS_IN_PAST
-            );
-        }
+        BroadcastMessageEntity broadcastMessage = transformToBroadcastMessageEntity(newBroadcastMessage);
         BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
         ChatChannelEntity chatChannel = chatChannelService.getChatChannel(botScheme, tamBot, chatChannelId);
         broadcastMessage.setBotSchemeId(botScheme.getId());
         broadcastMessage.setTamBotId(tamBot.getId().getBotId());
         broadcastMessage.setChatChannelId(chatChannel.getId().getChatId());
-        broadcastMessage.setState(BroadcastMessageState.SCHEDULED.getValue());
-        return new BroadcastMessageSuccessResponse(broadcastMessageRepository.save(broadcastMessage));
+        broadcastMessage.setState(BroadcastMessageState.SCHEDULED);
+        return new SuccessResponseWrapper<>(broadcastMessageRepository.save(broadcastMessage));
+    }
+
+    private BroadcastMessageEntity transformToBroadcastMessageEntity(final NewBroadcastMessage newBroadcastMessage) {
+        // @todo #CC-63 Expand broadcastMessage filtering(payload check etc.)
+        if (StringUtils.isEmpty(newBroadcastMessage.getTitle())) {
+            throw new CreateBroadcastMessageException(
+                    "Can't create broadCastMessage because name is empty",
+                    Error.BROADCAST_MESSAGE_TITLE_IS_EMPTY
+            );
+        }
+        if (newBroadcastMessage.getFiringTime() == null) {
+            throw new CreateBroadcastMessageException(
+                    "Can't create broadCastMessage because firing time is null",
+                    Error.BROADCAST_MESSAGE_FIRING_TIME_IS_NULL
+            );
+        }
+        Timestamp localTimeStamp = new Timestamp(System.currentTimeMillis());
+        if (!localTimeStamp.after(newBroadcastMessage.getFiringTime())) {
+            throw new CreateBroadcastMessageException(
+                    "Can't create broadCastMessage because firing time in past="
+                            + newBroadcastMessage.getFiringTime()
+                            + " and local time="
+                            + localTimeStamp,
+                    Error.BROADCAST_MESSAGE_FIRING_TIME_IS_IN_PAST
+            );
+        }
+        BroadcastMessageEntity broadcastMessage = new BroadcastMessageEntity();
+        broadcastMessage.setTitle(newBroadcastMessage.getTitle());
+        broadcastMessage.setFiringTime(newBroadcastMessage.getFiringTime());
+        broadcastMessage.setText(newBroadcastMessage.getText());
+        return broadcastMessage;
     }
 }

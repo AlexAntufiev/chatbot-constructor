@@ -58,6 +58,7 @@ export default {
     'errors.broadcast.message.does.not.exist': 'Сообщения не существует',
     'errors.broadcast.message.firing.time.is.in.past': 'Время для отправки прошло',
     'errors.broadcast.message.firing.time.is.null': 'Время для отправки не установлено',
+    'errors.broadcast.message.title.is.empty': '',
 
     //Success messages
     'app.successmessage.successsumary': 'Успешно',

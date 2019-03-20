@@ -1,6 +1,6 @@
 package chat.tamtam.bot.domain.broadcast.message;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,12 +27,19 @@ public class BroadcastMessageEntity {
     private Long tamBotId;
     @Column(name = "chatChannelId", nullable = false)
     private Long chatChannelId;
+    @Column(name = "title", nullable = false)
+    private String title;
     @Column(name = "firingTime", nullable = false)
-    private LocalDateTime firingTime;
+    private Timestamp firingTime;
     @Column(name = "text")
     private String text;
     @Column(name = "state")
     private Byte state;
     @Column(name = "error")
     private String error;
+    // @todo #CC-63 Add payload field into BroadcastMessageEntity
+
+    public void setState(final BroadcastMessageState state) {
+        this.state = state.getValue();
+    }
 }

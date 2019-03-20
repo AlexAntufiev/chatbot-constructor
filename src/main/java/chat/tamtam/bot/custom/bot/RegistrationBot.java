@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import com.auth0.jwt.JWT;
 
 import chat.tamtam.bot.configuration.Profiles;
-import chat.tamtam.bot.controller.Endpoints;
+import chat.tamtam.bot.controller.Endpoint;
 import chat.tamtam.bot.domain.session.SessionEntity;
 import chat.tamtam.bot.domain.user.UserEntity;
 import chat.tamtam.bot.repository.SessionRepository;
@@ -212,7 +212,7 @@ public class RegistrationBot extends AbstractCustomBot {
     @Bean
     public void subscribeRegBotOnAppReadyProduction() {
         try {
-            url = host + Endpoints.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
+            url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
             SimpleQueryResult result = botAPI.subscribe(new SubscriptionRequestBody(url)).execute();
             if (!result.isSuccess()) {
                 log.debug("Can't subscribe bot with id:" + id);

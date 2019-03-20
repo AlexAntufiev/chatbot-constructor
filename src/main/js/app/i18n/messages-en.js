@@ -58,6 +58,7 @@ export default {
     'errors.broadcast.message.does.not.exist': 'Message does not exist',
     'errors.broadcast.message.firing.time.is.in.past': 'Time to send is in past',
     'errors.broadcast.message.firing.time.is.null': 'Time to send is not set',
+    'errors.broadcast.message.title.is.empty': 'Message title is empty',
 
     //Success messages
     'app.successmessage.successsumary': 'Success',
