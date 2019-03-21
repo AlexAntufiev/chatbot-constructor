@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import chat.tamtam.bot.domain.exception.BroadcastMessageIllegalStateException;
 import chat.tamtam.bot.domain.exception.ChatBotConstructorException;
 import chat.tamtam.bot.domain.exception.ChatChannelStoreException;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
@@ -41,6 +42,18 @@ public class ControllerHandler extends ResponseEntityExceptionHandler {
         return handle(
                 ex,
                 new FailResponseWrapper<>(ex.getErrorKey(), ex.getChatChannel()),
+                request
+        );
+    }
+
+    @ExceptionHandler(BroadcastMessageIllegalStateException.class)
+    public ResponseEntity<Object> handleBroadcastMessageIllegalStateException(
+            BroadcastMessageIllegalStateException ex,
+            WebRequest request
+    ) {
+        return handle(
+                ex,
+                new FailResponse(ex.getErrorKey()),
                 request
         );
     }

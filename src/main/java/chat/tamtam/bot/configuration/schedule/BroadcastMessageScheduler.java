@@ -1,7 +1,6 @@
 package chat.tamtam.bot.configuration.schedule;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -13,6 +12,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
@@ -21,6 +22,7 @@ import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.repository.BotSchemaRepository;
 import chat.tamtam.bot.repository.BroadcastMessageRepository;
 import chat.tamtam.bot.repository.TamBotRepository;
+import chat.tamtam.bot.service.Error;
 import chat.tamtam.botapi.TamTamBotAPI;
 import chat.tamtam.botapi.exceptions.APIException;
 import chat.tamtam.botapi.exceptions.ClientException;
@@ -45,44 +47,77 @@ public class BroadcastMessageScheduler {
 
     @Scheduled(fixedRate = SchedulerRates.DEFAULT_SENDING_RATE)
     public void fireScheduledMessages() {
-        Timestamp currentTimestamp = Timestamp.valueOf(LocalDateTime.now());
+        Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
         List<BroadcastMessageEntity> scheduledMessages =
                 broadcastMessageRepository.findAllByFiringTimeBeforeAndState(
                         currentTimestamp,
                         BroadcastMessageState.SCHEDULED.getValue()
                 );
         scheduledMessages.forEach(e -> {
-            BotSchemeEntity botScheme = botSchemaRepository.findById(e.getBotSchemeId()).orElseThrow();
+            BotSchemeEntity botScheme = botSchemaRepository.findById(e.getBotSchemeId()).get();
             TamTamBotAPI tamTamBotAPI = getTamTamBotAPI(e, botScheme);
             if (tamTamBotAPI != null) {
-                e.setState(BroadcastMessageState.PROCESSING);
+                try {
+                    setProcessingStateAttempt(e, BroadcastMessageState.SCHEDULED);
+                    executor.execute(() -> sendBroadcastMessage(tamTamBotAPI, e));
+                } catch (IllegalStateException iSE) {
+                    log.error(String.format("Can't change message state with id=%d", e.getId()), iSE);
+                }
+            } else {
+                e.setState(BroadcastMessageState.ERROR);
+                e.setError(Error.BROADCAST_MESSAGE_ILLEGAL_STATE.getErrorKey());
                 broadcastMessageRepository.save(e);
-                executor.execute(() -> sendBroadcastMessageAsync(tamTamBotAPI, e));
             }
         });
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+    protected void setProcessingStateAttempt(
+            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessageState requiredState
+    ) {
+        if (broadcastMessageRepository
+                .findById(broadcastMessage.getId())
+                .get()
+                .getState() == requiredState.getValue()) {
+            broadcastMessage.setState(BroadcastMessageState.PROCESSING);
+            broadcastMessageRepository.save(broadcastMessage);
+        } else {
+            throw new IllegalStateException(
+                    "Can't set PROCESSING state because message is not in "
+                            + requiredState.name()
+                            + " state");
+        }
+    }
+
     @Scheduled(fixedRate = SchedulerRates.DEFAULT_ERASING_RATE)
     public void eraseScheduledMessages() {
-        Timestamp currentTimestamp = Timestamp.valueOf(LocalDateTime.now());
+        Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
         List<BroadcastMessageEntity> scheduledMessages =
                 broadcastMessageRepository.findAllByErasingTimeBeforeAndState(
                         currentTimestamp,
                         BroadcastMessageState.SENT.getValue()
                 );
         scheduledMessages.forEach(e -> {
-            BotSchemeEntity botScheme = botSchemaRepository.findById(e.getBotSchemeId()).orElseThrow();
+            BotSchemeEntity botScheme = botSchemaRepository.findById(e.getBotSchemeId()).get();
             TamTamBotAPI tamTamBotAPI = getTamTamBotAPI(e, botScheme);
             if (tamTamBotAPI != null) {
-                e.setState(BroadcastMessageState.PROCESSING);
+                try {
+                    setProcessingStateAttempt(e, BroadcastMessageState.SENT);
+                    executor.execute(() -> eraseBroadcastMessage(tamTamBotAPI, e));
+                } catch (IllegalStateException iSE) {
+                    log.error(String.format("Can't change message state with id=%d", e.getId()), iSE);
+                }
+            } else {
+                e.setState(BroadcastMessageState.ERROR);
+                e.setError(Error.BROADCAST_MESSAGE_ILLEGAL_STATE.getErrorKey());
                 broadcastMessageRepository.save(e);
-                executor.execute(() -> eraseBroadcastMessageAsync(tamTamBotAPI, e));
             }
         });
     }
 
     @Async
-    protected void sendBroadcastMessageAsync(
+    protected void sendBroadcastMessage(
             final TamTamBotAPI tamTamBotAPI,
             final BroadcastMessageEntity broadcastMessage
     ) {
@@ -97,12 +132,13 @@ public class BroadcastMessageScheduler {
         } catch (APIException | ClientException ex) {
             log.error(String.format("Can't send scheduled message with id=%d", broadcastMessage.getId()), ex);
             broadcastMessage.setState(BroadcastMessageState.ERROR);
+            broadcastMessage.setError(Error.BROADCAST_MESSAGE_SEND_ERROR.getErrorKey());
         }
         broadcastMessageRepository.save(broadcastMessage);
     }
 
     @Async
-    protected void eraseBroadcastMessageAsync(
+    protected void eraseBroadcastMessage(
             final TamTamBotAPI tamTamBotAPI,
             final BroadcastMessageEntity broadcastMessage
     ) {
@@ -117,6 +153,7 @@ public class BroadcastMessageScheduler {
         } catch (APIException | ClientException ex) {
             log.error(String.format("Can't erase scheduled message with id=%d", broadcastMessage.getId()), ex);
             broadcastMessage.setState(BroadcastMessageState.ERROR);
+            broadcastMessage.setError(Error.BROADCAST_MESSAGE_ERASE_ERROR.getErrorKey());
         }
         broadcastMessageRepository.save(broadcastMessage);
     }

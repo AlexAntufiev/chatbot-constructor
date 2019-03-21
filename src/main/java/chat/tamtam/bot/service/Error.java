@@ -25,6 +25,9 @@ public enum Error {
     BROADCAST_MESSAGE_ERASING_TIME_IS_BEFORE_THEN_FIRING_TIME(
             "errors.broadcast.message.erasing.time.is.before.then.firing.time"
     ),
+    BROADCAST_MESSAGE_ILLEGAL_STATE("errors.broadcast.message.illegal.state"),
+    BROADCAST_MESSAGE_SEND_ERROR("errors.broadcast.message.send.error"),
+    BROADCAST_MESSAGE_ERASE_ERROR("errors.broadcast.message.erase.error"),
     ;
 
     @Getter
