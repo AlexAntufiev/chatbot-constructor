@@ -1,4 +1,4 @@
-import {USER_ID, AUTHORIZATION} from "app/constants/cookies";
+import {AUTHORIZATION, USER_ID} from "app/constants/cookies";
 import {Cookies} from "react-cookie";
 import axios from "axios";
 

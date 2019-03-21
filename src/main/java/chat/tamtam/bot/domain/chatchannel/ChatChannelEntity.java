@@ -30,6 +30,8 @@ public class ChatChannelEntity {
     private String iconUrl;
     @Column(name = "link")
     private String link;
+    @Column(name = "description")
+    private String description;
 
     public ChatChannelEntity(
             final @NotNull Integer botSchemeId,
@@ -43,6 +45,11 @@ public class ChatChannelEntity {
             iconUrl = chat.getIcon().getUrl();
         } else {
             iconUrl = null;
+        }
+        if (chat.getDescription() != null) {
+            description = chat.getDescription().toString();
+        } else {
+            description = null;
         }
         link = chat.getLink();
     }
