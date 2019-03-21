@@ -63,7 +63,7 @@ export default () => ({
                 use: {
                     loader: 'file-loader',
                     options: {name: 'assets/images/[name]/[hash].[ext]'}
-                },
+                }
             },
             {
                 test: /\.(svg|woff|woff2|eot|ttf)$/,
