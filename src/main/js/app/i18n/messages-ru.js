@@ -58,7 +58,7 @@ export default {
     'errors.tam.bot.unsubscribed.already': 'Бот уже отключен',
     'errors.tam.bot.not.subscribed': "Бот не подключен",
     'errors.chatChannel.selected.empty': 'Id канала не указан',
-    'errors.chatChannel.permission': 'У канала недостаточно прав',
+    'errors.chatChannel.permission': 'Бот не является администратором канала',
     'errors.chatChannel.does.not.exist': 'Канал не существует',
     'errors.not.chatChannel': 'Это не канал',
     'errors.broadcast.message.does.not.exist': 'Сообщения не существует',
