@@ -60,6 +60,9 @@ export default {
     'errors.broadcast.message.firing.time.is.null': 'Time to send is not set',
     'errors.broadcast.message.title.is.empty': 'Message title is empty',
     'errors.broadcast.message.erasing.time.is.before.then.firing.time': 'Time to erase message is before then time to send',
+    'errors.broadcast.message.illegal.state': 'You cannot change message now',
+    'errors.broadcast.message.send.error': 'Error occurs at message sending',
+    'errors.broadcast.message.erase.error': 'Error occurs at message erasing',
 
     //Success messages
     'app.successmessage.successsumary': 'Success',

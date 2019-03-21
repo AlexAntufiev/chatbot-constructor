@@ -60,6 +60,9 @@ export default {
     'errors.broadcast.message.firing.time.is.null': 'Время для отправки не установлено',
     'errors.broadcast.message.title.is.empty': 'Пустое название сообщения',
     'errors.broadcast.message.erasing.time.is.before.then.firing.time': 'Время отпарвки позже времени удаления',
+    'errors.broadcast.message.illegal.state': 'Невозможно изменить сообщение',
+    'errors.broadcast.message.send.error': 'Во время отправки произошла ошибка',
+    'errors.broadcast.message.erase.error': 'Во время удаления произошла ошибка',
 
     //Success messages
     'app.successmessage.successsumary': 'Успешно',
