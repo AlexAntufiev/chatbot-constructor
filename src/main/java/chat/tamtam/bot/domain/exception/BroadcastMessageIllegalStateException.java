@@ -1,13 +1,10 @@
 package chat.tamtam.bot.domain.exception;
 
-import lombok.Getter;
+import chat.tamtam.bot.service.Error;
 
-public class BroadcastMessageIllegalStateException extends IllegalStateException {
-    @Getter
-    private final String errorKey;
+public class BroadcastMessageIllegalStateException extends ChatBotConstructorException {
 
-    public BroadcastMessageIllegalStateException(final IllegalStateException ex, final String errorKey) {
-        super(ex.getLocalizedMessage());
-        this.errorKey = errorKey;
+    public BroadcastMessageIllegalStateException(final String message, final Error error) {
+        super(message, error);
     }
 }

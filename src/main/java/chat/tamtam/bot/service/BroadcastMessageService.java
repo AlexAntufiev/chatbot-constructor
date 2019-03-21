@@ -123,7 +123,10 @@ public class BroadcastMessageService {
             );
             return new SuccessResponseWrapper<>(broadcastMessage);
         } catch (IllegalStateException iSE) {
-            throw new BroadcastMessageIllegalStateException(iSE, Error.BROADCAST_MESSAGE_ILLEGAL_STATE.getErrorKey());
+            throw new BroadcastMessageIllegalStateException(
+                    iSE.getLocalizedMessage(),
+                    Error.BROADCAST_MESSAGE_ILLEGAL_STATE
+            );
         }
     }
 
@@ -132,7 +135,7 @@ public class BroadcastMessageService {
             final BroadcastMessageEntity broadcastMessage,
             final BroadcastMessageState requiredState,
             final BroadcastMessageState targetState
-    ) {
+    ) throws IllegalStateException {
         if (broadcastMessageRepository
                 .findById(broadcastMessage.getId())
                 .get()

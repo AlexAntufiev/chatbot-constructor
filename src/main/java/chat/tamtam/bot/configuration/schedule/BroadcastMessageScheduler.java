@@ -58,20 +58,36 @@ public class BroadcastMessageScheduler {
                         BroadcastMessageState.SCHEDULED.getValue()
                 );
         scheduledMessages.forEach(e -> {
-            BotSchemeEntity botScheme = botSchemaRepository.findById(e.getBotSchemeId()).get();
-            TamTamBotAPI tamTamBotAPI = getTamTamBotAPI(e, botScheme);
-            if (tamTamBotAPI != null) {
-                try {
-                    setProcessingStateAttempt(e, BroadcastMessageState.SCHEDULED);
-                    executor.execute(() -> sendBroadcastMessage(tamTamBotAPI, e));
-                } catch (IllegalStateException iSE) {
-                    log.error(String.format("Can't change message state with id=%d", e.getId()), iSE);
-                }
-            } else {
-                e.setState(BroadcastMessageState.ERROR);
-                e.setError(Error.BROADCAST_MESSAGE_ILLEGAL_STATE.getErrorKey());
-                broadcastMessageRepository.save(e);
-            }
+            botSchemaRepository
+                    .findById(e.getBotSchemeId())
+                    .ifPresentOrElse(
+                            botScheme -> {
+                                TamTamBotAPI tamTamBotAPI = getTamTamBotAPI(e, botScheme);
+                                if (tamTamBotAPI != null) {
+                                    try {
+                                        setProcessingStateAttempt(e, BroadcastMessageState.SCHEDULED);
+                                        executor.execute(() -> sendBroadcastMessage(tamTamBotAPI, e));
+                                    } catch (IllegalStateException iSE) {
+                                        log.error(String.format(
+                                                "Can't change message state with id=%d",
+                                                e.getId()
+                                        ), iSE);
+                                    }
+                                } else {
+                                    e.setState(BroadcastMessageState.ERROR);
+                                    e.setError(Error.BROADCAST_MESSAGE_ILLEGAL_STATE.getErrorKey());
+                                    broadcastMessageRepository.save(e);
+                                }
+                            },
+                            () -> {
+                                log.error(
+                                        String.format(
+                                                "Can't send message with id=%d because botScheme is not presented",
+                                                e.getBotSchemeId()
+                                        ));
+                            }
+                    );
+
         });
     }
 
@@ -79,7 +95,7 @@ public class BroadcastMessageScheduler {
     protected void setProcessingStateAttempt(
             final BroadcastMessageEntity broadcastMessage,
             final BroadcastMessageState requiredState
-    ) {
+    ) throws IllegalStateException {
         if (broadcastMessageRepository
                 .findById(broadcastMessage.getId())
                 .get()
@@ -103,20 +119,36 @@ public class BroadcastMessageScheduler {
                         BroadcastMessageState.SENT.getValue()
                 );
         scheduledMessages.forEach(e -> {
-            BotSchemeEntity botScheme = botSchemaRepository.findById(e.getBotSchemeId()).get();
-            TamTamBotAPI tamTamBotAPI = getTamTamBotAPI(e, botScheme);
-            if (tamTamBotAPI != null) {
-                try {
-                    setProcessingStateAttempt(e, BroadcastMessageState.SENT);
-                    executor.execute(() -> eraseBroadcastMessage(tamTamBotAPI, e));
-                } catch (IllegalStateException iSE) {
-                    log.error(String.format("Can't change message state with id=%d", e.getId()), iSE);
-                }
-            } else {
-                e.setState(BroadcastMessageState.ERROR);
-                e.setError(Error.BROADCAST_MESSAGE_ILLEGAL_STATE.getErrorKey());
-                broadcastMessageRepository.save(e);
-            }
+            botSchemaRepository
+                    .findById(e.getBotSchemeId())
+                    .ifPresentOrElse(
+                            botScheme -> {
+                                TamTamBotAPI tamTamBotAPI = getTamTamBotAPI(e, botScheme);
+                                if (tamTamBotAPI != null) {
+                                    try {
+                                        setProcessingStateAttempt(e, BroadcastMessageState.SENT);
+                                        executor.execute(() -> eraseBroadcastMessage(tamTamBotAPI, e));
+                                    } catch (IllegalStateException iSE) {
+                                        log.error(String.format(
+                                                "Can't change message state with id=%d",
+                                                e.getId()
+                                        ), iSE);
+                                    }
+                                } else {
+                                    e.setState(BroadcastMessageState.ERROR);
+                                    e.setError(Error.BROADCAST_MESSAGE_ILLEGAL_STATE.getErrorKey());
+                                    broadcastMessageRepository.save(e);
+                                }
+                            },
+                            () -> {
+                                log.error(
+                                        String.format(
+                                                "Can't erase message with id=%d because botScheme is not presented",
+                                                e.getBotSchemeId()
+                                        ));
+                            }
+                    );
+
         });
     }
 
