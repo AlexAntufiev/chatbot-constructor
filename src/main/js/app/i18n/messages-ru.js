@@ -6,6 +6,9 @@ export default {
     'app.bot.edit': 'Редактировать',
     'app.bot.remove': 'Удалить',
 
+    //Bot detail
+    'app.bot.detail.select.channels': 'Выберите каналы',
+
     //Menu
     'app.menu.home': 'Домой',
     'app.menu.botlist': 'Список ботов',
@@ -15,6 +18,7 @@ export default {
     'app.menu.settings': 'Настройки',
     'app.menu.constructor': 'Конструктор',
     'app.menu.statistic': 'Статистика',
+    'app.menu.broadcasting': 'Рассылка',
 
     //Dialogs
     'app.dialog.name': 'Название',
@@ -37,13 +41,15 @@ export default {
     'app.dialog.checksure': 'Вы уверены?',
     'app.dialog.connect': 'Подключить',
     'app.dialog.disconnect': 'Отключить',
+    'app.dialog.append': 'Добавить',
+    'app.dialog.refresh': 'Обновить',
 
     //Error messages
     'app.errormessage.errorsummary': 'Сообщение об ошибке',
     'app.errormessage.passwordnotmatch': 'Пароли не совпадают',
     'app.errormessage.fillallfields': 'Заполните все поля',
     'app.errormessage.fillname': 'Заполните имя',
-    'app.errormessage.servernotresponse': 'Сервер не доступен',
+    'app.errormessage.servernotresponse': 'Сервер недоступен',
     'app.errormessage.serverwrongresponse': 'Неверный ответ от сервера',
     'errors.tam.service': 'Ошибка сервиса ТамТам',
     'errors.tam.bot.token.incorrect': 'Неправильный токен',
@@ -52,7 +58,7 @@ export default {
     'errors.tam.bot.unsubscribed.already': 'Бот уже отключен',
     'errors.tam.bot.not.subscribed': "Бот не подключен",
     'errors.chatChannel.selected.empty': 'Id канала не указан',
-    'errors.chatChannel.permission': 'У канала недостаточно прав',
+    'errors.chatChannel.permission': 'Бот не является администратором канала',
     'errors.chatChannel.does.not.exist': 'Канал не существует',
     'errors.not.chatChannel': 'Это не канал',
     'errors.broadcast.message.does.not.exist': 'Сообщения не существует',

@@ -6,6 +6,9 @@ export default {
     'app.bot.edit': 'Edit',
     'app.bot.remove': 'Remove',
 
+    //Bot detail
+    'app.bot.detail.select.channels': 'Select channels',
+
     //Menu
     'app.menu.home': 'Home',
     'app.menu.botlist': 'Bot list',
@@ -15,6 +18,7 @@ export default {
     'app.menu.settings': 'Settings',
     'app.menu.constructor': 'Constructor',
     'app.menu.statistic': 'Statistic',
+    'app.menu.broadcasting': 'Broadcasting',
 
     //Dialogs
     'app.dialog.name': 'Name',
@@ -37,6 +41,8 @@ export default {
     'app.dialog.checksure': 'Are you sure?',
     'app.dialog.connect': 'Connect',
     'app.dialog.disconnect': 'Disconnect',
+    'app.dialog.append': 'Append',
+    'app.dialog.refresh': 'Refresh',
 
     //Error messages
     'app.errormessage.errorsummary': 'Error Message',
@@ -52,7 +58,7 @@ export default {
     'errors.tam.bot.unsubscribed.already': 'Bot is already unsubscribed',
     'errors.tam.bot.not.subscribed': 'Bot not subscribed',
     'errors.chatChannel.selected.empty': 'Provided channel id is empty',
-    'errors.chatChannel.permission': 'This channel has insufficient permissions',
+    'errors.chatChannel.permission': 'Bot not an administrator of the channel',
     'errors.chatChannel.does.not.exist': 'This channel does not exist',
     'errors.not.chatChannel': 'This is not channel',
     'errors.broadcast.message.does.not.exist': 'Message does not exist',
