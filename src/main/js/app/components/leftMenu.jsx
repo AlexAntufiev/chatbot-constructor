@@ -4,6 +4,7 @@ import {connect} from "react-redux";
 import {injectIntl} from "react-intl";
 import * as routers from 'app/constants/routes';
 import makeUrl from 'app/utils/makeUrl';
+import {withRouter} from "react-router";
 
 class LeftMenu extends Component {
     constructor(props) {
@@ -12,7 +13,7 @@ class LeftMenu extends Component {
         const settingsUrl = makeUrl(routers.botSettings(), {id: this.props.id});
         const constructorUrl = makeUrl(routers.botSetup(), {id: this.props.id});
         const statisticUrl = makeUrl(routers.botStatistic(), {id: this.props.id});
-
+        const broadcastingUrl = makeUrl(routers.botBroadcasting(), {id: this.props.id});
         this.state = {
             items: [
                 {
@@ -27,6 +28,13 @@ class LeftMenu extends Component {
                     icon: 'pi pi-table',
                     command: () => {
                         this.props.history.push(constructorUrl)
+                    }
+                },
+                {
+                    label: intl.formatMessage({id: 'app.menu.broadcasting'}),
+                    icon: 'pi pi-envelope',
+                    command: () => {
+                        this.props.history.push(broadcastingUrl)
                     }
                 },
                 {
@@ -48,4 +56,4 @@ class LeftMenu extends Component {
     }
 }
 
-export default connect()(injectIntl(LeftMenu));
+export default withRouter(connect()(injectIntl(LeftMenu)));

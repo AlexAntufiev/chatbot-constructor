@@ -1,4 +1,4 @@
-.bot_card {
+.card-container {
   flex-basis: 300px;
   flex-grow: 0;
   flex-shrink: 1;
@@ -6,10 +6,10 @@
   overflow: hidden;
 }
 
-.bot_card .p-button-text {
+.card-container .p-button-text {
   padding-left: 25px !important;
 }
 
-.bot_card .p-button {
+.card-container .p-button {
   margin: 2px;
 }

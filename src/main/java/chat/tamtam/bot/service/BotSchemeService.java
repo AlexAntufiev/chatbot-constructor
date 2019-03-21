@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
+import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
 import chat.tamtam.bot.repository.BotSchemaRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -59,7 +60,7 @@ public class BotSchemeService {
         return false;
     }
 
-    public List<BotSchemeEntity> getList(final Long userId) {
-        return botSchemaRepository.findAllByUserId(userId);
+    public SuccessResponseWrapper<List<BotSchemeEntity>> getList(final Long userId) {
+        return new SuccessResponseWrapper<>(botSchemaRepository.findAllByUserId(userId));
     }
 }

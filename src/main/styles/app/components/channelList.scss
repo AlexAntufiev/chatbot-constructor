@@ -1,0 +1,29 @@
+.channel-list-element {
+  flex-basis: 200px;
+  margin: 10px;
+  flex-grow: 0;
+  overflow: hidden;
+}
+
+.channel-list-element .p-card-title {
+  font-size: 14px;
+}
+
+.channel-list_refresh-button {
+  margin-bottom: 12px !important;
+  margin-top: 12px !important;
+}
+
+.channel-list-element .channel-list-element_image {
+  border-radius: 100%;
+  height: 120px;
+  width: 120px;
+}
+
+.channel-list-element .p-card-header {
+  text-align: center;
+}
+
+.channel-list-element .p-card-body {
+  text-align: center;
+}
