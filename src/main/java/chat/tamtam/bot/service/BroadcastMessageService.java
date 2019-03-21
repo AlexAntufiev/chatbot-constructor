@@ -133,7 +133,9 @@ public class BroadcastMessageService {
         return new SuccessResponseWrapper<>(broadcastMessageRepository.save(broadcastMessage));
     }
 
-    private static BroadcastMessageEntity transformToBroadcastMessageEntity(final NewBroadcastMessage newBroadcastMessage) {
+    private static BroadcastMessageEntity transformToBroadcastMessageEntity(
+            final NewBroadcastMessage newBroadcastMessage
+    ) {
         // @todo #CC-63 Expand broadcastMessage filtering(payload check etc.)
         if (StringUtils.isEmpty(newBroadcastMessage.getTitle())) {
             throw new CreateBroadcastMessageException(
@@ -178,7 +180,7 @@ public class BroadcastMessageService {
             final String baseTimeAfterSuppliedTimeMessageFormat,
             final Error baseTimeAfterSuppliedTimeError
     ) {
-        // @todo #CC-63 Add value to props that will be minimal diff between base-time and supplied-time(supplied time - base time >= diff)
+        // @todo #CC-63 Add value to props that will be minimal diff between base-time and supplied-time
         // @todo #CC-63 Fix timestamp representation, now it builds time-date string using wrong timezone
         Timestamp futureActionTimestamp = new Timestamp(baseTime.getTime() + supplier.get());
         if (!futureActionTimestamp.after(baseTime)) {
