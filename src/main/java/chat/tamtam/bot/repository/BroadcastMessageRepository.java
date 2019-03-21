@@ -1,5 +1,6 @@
 package chat.tamtam.bot.repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
@@ -38,4 +39,8 @@ public interface BroadcastMessageRepository extends CrudRepository<BroadcastMess
             long chatChannelId,
             long messageId
     );
+
+    List<BroadcastMessageEntity> findAllByFiringTimeBeforeAndState(Timestamp timestamp, byte state);
+
+    List<BroadcastMessageEntity> findAllByErasingTimeBeforeAndState(Timestamp timestamp, byte state);
 }
