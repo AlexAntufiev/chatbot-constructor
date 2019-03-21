@@ -1,4 +1,4 @@
-package chat.tamtam.bot.domain;
+package chat.tamtam.bot.domain.bot;
 
 import java.io.Serializable;
 

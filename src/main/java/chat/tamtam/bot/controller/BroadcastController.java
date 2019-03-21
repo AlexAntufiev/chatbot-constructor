@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import chat.tamtam.bot.domain.broadcast.message.NewBroadcastMessage;
 import chat.tamtam.bot.domain.chatchannel.SelectedChatChannelEntity;
+import chat.tamtam.bot.service.BroadcastMessageService;
 import chat.tamtam.bot.service.ChatChannelService;
 import chat.tamtam.bot.service.TamBotService;
 import lombok.AllArgsConstructor;
@@ -22,19 +24,19 @@ import lombok.extern.log4j.Log4j2;
 @RestController
 @AllArgsConstructor
 @RequestMapping(
-        path = Endpoints.API_BOT,
+        path = Endpoint.API_BOT + Endpoint.ID + Endpoint.TAM_CHATCHANNEL,
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
 )
 public class BroadcastController {
     private final TamBotService tamBotService;
     private final ChatChannelService chatChannelService;
+    private final BroadcastMessageService broadcastMessageService;
 
     @GetMapping(
             path = {
-                    Endpoints.ID + Endpoints.TAM_CHATCHANNEL + Endpoints.ADMIN
-                            + Endpoints.LIST + Endpoints.TAM_MARKER,
-                    Endpoints.ID + Endpoints.TAM_CHATCHANNEL + Endpoints.ADMIN + Endpoints.LIST
+                    Endpoint.ADMIN + Endpoint.LIST + Endpoint.TAM_MARKER,
+                    Endpoint.ADMIN + Endpoint.LIST
             },
             consumes = MediaType.ALL_VALUE
     )
@@ -49,7 +51,7 @@ public class BroadcastController {
         );
     }
 
-    @PostMapping(Endpoints.ID + Endpoints.TAM_CHATCHANNEL + Endpoints.SAVE)
+    @PostMapping(Endpoint.SAVE)
     public ResponseEntity<?> saveChatChannel(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final Integer botSchemeId,
@@ -61,10 +63,7 @@ public class BroadcastController {
         );
     }
 
-    @GetMapping(
-            path = Endpoints.ID + Endpoints.TAM_CHATCHANNEL + Endpoints.LIST,
-            consumes = MediaType.ALL_VALUE
-    )
+    @GetMapping(path = Endpoint.LIST, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> getChatChannels(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final Integer botSchemeId
@@ -75,10 +74,7 @@ public class BroadcastController {
         );
     }
 
-    @GetMapping(
-            path = Endpoints.ID + Endpoints.TAM_CHATCHANNEL + Endpoints.CHATCHANNEL_ID,
-            consumes = MediaType.ALL_VALUE
-    )
+    @GetMapping(path = Endpoint.CHATCHANNEL_ID, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> getChatChannel(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final Integer botSchemeId,
@@ -90,10 +86,7 @@ public class BroadcastController {
         );
     }
 
-    @PostMapping(
-            path = Endpoints.ID + Endpoints.TAM_CHATCHANNEL + Endpoints.CHATCHANNEL_ID + Endpoints.DELETE,
-            consumes = MediaType.ALL_VALUE
-    )
+    @PostMapping(path = Endpoint.CHATCHANNEL_ID + Endpoint.DELETE, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> removeChatChannel(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final Integer botSchemeId,
@@ -101,6 +94,67 @@ public class BroadcastController {
     ) {
         return new ResponseEntity<>(
                 chatChannelService.removeChatChannel(authToken, botSchemeId, channelId),
+                HttpStatus.OK
+        );
+    }
+
+    @PostMapping(path = Endpoint.CHATCHANNEL_ID + Endpoint.MESSAGE)
+    public ResponseEntity<?> addBroadcastMessage(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable("id") final Integer botSchemeId,
+            @PathVariable("chatchannel_id") final Long channelId,
+            @RequestBody final NewBroadcastMessage newBroadcastMessage
+    ) {
+        return new ResponseEntity<>(
+                broadcastMessageService
+                        .addBroadcastMessage(authToken, botSchemeId, channelId, newBroadcastMessage),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping(
+            path = Endpoint.CHATCHANNEL_ID + Endpoint.MESSAGE + Endpoint.MESSAGE_ID,
+            consumes = MediaType.ALL_VALUE
+    )
+    public ResponseEntity<?> getBroadcastMessage(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable("id") final Integer botSchemeId,
+            @PathVariable("chatchannel_id") final Long chatchannelId,
+            @PathVariable("message_id") long messageId
+    ) {
+        return new ResponseEntity<>(
+                broadcastMessageService.getBroadcastMessage(authToken, botSchemeId, chatchannelId, messageId),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping(
+            path = Endpoint.CHATCHANNEL_ID + Endpoint.MESSAGE + Endpoint.LIST,
+            consumes = MediaType.ALL_VALUE
+    )
+    public ResponseEntity<?> getBroadcastMessages(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable("id") final Integer botSchemeId,
+            @PathVariable("chatchannel_id") final Long channelId
+    ) {
+        return new ResponseEntity<>(
+                broadcastMessageService.getBroadcastMessages(authToken, botSchemeId, channelId),
+                HttpStatus.OK
+        );
+    }
+
+    @PostMapping(
+            path = Endpoint.CHATCHANNEL_ID + Endpoint.MESSAGE + Endpoint.MESSAGE_ID + Endpoint.DELETE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public ResponseEntity<?> removeBroadcastMessage(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable("id") final Integer botSchemeId,
+            @PathVariable("chatchannel_id") final Long channelId,
+            @PathVariable("message_id") long messageId
+    ) {
+        return new ResponseEntity<>(
+                broadcastMessageService.removeBroadcastMessage(authToken, botSchemeId, channelId, messageId),
                 HttpStatus.OK
         );
     }

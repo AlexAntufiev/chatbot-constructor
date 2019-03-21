@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import chat.tamtam.bot.domain.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.service.BotSchemeService;
 import chat.tamtam.bot.service.UserService;
 import lombok.AllArgsConstructor;
@@ -24,25 +24,25 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = Endpoints.API_BOT, consumes = MediaType.APPLICATION_JSON_VALUE, produces =
+@RequestMapping(path = Endpoint.API_BOT, consumes = MediaType.APPLICATION_JSON_VALUE, produces =
         MediaType.APPLICATION_JSON_VALUE)
 public class BotSchemeController {
     private final UserService userService;
     private final BotSchemeService botSchemeService;
 
-    @GetMapping(path = Endpoints.LIST, consumes = MediaType.ALL_VALUE)
+    @GetMapping(path = Endpoint.LIST, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> botList(@RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken) {
         return new ResponseEntity<>(botSchemeService.getList(userService.getUserIdByToken(authToken)), HttpStatus.OK);
     }
 
-    @GetMapping(path = Endpoints.ID, consumes = MediaType.ALL_VALUE)
+    @GetMapping(path = Endpoint.ID, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> getBotScheme(
             @PathVariable final int id, @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
     ) {
         return new ResponseEntity<>(botSchemeService.getBotScheme(authToken, id), HttpStatus.OK);
     }
 
-    @PostMapping(Endpoints.ADD)
+    @PostMapping(Endpoint.ADD)
     public ResponseEntity<?> addBot(
             @RequestBody final BotSchemeEntity bot,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
@@ -57,7 +57,7 @@ public class BotSchemeController {
         }
     }
 
-    @DeleteMapping(Endpoints.DELETE)
+    @DeleteMapping(Endpoint.DELETE)
     public ResponseEntity<?> deleteBot(
             @RequestBody final BotSchemeEntity bot,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
@@ -75,7 +75,7 @@ public class BotSchemeController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping(Endpoints.ID + Endpoints.SAVE)
+    @PostMapping(Endpoint.ID + Endpoint.SAVE)
     public ResponseEntity<?> saveBot(
             @PathVariable final Integer id, @RequestBody final BotSchemeEntity bot,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken

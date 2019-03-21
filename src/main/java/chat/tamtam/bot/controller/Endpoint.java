@@ -1,6 +1,6 @@
 package chat.tamtam.bot.controller;
 
-public interface Endpoints {
+public interface Endpoint {
     String API_LOGIN = "/api/login";
     String API_LOGOUT = "/api/logout";
     String API_REGISTRATION = "/api/registration";
@@ -19,6 +19,9 @@ public interface Endpoints {
     String CHATCHANNEL_ID = "/{chatchannel_id}";
     String ADMIN = "/admin";
     String TAM_MARKER = "/{marker}";
+
+    String MESSAGE = "/message";
+    String MESSAGE_ID = "/{message_id}";
 
     String STATIC_INDEX = "/index.html";
     String STATIC_RESOURCES = "/assets/**";

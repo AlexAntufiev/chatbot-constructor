@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import chat.tamtam.bot.domain.SessionEntity;
+import chat.tamtam.bot.domain.session.SessionEntity;
 
 @Repository
 public interface SessionRepository extends JpaRepository<SessionEntity, Integer> {

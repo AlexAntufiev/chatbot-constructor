@@ -1,7 +1,7 @@
 package chat.tamtam.bot;
 
-import chat.tamtam.bot.domain.BotSchemeEntity;
-import chat.tamtam.bot.domain.TamBotEntity;
+import chat.tamtam.bot.domain.bot.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.botapi.model.UserWithPhoto;
 
 public class TestContext {

@@ -14,11 +14,11 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping(path = Endpoints.TAM_BOT_WEBHOOK,
+@RequestMapping(path = Endpoint.TAM_BOT_WEBHOOK,
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.ALL_VALUE)
 public class WebHookBotController {
-    @PostMapping(Endpoints.ID)
+    @PostMapping(Endpoint.ID)
     public ResponseEntity<?> webHookMessage(
             @PathVariable final String id,
             @RequestBody final Message message

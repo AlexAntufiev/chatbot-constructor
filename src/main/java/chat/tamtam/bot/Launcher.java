@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 
 import chat.tamtam.bot.configuration.Profiles;
-import chat.tamtam.bot.domain.UserAuthEntity;
+import chat.tamtam.bot.domain.user.UserAuthEntity;
 import chat.tamtam.bot.service.UserService;
 import lombok.AllArgsConstructor;
 

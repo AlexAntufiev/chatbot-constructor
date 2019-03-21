@@ -19,10 +19,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.auth0.jwt.JWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import chat.tamtam.bot.domain.SessionEntity;
-import chat.tamtam.bot.domain.UserAuthEntity;
-import chat.tamtam.bot.domain.UserAuthorizedEntity;
-import chat.tamtam.bot.domain.UserEntity;
+import chat.tamtam.bot.domain.session.SessionEntity;
+import chat.tamtam.bot.domain.user.UserAuthEntity;
+import chat.tamtam.bot.domain.user.UserAuthorizedEntity;
+import chat.tamtam.bot.domain.user.UserEntity;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.repository.UserRepository;
 

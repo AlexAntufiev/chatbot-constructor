@@ -17,13 +17,13 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @AllArgsConstructor
 @RestController
-@RequestMapping(path = Endpoints.TAM_CUSTOM_BOT_WEBHOOK,
+@RequestMapping(path = Endpoint.TAM_CUSTOM_BOT_WEBHOOK,
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.ALL_VALUE)
 public class WebHookCustomBotController {
     private final WebHookBotService webHookBotService;
 
-    @PostMapping(Endpoints.ID)
+    @PostMapping(Endpoint.ID)
     public ResponseEntity<?> webHookMessage(
             @PathVariable final String id,
             @RequestBody final Message message

@@ -21,8 +21,8 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 import com.auth0.jwt.JWT;
 
-import chat.tamtam.bot.controller.Endpoints;
-import chat.tamtam.bot.domain.SessionEntity;
+import chat.tamtam.bot.controller.Endpoint;
+import chat.tamtam.bot.domain.session.SessionEntity;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.service.UserDetailsServiceImpl;
 
@@ -86,7 +86,7 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
             if (authCookie.isPresent()) {
                 SessionEntity session = sessionRepository.findByToken(authCookie.get().getValue());
                 if (session == null || session.isExpired()) {
-                    response.sendRedirect(Endpoints.API_LOGOUT);
+                    response.sendRedirect(Endpoint.API_LOGOUT);
                     return;
                 }
             }

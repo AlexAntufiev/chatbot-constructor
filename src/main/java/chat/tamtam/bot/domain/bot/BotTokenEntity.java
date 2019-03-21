@@ -1,4 +1,4 @@
-package chat.tamtam.bot.domain;
+package chat.tamtam.bot.domain.bot;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

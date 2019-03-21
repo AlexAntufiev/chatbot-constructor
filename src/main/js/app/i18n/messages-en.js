@@ -53,8 +53,13 @@ export default {
     'errors.tam.bot.not.subscribed': 'Bot not subscribed',
     'errors.chatChannel.selected.empty': 'Provided channel id is empty',
     'errors.chatChannel.permission': 'This channel has insufficient permissions',
-    'errors.chatChannel.not.exist': 'This channel does not exist',
+    'errors.chatChannel.does.not.exist': 'This channel does not exist',
     'errors.not.chatChannel': 'This is not channel',
+    'errors.broadcast.message.does.not.exist': 'Message does not exist',
+    'errors.broadcast.message.firing.time.is.in.past': 'Time to send is in past',
+    'errors.broadcast.message.firing.time.is.null': 'Time to send is not set',
+    'errors.broadcast.message.title.is.empty': 'Message title is empty',
+    'errors.broadcast.message.erasing.time.is.before.then.firing.time': 'Time to erase message is before then time to send',
 
     //Success messages
     'app.successmessage.successsumary': 'Success',

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import chat.tamtam.bot.domain.BotTokenEntity;
+import chat.tamtam.bot.domain.bot.BotTokenEntity;
 import chat.tamtam.bot.service.TamBotService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,12 +20,12 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RestController
 @AllArgsConstructor
-@RequestMapping(path = Endpoints.API_BOT, consumes = MediaType.APPLICATION_JSON_VALUE, produces =
+@RequestMapping(path = Endpoint.API_BOT, consumes = MediaType.APPLICATION_JSON_VALUE, produces =
         MediaType.APPLICATION_JSON_VALUE)
 public class TamBotController {
     private final TamBotService tamBotService;
 
-    @GetMapping(path = Endpoints.ID + Endpoints.STATUS, consumes = MediaType.ALL_VALUE)
+    @GetMapping(path = Endpoint.ID + Endpoint.STATUS, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> status(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final int botSchemeId
@@ -36,7 +36,7 @@ public class TamBotController {
         );
     }
 
-    @PostMapping(Endpoints.ID + Endpoints.TAM_CONNECT)
+    @PostMapping(Endpoint.ID + Endpoint.TAM_CONNECT)
     public ResponseEntity<?> connectBot(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final Integer botSchemeId,
@@ -48,7 +48,7 @@ public class TamBotController {
         );
     }
 
-    @PostMapping(path = Endpoints.ID + Endpoints.TAM_DISCONNECT, consumes = MediaType.ALL_VALUE)
+    @PostMapping(path = Endpoint.ID + Endpoint.TAM_DISCONNECT, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> disconnectBot(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final Integer botSchemeId

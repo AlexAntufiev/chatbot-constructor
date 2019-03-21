@@ -1,4 +1,4 @@
-package chat.tamtam.bot.domain;
+package chat.tamtam.bot.domain.user;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import chat.tamtam.bot.domain.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 
 @Repository
 public interface BotSchemaRepository extends CrudRepository<BotSchemeEntity, Integer> {
