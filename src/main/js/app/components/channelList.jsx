@@ -7,6 +7,7 @@ import {connect} from "react-redux";
 import {injectIntl} from "react-intl";
 
 class ChannelList extends React.Component {
+    // @todo #CC-38 show link to tt, cut the long title and description
     constructor(props) {
         super(props);
 
