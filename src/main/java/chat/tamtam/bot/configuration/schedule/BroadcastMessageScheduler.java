@@ -35,6 +35,10 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @RequiredArgsConstructor
 public class BroadcastMessageScheduler {
+    private static final long DEFAULT_SENDING_RATE = 30_000L;
+    private static final long DEFAULT_ERASING_RATE = 30_000L;
+
+
     private final BroadcastMessageRepository broadcastMessageRepository;
     private final BotSchemaRepository botSchemaRepository;
     private final TamBotRepository tamBotRepository;
@@ -45,7 +49,7 @@ public class BroadcastMessageScheduler {
     @Value("${tamtam.broadcast.executor.maxPoolSize:1}")
     private int maxPoolSize;
 
-    @Scheduled(fixedRate = SchedulerRates.DEFAULT_SENDING_RATE)
+    @Scheduled(fixedRate = DEFAULT_SENDING_RATE)
     public void fireScheduledMessages() {
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
         List<BroadcastMessageEntity> scheduledMessages =
@@ -90,7 +94,7 @@ public class BroadcastMessageScheduler {
         }
     }
 
-    @Scheduled(fixedRate = SchedulerRates.DEFAULT_ERASING_RATE)
+    @Scheduled(fixedRate = DEFAULT_ERASING_RATE)
     public void eraseScheduledMessages() {
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
         List<BroadcastMessageEntity> scheduledMessages =
