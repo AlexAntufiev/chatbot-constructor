@@ -59,6 +59,7 @@ export default {
     'errors.broadcast.message.firing.time.is.in.past': 'Time to send is in past',
     'errors.broadcast.message.firing.time.is.null': 'Time to send is not set',
     'errors.broadcast.message.title.is.empty': 'Message title is empty',
+    'errors.broadcast.message.erasing.time.is.before.then.firing.time': 'Time to erase message is before then time to send',
 
     //Success messages
     'app.successmessage.successsumary': 'Success',

@@ -31,6 +31,10 @@ public class BroadcastMessageEntity {
     private String title;
     @Column(name = "firingTime", nullable = false)
     private Timestamp firingTime;
+    @Column(name = "erasingTime")
+    private Timestamp erasingTime;
+    @Column(name = "mid")
+    private String messageId;
     @Column(name = "text")
     private String text;
     @Column(name = "state")

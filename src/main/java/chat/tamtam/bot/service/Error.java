@@ -22,6 +22,9 @@ public enum Error {
     BROADCAST_MESSAGE_FIRING_TIME_IS_IN_PAST("errors.broadcast.message.firing.time.is.in.past"),
     BROADCAST_MESSAGE_FIRING_TIME_IS_NULL("errors.broadcast.message.firing.time.is.null"),
     BROADCAST_MESSAGE_TITLE_IS_EMPTY("errors.broadcast.message.title.is.empty"),
+    BROADCAST_MESSAGE_ERASING_TIME_IS_BEFORE_THEN_FIRING_TIME(
+            "errors.broadcast.message.erasing.time.is.before.then.firing.time"
+    ),
     ;
 
     @Getter
