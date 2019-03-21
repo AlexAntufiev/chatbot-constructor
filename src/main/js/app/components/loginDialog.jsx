@@ -36,7 +36,7 @@ export class LoginDialog extends BaseDialog {
         const self = this;
         UserService.login(this.state.username, this.state.password, (res) => {
             self.props.setUser({
-                userId: res.data.userId,
+                userId: res.data.payload.userId,
                 token: res.headers[AUTHORIZATION]
             });
             self.onHide();

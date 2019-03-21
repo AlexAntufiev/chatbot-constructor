@@ -24,7 +24,7 @@ class ChannelList extends React.Component {
         ChatChannelService.getChannels(this.props.botSchemeId, (res) => {
 
             let channels = {};
-            res.data.chatChannels.forEach((channel) => {
+            res.data.payload.forEach((channel) => {
                 channels[channel.id.chatId] = {
                     chat_id: channel.id.chatId,
                     title: channel.title,
@@ -42,7 +42,7 @@ class ChannelList extends React.Component {
         ChatChannelService.getTamChatsWhereAdmin(this.props.botSchemeId, (res) => {
             let channels = {};
 
-            res.data.chatChannels.forEach((channel) => {
+            res.data.payload.forEach((channel) => {
                 if (!(channel.chat_id in self.state.userChannels)) {
                     channels[channel.chat_id] = {
                         chat_id: channel.chat_id,

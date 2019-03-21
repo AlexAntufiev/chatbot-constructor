@@ -24,7 +24,7 @@ class BotBroadcasting extends Component {
     componentDidMount() {
         const self = this;
         ChatChannelService.getChannels(this.props.match.params.id, (res) => {
-            self.setState({chatChannels: res.data.chatChannels});
+            self.setState({chatChannels: res.data.payload});
         }, null, this);
     }
 

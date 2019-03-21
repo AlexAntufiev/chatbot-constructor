@@ -22,7 +22,7 @@ class BotList extends React.Component {
     refreshBotList() {
         const self = this;
         BotSchemeService.getList((res) => {
-            self.setState({bots: res.data.botList});
+            self.setState({bots: res.data.payload});
         }, null, this);
     }
 
@@ -35,8 +35,8 @@ class BotList extends React.Component {
         const self = this;
 
         BotSchemeService.addBot(defaultName, (res) => {
-            if (Number.isInteger(res.data.id)) {
-                const url = makeUrl(routers.botDetail(), {id: res.data.id});
+            if (Number.isInteger(res.data.payload.id)) {
+                const url = makeUrl(routers.botDetail(), {id: res.data.payload.id});
                 self.props.history.push(url);
             } else {
                 AxiosMessages.serverErrorResponse(self);

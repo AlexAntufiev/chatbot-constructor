@@ -37,7 +37,7 @@ class BotSettings extends Component {
         const self = this;
         TamBotService.getTamBot(this.props.match.params.id, (res) => {
             if (self.state.connected) {
-                self.setState({token: res.data.token});
+                self.setState({token: res.data.payload.token});
             }
         }, null, this)
     }
@@ -45,15 +45,15 @@ class BotSettings extends Component {
     refreshBotInfo() {
         const self = this;
         BotSchemeService.getBotScheme(this.props.match.params.id, (res) => {
-            const connected = !!res.data.botId;
+            const connected = !!res.data.payload.botId;
             self.setState({
-                name: res.data.name,
-                botId: res.data.botId,
+                name: res.data.payload.name,
+                botId: res.data.payload.botId,
                 connected: connected,
-                initialName: res.data.name,
+                initialName: res.data.payload.name,
             });
             if (connected) {
-                self.refreshToken(res.data.botId);
+                self.refreshToken(res.data.payload.botId);
             }
         }, null, this);
     }

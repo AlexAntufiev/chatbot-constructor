@@ -2,7 +2,7 @@ package chat.tamtam.bot.domain.response;
 
 import lombok.Getter;
 
-public class SuccessResponseListWrapper<T> extends SuccessResponseWrapper {
+public class SuccessResponseListWrapper<T> extends SuccessResponseWrapper<T> {
     @Getter
     private Long marker;
 
