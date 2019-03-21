@@ -10,7 +10,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import chat.tamtam.bot.domain.exception.ChatBotConstructorException;
 import chat.tamtam.bot.domain.exception.ChatChannelStoreException;
-import chat.tamtam.bot.domain.exception.NotFoundEntityException;
 import chat.tamtam.bot.domain.response.FailResponse;
 import chat.tamtam.bot.domain.response.FailResponseWrapper;
 import io.micrometer.core.lang.Nullable;
@@ -18,17 +17,8 @@ import io.micrometer.core.lang.Nullable;
 @RestControllerAdvice
 public class ControllerHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(NotFoundEntityException.class)
-    public ResponseEntity<Object> handleBadRequest(NotFoundEntityException ex, WebRequest request) {
-        return handle(
-                ex,
-                new FailResponse(ex.getErrorKey()),
-                request
-        );
-    }
-
     @ExceptionHandler(ChatBotConstructorException.class)
-    public ResponseEntity<Object> handleBotSubscriptionException(ChatBotConstructorException ex, WebRequest request) {
+    public ResponseEntity<Object> handleException(ChatBotConstructorException ex, WebRequest request) {
         return handle(
                 ex,
                 new FailResponse(ex.getErrorKey()),

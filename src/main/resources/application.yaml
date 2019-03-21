@@ -49,3 +49,11 @@ tamtam:
       botType: Registration
       onlyTrustedUsers: true
       trustedUsers: 555537636725, 590435433004, 575868018573, 577949140156
+
+---
+
+tamtam:
+  broadcast:
+    executor:
+      corePoolSize: 2
+      maxPoolSize: 4
