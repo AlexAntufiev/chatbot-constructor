@@ -119,7 +119,7 @@ public class BroadcastMessageService {
             setBroadcastMessageStateAttempt(
                     broadcastMessage,
                     BroadcastMessageState.SCHEDULED,
-                    BroadcastMessageState.DELETED
+                    BroadcastMessageState.DISCARDED_SEND_BY_USER
             );
             return new SuccessResponseWrapper<>(broadcastMessage);
         } catch (IllegalStateException iSE) {

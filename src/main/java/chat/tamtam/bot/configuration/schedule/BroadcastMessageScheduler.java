@@ -185,7 +185,7 @@ public class BroadcastMessageScheduler {
                             new NewMessageBody(".", Collections.emptyList()),
                             broadcastMessage.getMessageId()
                     ).execute();
-            broadcastMessage.setState(BroadcastMessageState.ERASED);
+            broadcastMessage.setState(BroadcastMessageState.ERASED_BY_SCHEDULE);
         } catch (APIException | ClientException ex) {
             log.error(String.format("Can't erase scheduled message with id=%d", broadcastMessage.getId()), ex);
             broadcastMessage.setState(BroadcastMessageState.ERROR);
