@@ -112,6 +112,26 @@ public class BroadcastController {
         );
     }
 
+    @PostMapping(Endpoint.CHATCHANNEL_ID + Endpoint.MESSAGE + Endpoint.MESSAGE_ID)
+    public ResponseEntity<?> updateBroadcastMessage(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable("id") final int botSchemeId,
+            @PathVariable("chatchannel_id") final long channelId,
+            @PathVariable("message_id") long messageId,
+            @RequestBody final NewBroadcastMessage newBroadcastMessage
+    ) {
+        return new ResponseEntity<>(
+                broadcastMessageService.updateBroadcastMessage(
+                        authToken,
+                        botSchemeId,
+                        channelId,
+                        messageId,
+                        newBroadcastMessage
+                ),
+                HttpStatus.OK
+        );
+    }
+
     @GetMapping(
             path = Endpoint.CHATCHANNEL_ID + Endpoint.MESSAGE + Endpoint.MESSAGE_ID,
             consumes = MediaType.ALL_VALUE

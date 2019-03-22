@@ -20,6 +20,7 @@ import chat.tamtam.bot.domain.exception.BroadcastMessageIllegalStateException;
 import chat.tamtam.bot.domain.exception.ChatBotConstructorException;
 import chat.tamtam.bot.domain.exception.CreateBroadcastMessageException;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
+import chat.tamtam.bot.domain.exception.UpdateBroadcastMessageException;
 import chat.tamtam.bot.domain.response.SuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
 import chat.tamtam.bot.repository.BroadcastMessageRepository;
@@ -153,6 +154,217 @@ public class BroadcastMessageService {
         }
     }
 
+    public SuccessResponse updateBroadcastMessage(
+            final String authToken,
+            int botSchemeId,
+            long chatChannelId,
+            long messageId,
+            final NewBroadcastMessage newBroadcastMessage
+    ) {
+        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        TamBotEntity tamBotEntity = tamBotService.getTamBot(botScheme);
+        BroadcastMessageEntity broadcastMessage =
+                getBroadcastMessage(
+                        botScheme,
+                        tamBotEntity,
+                        chatChannelId,
+                        messageId
+                );
+        if (StringUtils.isEmpty(newBroadcastMessage.getTitle())) {
+            throw new UpdateBroadcastMessageException(
+                    String.format(
+                            "Can't update broadcastMessage's title with id=%d because new title is empty",
+                            messageId
+                    ),
+                    Error.BROADCAST_MESSAGE_TITLE_IS_EMPTY
+            );
+        }
+        if (StringUtils.isEmpty(newBroadcastMessage.getText())) {
+            throw new UpdateBroadcastMessageException(
+                    String.format(
+                            "Can't update broadcastMessage's title with id=%d because new title is empty",
+                            messageId
+                    ),
+                    Error.BROADCAST_MESSAGE_TEXT_IS_EMPTY
+            );
+        }
+        return new SuccessResponseWrapper<>(updateMessageAttempt(newBroadcastMessage, messageId));
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+    protected BroadcastMessageEntity updateMessageAttempt(
+            final NewBroadcastMessage newBroadcastMessage,
+            long messageId
+    ) {
+        BroadcastMessageEntity broadcastMessage =
+                broadcastMessageRepository
+                        .findById(messageId)
+                        .orElseThrow(
+                                () -> new NotFoundEntityException(
+                                        String.format(
+                                                "Broadcast message with id=%d does not exist",
+                                                messageId
+                                        ),
+                                        Error.BROADCAST_MESSAGE_DOES_NOT_EXIST
+                                )
+                        );
+        broadcastMessage.setTitle(newBroadcastMessage.getTitle());
+        broadcastMessage.setText(newBroadcastMessage.getText());
+
+        final BroadcastMessageState state = BroadcastMessageState.getState(broadcastMessage.getState());
+        switch (state) {
+            case SCHEDULED:
+                if (newBroadcastMessage.getFiringTime() != null) {
+                    if (newBroadcastMessage.getFiringTime() > 0) {
+                        broadcastMessage.setFiringTime(
+                                getTimestamp(
+                                        newBroadcastMessage::getFiringTime,
+                                        new Timestamp(System.currentTimeMillis()),
+                                        "Can't update broadCastMessage because firing time=%d is in the past and local time=%d",
+                                        Error.BROADCAST_MESSAGE_FIRING_TIME_IS_IN_PAST
+                                )
+                        );
+                    } else {
+                        broadcastMessage.setState(BroadcastMessageState.DISCARDED_SEND_BY_USER);
+                        break;
+                    }
+                }
+                if (newBroadcastMessage.getErasingTime() != null) {
+                    if (newBroadcastMessage.getErasingTime() > 0) {
+                        broadcastMessage.setErasingTime(
+                                getTimestamp(
+                                        newBroadcastMessage::getErasingTime,
+                                        broadcastMessage.getFiringTime(),
+                                        "Can't update broadCastMessage because erasing time=%d is before the firing time=%d",
+                                        Error.BROADCAST_MESSAGE_ERASING_TIME_IS_BEFORE_THEN_FIRING_TIME
+                                )
+                        );
+                    } else if (broadcastMessage.getErasingTime() == null) {
+                        throw new UpdateBroadcastMessageException(
+                                String.format(
+                                        "Broadcast message with id=%d has discarded erasing time already",
+                                        messageId
+                                ),
+                                Error.BROADCAST_MESSAGE_ERASE_ALREADY_DISCARDED
+                        );
+                    } else {
+                        broadcastMessage.setErasingTime(null);
+                        break;
+                    }
+                } else {
+                    if (broadcastMessage.getErasingTime() != null
+                            && !broadcastMessage.getErasingTime().after(broadcastMessage.getFiringTime())) {
+                        throw new UpdateBroadcastMessageException(
+                                String.format(
+                                        "Can't update broadcast message with id=%d" +
+                                                " because erasingTime is before then firingTime",
+                                        messageId
+                                ),
+                                Error.BROADCAST_MESSAGE_ERASING_TIME_IS_BEFORE_THEN_FIRING_TIME
+                        );
+                    }
+                }
+                break;
+
+            case SENT:
+                // discarded erase
+                if (newBroadcastMessage.getErasingTime() == null) {
+                    broadcastMessage.setErasingTime(null);
+                    broadcastMessage.setState(BroadcastMessageState.DISCARDED_ERASE_BY_USER);
+                } else {
+                    // update erase time
+                    Timestamp newErasingTime = getTimestamp(
+                            newBroadcastMessage::getErasingTime,
+                            broadcastMessage.getFiringTime(),
+                            "Can't update broadCastMessage because erasing time=%d is before the firing time=%d",
+                            Error.BROADCAST_MESSAGE_ERASING_TIME_IS_BEFORE_THEN_FIRING_TIME
+                    );
+                    broadcastMessage.setErasingTime(newErasingTime);
+                }
+                break;
+
+            case DISCARDED_ERASE_BY_USER:
+                if (newBroadcastMessage.getErasingTime() == null) {
+                    throw new UpdateBroadcastMessageException(
+                            String.format(
+                                    "Broadcast message with id=%d has discarded erasing time already",
+                                    messageId
+                            ),
+                            Error.BROADCAST_MESSAGE_ERASE_ALREADY_DISCARDED
+                    );
+                }
+                if (newBroadcastMessage.getErasingTime() <= 0) {
+                    throw new UpdateBroadcastMessageException(
+                            String.format(
+                                    "Broadcast message with id=%d has discarded erasing time already",
+                                    messageId
+                            ),
+                            Error.BROADCAST_MESSAGE_ERASE_ALREADY_DISCARDED
+                    );
+                }
+                // update erase time
+                Timestamp newErasingTime = getTimestamp(
+                        newBroadcastMessage::getErasingTime,
+                        new Timestamp(System.currentTimeMillis()),
+                        "Can't update broadCastMessage because erasing time=%d is before the current time=%d",
+                        Error.BROADCAST_MESSAGE_ERASING_TIME_IS_BEFORE_THEN_FIRING_TIME
+                );
+                broadcastMessage.setErasingTime(newErasingTime);
+                broadcastMessage.setState(BroadcastMessageState.SENT);
+                break;
+
+            case DISCARDED_SEND_BY_USER:
+                if (newBroadcastMessage.getFiringTime() == null) {
+                    throw new UpdateBroadcastMessageException(
+                            String.format(
+                                    "Broadcast message with id=%d has discarded firing time already",
+                                    messageId
+                            ),
+                            Error.BROADCAST_MESSAGE_SEND_ALREADY_DISCARDED
+                    );
+                }
+                if (newBroadcastMessage.getFiringTime() <= 0) {
+                    throw new UpdateBroadcastMessageException(
+                            String.format(
+                                    "Broadcast message with id=%d has discarded firing time already",
+                                    messageId
+                            ),
+                            Error.BROADCAST_MESSAGE_SEND_ALREADY_DISCARDED
+                    );
+                }
+                // update times
+                Timestamp newFiringTime = getTimestamp(
+                        newBroadcastMessage::getFiringTime,
+                        new Timestamp(System.currentTimeMillis()),
+                        "Can't update broadCastMessage because firing time=%d is in the past and local time=%d",
+                        Error.BROADCAST_MESSAGE_FIRING_TIME_IS_IN_PAST
+                );
+                broadcastMessage.setFiringTime(newFiringTime);
+                if (newBroadcastMessage.getErasingTime() != null) {
+                    if (newBroadcastMessage.getErasingTime() > 0) {
+                        broadcastMessage.setErasingTime(
+                                getTimestamp(
+                                        newBroadcastMessage::getErasingTime,
+                                        broadcastMessage.getFiringTime(),
+                                        "Can't update broadCastMessage because erasing time=%d is before the firing time=%d",
+                                        Error.BROADCAST_MESSAGE_ERASING_TIME_IS_BEFORE_THEN_FIRING_TIME
+                                )
+                        );
+                    }
+                }
+                broadcastMessage.setState(BroadcastMessageState.SCHEDULED);
+                break;
+
+            default:
+                throw new BroadcastMessageIllegalStateException(
+                        "Can't update broadcast message because it is in illegal state",
+                        Error.BROADCAST_MESSAGE_ILLEGAL_STATE
+                );
+        }
+        broadcastMessageRepository.save(broadcastMessage);
+        return broadcastMessage;
+    }
+
     public SuccessResponse addBroadcastMessage(
             final String authToken,
             int botSchemeId,
@@ -180,6 +392,12 @@ public class BroadcastMessageService {
                     Error.BROADCAST_MESSAGE_TITLE_IS_EMPTY
             );
         }
+        if (StringUtils.isEmpty(newBroadcastMessage.getText())) {
+            throw new CreateBroadcastMessageException(
+                    "Can't create broadCastMessage because text is empty",
+                    Error.BROADCAST_MESSAGE_TEXT_IS_EMPTY
+            );
+        }
         if (newBroadcastMessage.getFiringTime() == null) {
             throw new ChatBotConstructorException(
                     "Can't create broadCastMessage because firing time is null",
@@ -190,7 +408,7 @@ public class BroadcastMessageService {
         Timestamp firingTimestamp = getTimestamp(
                 newBroadcastMessage::getFiringTime,
                 localTimestamp,
-                "Can't create broadCastMessage because firing time=%d is in past and local time=%d",
+                "Can't create broadCastMessage because firing time=%d is in the past and local time=%d",
                 Error.BROADCAST_MESSAGE_FIRING_TIME_IS_IN_PAST
         );
         Timestamp erasingTimestamp = null;

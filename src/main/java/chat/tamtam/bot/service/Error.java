@@ -22,12 +22,16 @@ public enum Error {
     BROADCAST_MESSAGE_FIRING_TIME_IS_IN_PAST("errors.broadcast.message.firing.time.is.in.past"),
     BROADCAST_MESSAGE_FIRING_TIME_IS_NULL("errors.broadcast.message.firing.time.is.null"),
     BROADCAST_MESSAGE_TITLE_IS_EMPTY("errors.broadcast.message.title.is.empty"),
+    BROADCAST_MESSAGE_TEXT_IS_EMPTY("errors.broadcast.message.text.is.empty"),
     BROADCAST_MESSAGE_ERASING_TIME_IS_BEFORE_THEN_FIRING_TIME(
             "errors.broadcast.message.erasing.time.is.before.then.firing.time"
     ),
     BROADCAST_MESSAGE_ILLEGAL_STATE("errors.broadcast.message.illegal.state"),
     BROADCAST_MESSAGE_SEND_ERROR("errors.broadcast.message.send.error"),
     BROADCAST_MESSAGE_ERASE_ERROR("errors.broadcast.message.erase.error"),
+    BROADCAST_MESSAGE_SEND_ALREADY_DISCARDED("errors.broadcast.message.send.already.discarded"),
+    BROADCAST_MESSAGE_ERASE_ALREADY_DISCARDED("errors.broadcast.message.erase.already.discarded"),
+
     ;
 
     @Getter

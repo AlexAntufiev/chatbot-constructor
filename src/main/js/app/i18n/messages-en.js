@@ -69,6 +69,8 @@ export default {
     'errors.broadcast.message.illegal.state': 'You cannot change message now',
     'errors.broadcast.message.send.error': 'Error occurs at message sending',
     'errors.broadcast.message.erase.error': 'Error occurs at message erasing',
+    'errors.broadcast.message.send.already.discarded': 'Send is already aborted',
+    'errors.broadcast.message.erase.already.discarded': 'Erase is already aborted',
 
     //Success messages
     'app.successmessage.successsumary': 'Success',
