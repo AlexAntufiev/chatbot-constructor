@@ -3,6 +3,7 @@ import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import HtmlWebpackTemplate from 'html-webpack-template';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import FaviconsWebpackPlugin from 'favicons-webpack-plugin';
 
 // Public path
 const publicPath = 'application';
@@ -76,7 +77,7 @@ export default () => ({
     },
     resolve: {
         extensions: ['.js', '.jsx'],
-        modules: ['node_modules', 'src/main/js', 'src/main/styles'],
+        modules: ['node_modules', 'src/main/js', 'src/main/styles', 'src/main/custom_resources'],
         symlinks: false
     },
     plugins: [
@@ -85,6 +86,17 @@ export default () => ({
         }),
         new MiniCssExtractPlugin({
             filename: 'assets/stylesheets/main.css'
+        }),
+        new FaviconsWebpackPlugin({
+            logo: path.join(__dirname, 'src/main/custom_resources/images/favicon.png'),
+            prefix: 'assets/images/icons/',
+            icons: {
+                favicons: true,
+                android: false,
+                appleIcon: false,
+                appleStartup: false,
+                firefox: false
+            }
         }),
         new HtmlWebpackPlugin({
             appMountId: 'root',
