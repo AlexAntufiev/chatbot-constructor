@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
@@ -14,6 +16,7 @@ import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.domain.broadcast.message.NewBroadcastMessage;
 import chat.tamtam.bot.domain.chatchannel.ChatChannelEntity;
+import chat.tamtam.bot.domain.exception.BroadcastMessageIllegalStateException;
 import chat.tamtam.bot.domain.exception.ChatBotConstructorException;
 import chat.tamtam.bot.domain.exception.CreateBroadcastMessageException;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
@@ -112,8 +115,42 @@ public class BroadcastMessageService {
                 chatChannelId,
                 broadcastMessageId
         );
-        broadcastMessage.setState(BroadcastMessageState.DELETED);
-        return new SuccessResponseWrapper<>(broadcastMessage);
+        try {
+            setBroadcastMessageStateAttempt(
+                    broadcastMessage,
+                    BroadcastMessageState.SCHEDULED,
+                    BroadcastMessageState.DISCARDED_SEND_BY_USER
+            );
+            return new SuccessResponseWrapper<>(broadcastMessage);
+        } catch (IllegalStateException iSE) {
+            throw new BroadcastMessageIllegalStateException(
+                    iSE.getLocalizedMessage(),
+                    Error.BROADCAST_MESSAGE_ILLEGAL_STATE
+            );
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+    protected void setBroadcastMessageStateAttempt(
+            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessageState requiredState,
+            final BroadcastMessageState targetState
+    ) throws IllegalStateException {
+        if (broadcastMessageRepository
+                .findById(broadcastMessage.getId())
+                .get()
+                .getState() == requiredState.getValue()
+        ) {
+            broadcastMessage.setState(targetState);
+            broadcastMessageRepository.save(broadcastMessage);
+        } else {
+            throw new IllegalStateException(
+                    "Can't set "
+                            + targetState.name()
+                            + " state because message is not in "
+                            + requiredState.name()
+                            + " state");
+        }
     }
 
     public SuccessResponse addBroadcastMessage(

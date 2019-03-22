@@ -9,6 +9,8 @@ public class ChatBotConstructorException extends RuntimeException {
 
     public ChatBotConstructorException(final String message, final Error error) {
         super(message);
-        this.errorKey = error.getErrorKey();
+        if (error != null) {
+            errorKey = error.getErrorKey();
+        }
     }
 }
