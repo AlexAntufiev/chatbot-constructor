@@ -34,7 +34,7 @@ public class BroadcastMessageEntity {
     private Long chatChannelId;
     @Column(name = "title", nullable = false)
     private String title;
-    @Column(name = "firingTime", nullable = false)
+    @Column(name = "firingTime")
     private Timestamp firingTime;
     @Column(name = "erasingTime")
     private Timestamp erasingTime;
