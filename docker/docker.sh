@@ -5,6 +5,8 @@ token="QeFH2Jalc16THlx9YcNBDhtdx_u3uHOeDp8y8P20pT4"
 chat_id="-70460825709429"
 url="https://botapi.tamtam.chat/messages?access_token=${token}&chat_id=${chat_id}"
 server_name="TEST-1"
+host="89.208.84.173"
+port="8090"
 body=""
 
 function set_message(){
@@ -23,7 +25,6 @@ function send_message() {
 }
 
 function main() {
-    send_message "Всем привет"
     send_message "${server_name} останавливается"
     docker stop ${application_name}
     docker rm -f ${application_name}
@@ -34,7 +35,7 @@ function main() {
 
     send_message "${server_name} запускается"
     docker run -d -p 8090:8090 --name ${application_name} ${application_name}
-    send_message "${server_name} запущен"
+    send_message "${server_name} запущен: http://${host}:${port}/index.html"
 }
 
 main
