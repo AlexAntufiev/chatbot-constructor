@@ -16,12 +16,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import chat.tamtam.bot.configuration.Profiles;
-import chat.tamtam.bot.controller.Endpoints;
+import chat.tamtam.bot.controller.Endpoint;
 import chat.tamtam.bot.repository.BotSchemaRepository;
 import chat.tamtam.bot.repository.SessionRepository;
 
 import static chat.tamtam.bot.TestContext.AUTH_TOKEN;
-import static chat.tamtam.bot.TestContext.BOT_SCHEMA_ENTITY;
+import static chat.tamtam.bot.TestContext.BOT_SCHEME_ENTITY;
 import static chat.tamtam.bot.TestContext.USER_ID;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -48,10 +48,10 @@ public class BotScheme {
     // @todo #CC-31 unignore mockmvc test
     @Test
     public void getBotScheme() throws Exception {
-        String toJson = objectMapper.writeValueAsString(BOT_SCHEMA_ENTITY);
+        String toJson = objectMapper.writeValueAsString(BOT_SCHEME_ENTITY);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.put(HttpHeaders.AUTHORIZATION, Collections.singletonList(AUTH_TOKEN));
-        mockMvc.perform(get(String.format(Endpoints.API_BOT + "/%s", USER_ID)).accept(MediaType.APPLICATION_JSON)
+        mockMvc.perform(get(String.format(Endpoint.API_BOT + "/%s", USER_ID)).accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.ALL)
                 .headers(httpHeaders))
                 .andDo(MockMvcResultHandlers.print())

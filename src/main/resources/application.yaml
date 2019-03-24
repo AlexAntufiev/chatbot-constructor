@@ -39,6 +39,9 @@ spring:
 
 tamtam:
   host: http://localhost:8090
+  chat:
+    listSizeThreshold: 20
+    chatsFetchAmount: 20
   registration:
     bot:
       id: 581483330212
@@ -46,3 +49,11 @@ tamtam:
       botType: Registration
       onlyTrustedUsers: true
       trustedUsers: 555537636725, 590435433004, 575868018573, 577949140156
+
+---
+
+tamtam:
+  broadcast:
+    executor:
+      corePoolSize: 2
+      maxPoolSize: 4

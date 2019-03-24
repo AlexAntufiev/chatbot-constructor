@@ -6,14 +6,18 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import chat.tamtam.bot.configuration.Profiles;
-import chat.tamtam.bot.domain.UserAuthEntity;
+import chat.tamtam.bot.domain.user.UserAuthEntity;
 import chat.tamtam.bot.service.UserService;
 import lombok.AllArgsConstructor;
 
 @SpringBootApplication
 @AllArgsConstructor
+@EnableScheduling
+@EnableAsync
 public class Launcher {
 
     private final UserService userService;

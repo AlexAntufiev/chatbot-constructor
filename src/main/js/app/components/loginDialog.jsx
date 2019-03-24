@@ -1,5 +1,4 @@
 import React from 'react';
-import axios from 'axios';
 import {Button} from 'primereact/button';
 import {Dialog} from 'primereact/dialog';
 import {InputText} from 'primereact/inputtext';
@@ -7,10 +6,10 @@ import {Password} from 'primereact/password';
 import {Growl} from 'primereact/growl';
 import {BaseDialog} from 'app/components/baseDialog';
 import {FormattedMessage, injectIntl} from 'react-intl';
-import {AUTHORIZATION, USER_ID} from "app/constants/cookies";
-import {LOGIN} from "app/constants/apiPoints";
+import {AUTHORIZATION} from "app/constants/cookies";
 import {connect} from "react-redux";
 import setUserInfo from "app/actions/userInfo";
+import * as UserService from "app/service/user"
 
 export class LoginDialog extends BaseDialog {
     constructor(props) {
@@ -26,22 +25,22 @@ export class LoginDialog extends BaseDialog {
     onLogin() {
         const {intl} = this.props;
 
-        if (this.state.password.trim() == '' || this.state.password.trim() == '') {
+        if (this.state.password.trim() === '' || this.state.password.trim() === '') {
             this.growl.show({
                 severity: 'error',
                 summary: intl.formatMessage({id: 'app.errormessage.errorsummary'}),
                 detail: intl.formatMessage({id: 'app.errormessage.fillallfields'})
             });
         }
-        axios
-            .post(LOGIN, {login: this.state.username, password: this.state.password})
-            .then(response => {
-                this.props.setUser({
-                    userId: response.data.userId,
-                    token: response.headers[AUTHORIZATION]
-                });
-                this.onHide();
-            })
+
+        const self = this;
+        UserService.login(this.state.username, this.state.password, (res) => {
+            self.props.setUser({
+                userId: res.data.payload.userId,
+                token: res.headers[AUTHORIZATION]
+            });
+            self.onHide();
+        }, null, this);
     }
 
     render() {

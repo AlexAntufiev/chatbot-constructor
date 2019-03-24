@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import chat.tamtam.bot.domain.UserEntity;
+import chat.tamtam.bot.domain.user.UserEntity;
 import chat.tamtam.bot.repository.UserRepository;
 import lombok.AllArgsConstructor;
 

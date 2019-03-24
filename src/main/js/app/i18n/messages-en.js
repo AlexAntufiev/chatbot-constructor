@@ -6,6 +6,9 @@ export default {
     'app.bot.edit': 'Edit',
     'app.bot.remove': 'Remove',
 
+    //Bot detail
+    'app.bot.detail.select.channels': 'Select channels',
+
     //Menu
     'app.menu.home': 'Home',
     'app.menu.botlist': 'Bot list',
@@ -15,6 +18,7 @@ export default {
     'app.menu.settings': 'Settings',
     'app.menu.constructor': 'Constructor',
     'app.menu.statistic': 'Statistic',
+    'app.menu.broadcasting': 'Broadcasting',
 
     //Dialogs
     'app.dialog.name': 'Name',
@@ -35,6 +39,10 @@ export default {
     'app.dialog.password.strong': 'Strong',
     'app.dialog.password.enter': 'Enter a password',
     'app.dialog.checksure': 'Are you sure?',
+    'app.dialog.connect': 'Connect',
+    'app.dialog.disconnect': 'Disconnect',
+    'app.dialog.append': 'Append',
+    'app.dialog.refresh': 'Refresh',
 
     //Error messages
     'app.errormessage.errorsummary': 'Error Message',
@@ -48,10 +56,26 @@ export default {
     'errors.tam.bot.token.empty': 'Empty bot token',
     'errors.tam.bot.subscribed.already': 'Bot is already subscribed',
     'errors.tam.bot.unsubscribed.already': 'Bot is already unsubscribed',
+    'errors.tam.bot.not.subscribed': 'Bot not subscribed',
+    'errors.chatChannel.selected.empty': 'Provided channel id is empty',
+    'errors.chatChannel.permission': 'Bot not an administrator of the channel',
+    'errors.chatChannel.does.not.exist': 'This channel does not exist',
+    'errors.not.chatChannel': 'This is not channel',
+    'errors.broadcast.message.does.not.exist': 'Message does not exist',
+    'errors.broadcast.message.firing.time.is.in.past': 'Time to send is in past',
+    'errors.broadcast.message.firing.time.is.null': 'Time to send is not set',
+    'errors.broadcast.message.title.is.empty': 'Message title is empty',
+    'errors.broadcast.message.erasing.time.is.before.then.firing.time': 'Time to erase message is before then time to send',
+    'errors.broadcast.message.illegal.state': 'You cannot change message now',
+    'errors.broadcast.message.send.error': 'Error occurs at message sending',
+    'errors.broadcast.message.erase.error': 'Error occurs at message erasing',
 
     //Success messages
     'app.successmessage.successsumary': 'Success',
     'app.successmessage.successoperaton': 'Success operation',
+    'success.tam.bot.name.changed': 'Name changed',
+    'success.tam.bot.subscribed': 'Bot subscribed',
+    'success.tam.bot.unsubscribed': 'Bot unsubscribed',
 
     //Common
     'app.common.sigin.message': 'Please, sign in'

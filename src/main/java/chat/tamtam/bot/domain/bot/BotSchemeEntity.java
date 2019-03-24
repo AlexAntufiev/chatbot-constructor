@@ -1,6 +1,4 @@
-package chat.tamtam.bot.domain;
-
-import java.util.Date;
+package chat.tamtam.bot.domain.bot;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,30 +13,25 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Entity
-@Table(name = "Session")
+@Table(name = "BotSchema")
 @NoArgsConstructor
 @Data
 @RequiredArgsConstructor
-public class SessionEntity {
-
+public class BotSchemeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "token")
-    private @NonNull String token;
-
     @Column(name = "userId")
     private @NonNull Long userId;
 
-    @Column(name = "login")
-    private @NonNull String login;
+    @Column(name = "botId")
+    private Long botId;
 
-    @Column(name = "expireDate")
-    private @NonNull Date expireDate;
+    @Column(name = "name")
+    private @NonNull String name;
 
-    public boolean isExpired() {
-        return expireDate.before(new Date());
-    }
+    @Column(name = "schema")
+    private byte[] schema;
 }

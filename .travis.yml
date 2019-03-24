@@ -21,6 +21,7 @@ before_install:
 branches:
   only:
     - master
+    - travis
 
 script:
   - ./gradlew clean build
