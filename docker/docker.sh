@@ -35,6 +35,7 @@ function main() {
 
     send_message "${server_name} запускается"
     docker run -d -p 8090:8090 --name ${application_name} ${application_name}
+    sleep 10
     send_message "${server_name} запущен: http://${host}:${port}/index.html"
 }
 
