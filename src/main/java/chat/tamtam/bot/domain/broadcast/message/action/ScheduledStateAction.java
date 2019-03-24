@@ -38,7 +38,7 @@ public final class ScheduledStateAction extends BroadcastMessageStateAction {
                 currentTime.getOffset()
         );
 
-        if (!firingTime.isAfter(currentTime)) {
+        if (currentTime.isBefore(firingTime)) {
             throw new UpdateBroadcastMessageException(
                     String.format(
                             "Firing time=%s is in the past, current time=%s, message id=%d",
@@ -66,7 +66,7 @@ public final class ScheduledStateAction extends BroadcastMessageStateAction {
                 currentTime.getOffset()
         );
 
-        if (!erasingTime.isAfter(firingTime)) {
+        if (firingTime.isBefore(erasingTime)) {
             throw new UpdateBroadcastMessageException(
                     String.format(
                             "Erasing time=%s is before then firing time=%s, message id=%d",

@@ -44,7 +44,7 @@ public final class DiscardedEraseByUserStateAction extends BroadcastMessageState
                 currentTime.getOffset()
         );
 
-        if (!erasingTime.isAfter(currentTime)) {
+        if (currentTime.isBefore(erasingTime)) {
             throw new UpdateBroadcastMessageException(
                     String.format(
                             "Erasing time=%s is in the past, current time=%s, message id=%d",
