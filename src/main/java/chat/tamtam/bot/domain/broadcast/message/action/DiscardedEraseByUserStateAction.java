@@ -1,20 +1,22 @@
 package chat.tamtam.bot.domain.broadcast.message.action;
 
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
+
+import org.springframework.stereotype.Component;
 
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
 import chat.tamtam.bot.domain.exception.UpdateBroadcastMessageException;
 import chat.tamtam.bot.service.Error;
+import lombok.NoArgsConstructor;
 
-import static chat.tamtam.bot.domain.broadcast.message.utils.TimeUtils.getTimestamp;
-import static chat.tamtam.bot.domain.broadcast.message.utils.TimeUtils.parseZonedDateTime;
-
-public final class DiscardedEraseByUserStateAction {
-    private DiscardedEraseByUserStateAction() { }
-
-    public static void doAction(
+@Component
+@NoArgsConstructor
+public final class DiscardedEraseByUserStateAction extends BroadcastMessageStateAction {
+    @Override
+    public void doAction(
             final BroadcastMessageEntity broadcastMessage,
             final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
@@ -27,21 +29,34 @@ public final class DiscardedEraseByUserStateAction {
                     Error.BROADCAST_MESSAGE_ERASE_ALREADY_DISCARDED
             );
         }
-        broadcastMessage.setErasingTime(
-                getTimestamp(
-                        parseZonedDateTime(
-                                broadcastMessageUpdate.getErasingTime(),
-                                String.format(
-                                        "Erasing utils is malformed, broadcast message id=%d",
-                                        broadcastMessage.getId()
-                                ),
-                                Error.BROADCAST_MESSAGE_ERASING_TIME_IS_MALFORMED
+
+        ZonedDateTime currentTime = ZonedDateTime.now();
+
+        ZonedDateTime erasingTime = atZone(
+                parseZonedDateTime(
+                        broadcastMessageUpdate.getErasingTime(),
+                        String.format(
+                                "Erasing time is malformed, broadcast message id=%d",
+                                broadcastMessage.getId()
                         ),
-                        ZonedDateTime.now(),
-                        "Erasing utils=%d is in the past and current utils=%d",
-                        Error.BROADCAST_MESSAGE_ERASING_TIME_IS_IN_THE_PAST
-                )
+                        Error.BROADCAST_MESSAGE_ERASING_TIME_IS_MALFORMED
+                ),
+                currentTime.getOffset()
         );
+
+        if (!erasingTime.isAfter(currentTime)) {
+            throw new UpdateBroadcastMessageException(
+                    String.format(
+                            "Erasing time=%s is in the past, current time=%s, message id=%d",
+                            erasingTime,
+                            currentTime,
+                            broadcastMessage.getId()
+                    ),
+                    Error.BROADCAST_MESSAGE_ERASING_TIME_IS_IN_THE_PAST
+            );
+        }
+
+        broadcastMessage.setErasingTime(Timestamp.valueOf(erasingTime.toLocalDateTime()));
         broadcastMessage.setState(BroadcastMessageState.SENT);
     }
 }

@@ -1,5 +1,8 @@
 package chat.tamtam.bot.domain.broadcast.message;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -33,4 +36,18 @@ public enum BroadcastMessageState {
 
     @Getter
     private final byte value;
+
+    private static final Map<Byte, BroadcastMessageState> BY_ID = new HashMap<>();
+
+    static {
+        for (BroadcastMessageState state : BroadcastMessageState.values()) {
+            if (BY_ID.put(state.value, state) != null) {
+                throw new IllegalArgumentException("Duplicate id=" + state.value);
+            }
+        }
+    }
+
+    public static BroadcastMessageState getById(byte id) {
+        return BY_ID.get(id);
+    }
 }

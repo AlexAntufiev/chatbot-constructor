@@ -12,7 +12,7 @@ import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
-import chat.tamtam.bot.domain.broadcast.message.action.CreatedStateAction;
+import chat.tamtam.bot.domain.broadcast.message.action.CreatedStateBroadcastMessageStateAction;
 import chat.tamtam.bot.domain.broadcast.message.action.DiscardedEraseByUserStateAction;
 import chat.tamtam.bot.domain.broadcast.message.action.ScheduledStateAction;
 import chat.tamtam.bot.domain.broadcast.message.action.SentStateAction;
@@ -34,6 +34,12 @@ public class BroadcastMessageService {
     private final BotSchemeService botSchemeService;
     private final TamBotService tamBotService;
     private final ChatChannelService chatChannelService;
+
+    // Broadcast message actions
+    private final CreatedStateBroadcastMessageStateAction createdStateBroadcastMessageStateAction;
+    private final DiscardedEraseByUserStateAction discardedEraseByUserStateAction;
+    private final ScheduledStateAction scheduledStateAction;
+    private final SentStateAction sentStateAction;
 
     public BroadcastMessageEntity getBroadcastMessage(
             final BotSchemeEntity botScheme,
@@ -211,36 +217,30 @@ public class BroadcastMessageService {
         broadcastMessage.setTitle(broadcastMessageUpdate.getTitle());
         broadcastMessage.setText(broadcastMessageUpdate.getText());
 
-        try {
-            switch (BroadcastMessageState.values()[broadcastMessage.getState()]) {
-                case CREATED:
-                    CreatedStateAction.doAction(broadcastMessage, broadcastMessageUpdate);
-                    break;
+        switch (BroadcastMessageState.getById(broadcastMessage.getState())) {
+            case CREATED:
+                createdStateBroadcastMessageStateAction.doAction(broadcastMessage, broadcastMessageUpdate);
+                break;
 
-                case SCHEDULED:
-                    ScheduledStateAction.doAction(broadcastMessage, broadcastMessageUpdate);
-                    break;
+            case SCHEDULED:
+                scheduledStateAction.doAction(broadcastMessage, broadcastMessageUpdate);
+                break;
 
-                case SENT:
-                    SentStateAction.doAction(broadcastMessage, broadcastMessageUpdate);
-                    break;
+            case SENT:
+                sentStateAction.doAction(broadcastMessage, broadcastMessageUpdate);
+                break;
 
-                case DISCARDED_ERASE_BY_USER:
-                    DiscardedEraseByUserStateAction.doAction(broadcastMessage, broadcastMessageUpdate);
-                    break;
+            case DISCARDED_ERASE_BY_USER:
+                discardedEraseByUserStateAction.doAction(broadcastMessage, broadcastMessageUpdate);
+                break;
 
-                default:
-                    throw new BroadcastMessageIllegalStateException(
-                            "Can't update broadcast message because it is in illegal state",
-                            Error.BROADCAST_MESSAGE_ILLEGAL_STATE
-                    );
-            }
-        } catch (IndexOutOfBoundsException iOBE) {
-            throw new UpdateBroadcastMessageException(
-                    String.format("Illegal broadcast message state id=%d", messageId),
-                    Error.BROADCAST_MESSAGE_ILLEGAL_STATE
-            );
+            default:
+                throw new BroadcastMessageIllegalStateException(
+                        "Can't update broadcast message because it is in illegal state",
+                        Error.BROADCAST_MESSAGE_ILLEGAL_STATE
+                );
         }
+
         broadcastMessageRepository.save(broadcastMessage);
         return broadcastMessage;
     }

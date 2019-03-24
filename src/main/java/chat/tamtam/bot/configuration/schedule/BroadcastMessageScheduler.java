@@ -35,8 +35,8 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @RequiredArgsConstructor
 public class BroadcastMessageScheduler {
-    private static final long DEFAULT_SENDING_RATE = 30_000L;
-    private static final long DEFAULT_ERASING_RATE = 30_000L;
+    private static final long DEFAULT_SENDING_RATE = 10_000L;
+    private static final long DEFAULT_ERASING_RATE = 10_000L;
 
 
     private final BroadcastMessageRepository broadcastMessageRepository;
