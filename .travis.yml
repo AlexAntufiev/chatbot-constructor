@@ -1,3 +1,6 @@
+addons:
+  ssh_known_hosts: 89.208.84.173
+
 language: java
 
 jdk:
@@ -12,18 +15,24 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-deploy:
-  provider: script
-  script: cp ./build/libs/chatbot-constructor.jar ./docker/chatbot-constructor.jar && ./scipts/deploy.sh ./docker/
-  skip_cleanup: true
-  on:
-    branch: travis
-    tags: true
+before_install:
+  - npm i -g npm@6.7.0
 
 branches:
   only:
     - master
-    - travis
 
 script:
   - ./gradlew clean build
+
+before_deploy:
+  - echo "${SSH_KEY}" | base64 --decode >/tmp/deploy_rsa
+  - chmod 600 /tmp/deploy_rsa
+  - chmod +x scripts/deploy.sh
+
+deploy:
+  provider: script
+  script: ./scripts/deploy.sh
+  skip_cleanup: true
+  on:
+    branch: master

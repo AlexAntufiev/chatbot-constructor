@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 application_name="chatbot-constructor"
-application_start_type="foreground"
+application_start_type="background"
 application_command=""
 application_arguments=""
 application_port="8090"
