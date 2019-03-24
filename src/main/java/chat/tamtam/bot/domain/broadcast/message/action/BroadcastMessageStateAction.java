@@ -13,8 +13,8 @@ import chat.tamtam.bot.service.Error;
 public abstract class BroadcastMessageStateAction {
 
     public abstract void doAction(
-            final BroadcastMessageEntity broadcastMessage,
-            final BroadcastMessageUpdate broadcastMessageUpdate
+            BroadcastMessageEntity broadcastMessage,
+            BroadcastMessageUpdate broadcastMessageUpdate
     );
 
     protected ZonedDateTime parseZonedDateTime(
