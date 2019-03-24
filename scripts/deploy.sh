@@ -10,4 +10,4 @@ server="89.208.84.173"
 cp ./build/libs/chatbot-constructor.jar ./docker/chatbot-constructor.jar
 chmod +x scripts/deploy.sh
 rsync -avz --progress -e "ssh -i ${ssh_path}" ./docker/ ${user}@${server}:/home/${user}/${app_name}
-ssh -i ${ssh_path} ${user}@${server} "cd ${app_name} && ls -l && chmod +x docker.sh run.sh && ./docker.sh"
+ssh -i ${ssh_path} ${user}@${server} "cd ${app_name} && ls -l && chmod +x docker.sh run.sh && nohup ./docker.sh &"
