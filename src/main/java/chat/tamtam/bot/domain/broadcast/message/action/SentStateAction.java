@@ -24,12 +24,12 @@ public final class SentStateAction extends BroadcastMessageStateAction {
             return;
         }
 
+        ZonedDateTime currentTime = ZonedDateTime.now(SERVER_LOCAL_ZONE_ID);
+
         ZonedDateTime erasingTime = getDateTimeAtLocalZone(
                 broadcastMessageUpdate.getErasingTime(),
                 Error.BROADCAST_MESSAGE_ERASING_TIME_IS_MALFORMED
         );
-
-        ZonedDateTime currentTime = ZonedDateTime.now();
 
         broadcastMessage.setErasingTime(
                 futureTimestamp(

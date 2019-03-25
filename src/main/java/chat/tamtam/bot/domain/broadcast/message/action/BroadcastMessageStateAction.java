@@ -2,6 +2,7 @@ package chat.tamtam.bot.domain.broadcast.message.action;
 
 import java.sql.Timestamp;
 import java.time.DateTimeException;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -13,14 +14,15 @@ import chat.tamtam.bot.service.Error;
 
 public abstract class BroadcastMessageStateAction {
 
-    protected static final ZoneOffset LOCAL_ZONE_OFFSET = ZonedDateTime.now().getOffset();
+    protected static final ZoneOffset SERVER_LOCAL_ZONE_OFFSET = ZoneOffset.of("+03:00"); // [EUROPE/MOSCOW]
+    protected static final ZoneId SERVER_LOCAL_ZONE_ID = SERVER_LOCAL_ZONE_OFFSET.normalized();
 
     public abstract void doAction(
             BroadcastMessageEntity broadcastMessage,
             BroadcastMessageUpdate broadcastMessageUpdate
     );
 
-    protected static ZonedDateTime parseZonedDateTime(
+    protected ZonedDateTime parseZonedDateTime(
             final String zonedDateTime,
             final Error malformedDateTimeError
     ) {
@@ -37,7 +39,7 @@ public abstract class BroadcastMessageStateAction {
         }
     }
 
-    protected static ZonedDateTime getDateTimeAtLocalZone(
+    protected ZonedDateTime getDateTimeAtLocalZone(
             final String gmtDateTime,
             final Error malformedDateTimeError
     ) {
@@ -45,11 +47,11 @@ public abstract class BroadcastMessageStateAction {
                 gmtDateTime,
                 malformedDateTimeError
         );
-        int zoneDif = LOCAL_ZONE_OFFSET.getTotalSeconds() - zonedDateTime.getOffset().getTotalSeconds();
-        return zonedDateTime.plusSeconds(zoneDif).toLocalDateTime().atZone(LOCAL_ZONE_OFFSET);
+        int zoneDif = SERVER_LOCAL_ZONE_OFFSET.getTotalSeconds() - zonedDateTime.getOffset().getTotalSeconds();
+        return zonedDateTime.plusSeconds(zoneDif).toLocalDateTime().atZone(SERVER_LOCAL_ZONE_OFFSET);
     }
 
-    protected static Timestamp futureTimestamp(
+    protected Timestamp futureTimestamp(
             final ZonedDateTime futureTime,
             final ZonedDateTime pastTime,
             long broadcastMessageId,

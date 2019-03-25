@@ -30,7 +30,7 @@ public final class ScheduledStateAction extends BroadcastMessageStateAction {
                 Error.BROADCAST_MESSAGE_FIRING_TIME_IS_MALFORMED
         );
 
-        ZonedDateTime currentTime = ZonedDateTime.now();
+        ZonedDateTime currentTime = ZonedDateTime.now(SERVER_LOCAL_ZONE_ID);
 
         broadcastMessage.setFiringTime(
                 futureTimestamp(

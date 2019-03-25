@@ -24,7 +24,7 @@ public final class CreatedStateBroadcastMessageStateAction extends BroadcastMess
                 Error.BROADCAST_MESSAGE_FIRING_TIME_IS_MALFORMED
         );
 
-        ZonedDateTime currentTime = ZonedDateTime.now();
+        ZonedDateTime currentTime = ZonedDateTime.now(SERVER_LOCAL_ZONE_ID);
 
         ZonedDateTime erasingTime;
 

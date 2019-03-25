@@ -34,7 +34,7 @@ public final class DiscardedEraseByUserStateAction extends BroadcastMessageState
                 Error.BROADCAST_MESSAGE_ERASING_TIME_IS_MALFORMED
         );
 
-        ZonedDateTime currentTime = ZonedDateTime.now();
+        ZonedDateTime currentTime = ZonedDateTime.now(SERVER_LOCAL_ZONE_ID);
 
         broadcastMessage.setErasingTime(
                 futureTimestamp(
