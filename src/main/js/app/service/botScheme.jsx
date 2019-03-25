@@ -13,8 +13,8 @@ export function disconnect(botSchemeId, callbackSuccess, callbackFail, context) 
     handleRequest(axios.post(url), callbackSuccess, callbackFail, context);
 }
 
-export function saveBot(botSchemeId, name, callbackSuccess, callbackFail, context) {
-    const url = makeUrl(ApiPoints.SAVE_BOT, {id: botSchemeId});
+export function saveBot(botSchemeId, botId, name, callbackSuccess, callbackFail, context) {
+    const url = makeUrl(ApiPoints.SAVE_BOT, {id: botSchemeId, botId: botId});
     handleRequest(axios.post(url, {name: name}), callbackSuccess, callbackFail, context);
 }
 
