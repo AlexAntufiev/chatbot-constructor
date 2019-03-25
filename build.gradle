@@ -19,8 +19,8 @@ checkstyle {
 }
 
 bootJar {
-    mainClassName = 'chatChannel.tamtam.bot.Launcher'
-    archiveName = '${rootProject.name}.jar'
+    mainClassName = 'chat.tamtam.bot.Launcher'
+    archiveName = 'chatbot-constructor.jar'
 }
 
 repositories {
