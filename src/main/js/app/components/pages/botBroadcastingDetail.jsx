@@ -10,48 +10,65 @@ export default class BotBroadcastingDetail extends Component {
         super(props);
 
         this.state = {
-            messageList: []
+            messageList: [],
+            editedMessage: {}
         };
         this.onAddMessage = this.onAddMessage.bind(this);
         this.createMessagesList = this.createMessagesList.bind(this);
     }
 
     onAddMessage() {
-        const self = this;
         const defaultName = 'Broadcast message';
         BroadcastMessageService.addBroadcastMessage(this.props.match.params.id, this.props.match.params.chatChannelId,
-            {title: defaultName}, (res) => {
+            {title: defaultName, firingTime: 1000000000}, (res) => {
                 const newMessUrl = makeUrl(routers.botBroadcastingDetailMessage(), {
-                    id: self.props.match.params.id,
-                    chatChannelId: self.props.match.params.chatChannelId,
-                    messageId: res.data.payload.id
+                    id: this.props.match.params.id,
+                    chatChannelId: this.props.match.params.chatChannelId,
+                    messageId: res.data.payload.id,
                 });
-                self.props.history.push(newMessUrl);
+                let messageList = this.state.messageList;
+                messageList[res.data.payload.id] = res.data.payload;
+                this.setState({messageList: messageList});
+                this.props.history.push(newMessUrl);
             });
     }
 
     componentDidMount() {
-        const self = this;
         BroadcastMessageService.getBroadcastMessages(this.props.match.params.id, this.props.match.params.chatChannelId,
             (res) => {
-                self.setState({messageList: res.data.payload});
+                let messageList = {};
+                res.data.payload.forEach((message) => {
+                    messageList[message.id] = message;
+                });
+                this.setState({messageList: messageList});
             });
     }
 
     createMessagesList() {
-        return this.state.messageList.map((message) => {
-
-            return (
+        let renderMessageList = [];
+        for (let messageId in this.state.messageList) {
+            const message = this.state.messageList[messageId];
+            const messUrl = makeUrl(routers.botBroadcastingDetailMessage(), {
+                id: this.props.match.params.id,
+                chatChannelId: this.props.match.params.chatChannelId,
+                messageId: messageId
+            });
+            renderMessageList.push(
                 <div className="bot-broadcasting_elements-container_element">
-                    <Button label={message.title} icon='pi pi-envelope'/>
+                    <Button label={message.title} icon='pi pi-envelope'
+                            onClick={() => this.props.history.push(messUrl)}/>
                 </div>
             );
-        });
+        }
+        return renderMessageList;
     }
 
     render() {
         const channelsList = this.createMessagesList();
 
+        const message = Number(this.props.match.params.messageId)
+            ? this.state.messageList[Number(this.props.match.params.messageId)]
+            : null;
         return (<div className="p-grid p-align-start bot-broadcasting">
             <div className="p-col bot-broadcasting_elements-container">
                 {channelsList}
@@ -60,7 +77,7 @@ export default class BotBroadcastingDetail extends Component {
                 </div>
             </div>
             <div className="p-col">
-                <TextMessage/>
+                <TextMessage message={message}/>
             </div>
         </div>);
     }
