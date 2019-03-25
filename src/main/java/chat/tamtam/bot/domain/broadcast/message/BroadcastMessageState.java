@@ -1,5 +1,6 @@
 package chat.tamtam.bot.domain.broadcast.message;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,13 +39,26 @@ public enum BroadcastMessageState {
     private final byte value;
 
     private static final Map<Byte, BroadcastMessageState> BY_ID = new HashMap<>();
+    private static final EnumSet<BroadcastMessageState> REMOVABLE_STATES;
 
     static {
+        REMOVABLE_STATES = EnumSet.of(
+                SCHEDULED,
+                SENT,
+                ERASED_BY_SCHEDULE,
+                ERROR,
+                CREATED,
+                DISCARDED_ERASE_BY_USER
+        );
         for (BroadcastMessageState state : BroadcastMessageState.values()) {
             if (BY_ID.put(state.value, state) != null) {
                 throw new IllegalArgumentException("Duplicate id=" + state.value);
             }
         }
+    }
+
+    public static boolean isRemovable(final BroadcastMessageState state) {
+        return REMOVABLE_STATES.contains(state);
     }
 
     public static BroadcastMessageState getById(byte id) {

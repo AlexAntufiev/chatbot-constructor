@@ -1,5 +1,6 @@
 package chat.tamtam.bot.domain.broadcast.message.action;
 
+import java.sql.Timestamp;
 import java.time.DateTimeException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -12,15 +13,16 @@ import chat.tamtam.bot.service.Error;
 
 public abstract class BroadcastMessageStateAction {
 
+    protected static final ZoneOffset LOCAL_ZONE_OFFSET = ZonedDateTime.now().getOffset();
+
     public abstract void doAction(
             BroadcastMessageEntity broadcastMessage,
             BroadcastMessageUpdate broadcastMessageUpdate
     );
 
-    protected ZonedDateTime parseZonedDateTime(
+    protected static ZonedDateTime parseZonedDateTime(
             final String zonedDateTime,
-            final String errorMessage,
-            final Error error
+            final Error malformedDateTimeError
     ) {
         try {
             return ZonedDateTime.parse(
@@ -29,17 +31,41 @@ public abstract class BroadcastMessageStateAction {
             );
         } catch (DateTimeException ex) {
             throw new UpdateBroadcastMessageException(
-                    errorMessage + "\n" + ex.getLocalizedMessage(),
-                    error
+                    ex.getLocalizedMessage(),
+                    malformedDateTimeError
             );
         }
     }
 
-    protected ZonedDateTime atZone(
-            final ZonedDateTime futureDateTime,
-            final ZoneOffset zoneOffset
+    protected static ZonedDateTime getDateTimeAtLocalZone(
+            final String gmtDateTime,
+            final Error malformedDateTimeError
     ) {
-        int zoneDif = zoneOffset.getTotalSeconds() - futureDateTime.getOffset().getTotalSeconds();
-        return futureDateTime.plusSeconds(zoneDif).toLocalDateTime().atZone(zoneOffset);
+        ZonedDateTime zonedDateTime = parseZonedDateTime(
+                gmtDateTime,
+                malformedDateTimeError
+        );
+        int zoneDif = LOCAL_ZONE_OFFSET.getTotalSeconds() - zonedDateTime.getOffset().getTotalSeconds();
+        return zonedDateTime.plusSeconds(zoneDif).toLocalDateTime().atZone(LOCAL_ZONE_OFFSET);
+    }
+
+    protected static Timestamp futureTimestamp(
+            final ZonedDateTime futureTime,
+            final ZonedDateTime pastTime,
+            long broadcastMessageId,
+            final Error error
+    ) {
+        if (futureTime.isBefore(pastTime)) {
+            throw new UpdateBroadcastMessageException(
+                    String.format(
+                            "Future time=%s is in the past, past time=%s, message id=%d",
+                            futureTime,
+                            pastTime,
+                            broadcastMessageId
+                    ),
+                    error
+            );
+        }
+        return Timestamp.valueOf(futureTime.toLocalDateTime());
     }
 }

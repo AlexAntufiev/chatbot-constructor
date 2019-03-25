@@ -1,6 +1,8 @@
 package chat.tamtam.bot.service;
 
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -116,47 +118,39 @@ public class BroadcastMessageService {
     ) {
         BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
-        BroadcastMessageEntity broadcastMessage = getBroadcastMessage(
-                botScheme,
-                tamBot,
-                chatChannelId,
-                broadcastMessageId
+        return new SuccessResponseWrapper<>(
+                setBroadcastMessageStateAttempt(
+                        () -> getBroadcastMessage(botScheme, tamBot, chatChannelId, broadcastMessageId),
+                        message -> BroadcastMessageState.isRemovable(
+                                BroadcastMessageState.getById(message.getState())
+                        ),
+                        BroadcastMessageState.DELETED
+                )
         );
-        try {
-            setBroadcastMessageStateAttempt(
-                    broadcastMessage,
-                    BroadcastMessageState.DELETED,
-                    BroadcastMessageState.PROCESSING
-            );
-            return new SuccessResponseWrapper<>(broadcastMessage);
-        } catch (IllegalStateException iSE) {
-            throw new BroadcastMessageIllegalStateException(
-                    iSE.getLocalizedMessage(),
-                    Error.BROADCAST_MESSAGE_ILLEGAL_STATE
-            );
-        }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-    protected void setBroadcastMessageStateAttempt(
-            final BroadcastMessageEntity broadcastMessage,
-            final BroadcastMessageState targetState,
-            final BroadcastMessageState illegalState
-    ) throws IllegalStateException {
-        if (broadcastMessageRepository
-                .findById(broadcastMessage.getId())
-                .get()
-                .getState() != illegalState.getValue()
+    protected BroadcastMessageEntity setBroadcastMessageStateAttempt(
+            Supplier<BroadcastMessageEntity> broadcastMessageSupplier,
+            Predicate<BroadcastMessageEntity> broadcastMessagePredicate,
+            final BroadcastMessageState targetState
+    ) {
+        BroadcastMessageEntity broadcastMessage = broadcastMessageSupplier.get();
+
+        if (broadcastMessagePredicate.test(broadcastMessage)
         ) {
             broadcastMessage.setState(targetState);
             broadcastMessageRepository.save(broadcastMessage);
+            return broadcastMessage;
         } else {
-            throw new IllegalStateException(
-                    "Can't set "
-                            + targetState.name()
-                            + " state because message is in "
-                            + illegalState.name()
-                            + " state");
+            throw new UpdateBroadcastMessageException(
+                    String.format(
+                            "Can't remove broadcast message with id=%d because it is in illegal state=%s",
+                            broadcastMessage.getId(),
+                            BroadcastMessageState.getById(broadcastMessage.getState()).name()
+                    ),
+                    Error.BROADCAST_MESSAGE_ILLEGAL_STATE
+            );
         }
     }
 
