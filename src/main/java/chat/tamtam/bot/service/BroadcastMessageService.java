@@ -1,8 +1,7 @@
 package chat.tamtam.bot.service;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.springframework.stereotype.Service;
@@ -14,12 +13,16 @@ import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
-import chat.tamtam.bot.domain.broadcast.message.NewBroadcastMessage;
+import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
+import chat.tamtam.bot.domain.broadcast.message.action.CreatedStateBroadcastMessageStateAction;
+import chat.tamtam.bot.domain.broadcast.message.action.DiscardedEraseByUserStateAction;
+import chat.tamtam.bot.domain.broadcast.message.action.ScheduledStateAction;
+import chat.tamtam.bot.domain.broadcast.message.action.SentStateAction;
 import chat.tamtam.bot.domain.chatchannel.ChatChannelEntity;
 import chat.tamtam.bot.domain.exception.BroadcastMessageIllegalStateException;
-import chat.tamtam.bot.domain.exception.ChatBotConstructorException;
 import chat.tamtam.bot.domain.exception.CreateBroadcastMessageException;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
+import chat.tamtam.bot.domain.exception.UpdateBroadcastMessageException;
 import chat.tamtam.bot.domain.response.SuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
 import chat.tamtam.bot.repository.BroadcastMessageRepository;
@@ -33,6 +36,12 @@ public class BroadcastMessageService {
     private final BotSchemeService botSchemeService;
     private final TamBotService tamBotService;
     private final ChatChannelService chatChannelService;
+
+    // Broadcast message actions
+    private final CreatedStateBroadcastMessageStateAction createdStateBroadcastMessageStateAction;
+    private final DiscardedEraseByUserStateAction discardedEraseByUserStateAction;
+    private final ScheduledStateAction scheduledStateAction;
+    private final SentStateAction sentStateAction;
 
     public BroadcastMessageEntity getBroadcastMessage(
             final BotSchemeEntity botScheme,
@@ -109,127 +118,149 @@ public class BroadcastMessageService {
     ) {
         BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
-        BroadcastMessageEntity broadcastMessage = getBroadcastMessage(
-                botScheme,
-                tamBot,
-                chatChannelId,
-                broadcastMessageId
+        return new SuccessResponseWrapper<>(
+                setBroadcastMessageStateAttempt(
+                        () -> getBroadcastMessage(botScheme, tamBot, chatChannelId, broadcastMessageId),
+                        message -> BroadcastMessageState.isRemovable(
+                                BroadcastMessageState.getById(message.getState())
+                        ),
+                        BroadcastMessageState.DELETED
+                )
         );
-        try {
-            setBroadcastMessageStateAttempt(
-                    broadcastMessage,
-                    BroadcastMessageState.SCHEDULED,
-                    BroadcastMessageState.DISCARDED_SEND_BY_USER
-            );
-            return new SuccessResponseWrapper<>(broadcastMessage);
-        } catch (IllegalStateException iSE) {
-            throw new BroadcastMessageIllegalStateException(
-                    iSE.getLocalizedMessage(),
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+    protected BroadcastMessageEntity setBroadcastMessageStateAttempt(
+            Supplier<BroadcastMessageEntity> broadcastMessageSupplier,
+            Predicate<BroadcastMessageEntity> broadcastMessagePredicate,
+            final BroadcastMessageState targetState
+    ) {
+        BroadcastMessageEntity broadcastMessage = broadcastMessageSupplier.get();
+
+        if (broadcastMessagePredicate.test(broadcastMessage)
+        ) {
+            broadcastMessage.setState(targetState);
+            broadcastMessageRepository.save(broadcastMessage);
+            return broadcastMessage;
+        } else {
+            throw new UpdateBroadcastMessageException(
+                    String.format(
+                            "Can't remove broadcast message with id=%d because it is in illegal state=%s",
+                            broadcastMessage.getId(),
+                            BroadcastMessageState.getById(broadcastMessage.getState()).name()
+                    ),
                     Error.BROADCAST_MESSAGE_ILLEGAL_STATE
             );
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-    protected void setBroadcastMessageStateAttempt(
-            final BroadcastMessageEntity broadcastMessage,
-            final BroadcastMessageState requiredState,
-            final BroadcastMessageState targetState
-    ) throws IllegalStateException {
-        if (broadcastMessageRepository
-                .findById(broadcastMessage.getId())
-                .get()
-                .getState() == requiredState.getValue()
-        ) {
-            broadcastMessage.setState(targetState);
-            broadcastMessageRepository.save(broadcastMessage);
-        } else {
-            throw new IllegalStateException(
-                    "Can't set "
-                            + targetState.name()
-                            + " state because message is not in "
-                            + requiredState.name()
-                            + " state");
+    public SuccessResponse updateBroadcastMessage(
+            final String authToken,
+            int botSchemeId,
+            long chatChannelId,
+            long messageId,
+            final BroadcastMessageUpdate broadcastMessageUpdate
+    ) {
+        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        TamBotEntity tamBotEntity = tamBotService.getTamBot(botScheme);
+        BroadcastMessageEntity broadcastMessage =
+                getBroadcastMessage(
+                        botScheme,
+                        tamBotEntity,
+                        chatChannelId,
+                        messageId
+                );
+        if (StringUtils.isEmpty(broadcastMessageUpdate.getTitle())) {
+            throw new UpdateBroadcastMessageException(
+                    String.format(
+                            "Can't update broadcastMessage's title with id=%d because new title is empty",
+                            messageId
+                    ),
+                    Error.BROADCAST_MESSAGE_TITLE_IS_EMPTY
+            );
         }
+        if (StringUtils.isEmpty(broadcastMessageUpdate.getText())) {
+            throw new UpdateBroadcastMessageException(
+                    String.format(
+                            "Can't update broadcastMessage's title with id=%d because new title is empty",
+                            messageId
+                    ),
+                    Error.BROADCAST_MESSAGE_TEXT_IS_EMPTY
+            );
+        }
+        return new SuccessResponseWrapper<>(updateMessageAttempt(broadcastMessageUpdate, messageId));
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+    protected BroadcastMessageEntity updateMessageAttempt(
+            final BroadcastMessageUpdate broadcastMessageUpdate,
+            long messageId
+    ) {
+        BroadcastMessageEntity broadcastMessage =
+                broadcastMessageRepository
+                        .findById(messageId)
+                        .orElseThrow(
+                                () -> new NotFoundEntityException(
+                                        String.format(
+                                                "Broadcast message with id=%d does not exist",
+                                                messageId
+                                        ),
+                                        Error.BROADCAST_MESSAGE_DOES_NOT_EXIST
+                                )
+                        );
+        broadcastMessage.setTitle(broadcastMessageUpdate.getTitle());
+        broadcastMessage.setText(broadcastMessageUpdate.getText());
+
+        switch (BroadcastMessageState.getById(broadcastMessage.getState())) {
+            case CREATED:
+                createdStateBroadcastMessageStateAction.doAction(broadcastMessage, broadcastMessageUpdate);
+                break;
+
+            case SCHEDULED:
+                scheduledStateAction.doAction(broadcastMessage, broadcastMessageUpdate);
+                break;
+
+            case SENT:
+                sentStateAction.doAction(broadcastMessage, broadcastMessageUpdate);
+                break;
+
+            case DISCARDED_ERASE_BY_USER:
+                discardedEraseByUserStateAction.doAction(broadcastMessage, broadcastMessageUpdate);
+                break;
+
+            default:
+                throw new BroadcastMessageIllegalStateException(
+                        "Can't update broadcast message because it is in illegal state",
+                        Error.BROADCAST_MESSAGE_ILLEGAL_STATE
+                );
+        }
+
+        broadcastMessageRepository.save(broadcastMessage);
+        return broadcastMessage;
     }
 
     public SuccessResponse addBroadcastMessage(
             final String authToken,
             int botSchemeId,
             long chatChannelId,
-            final NewBroadcastMessage newBroadcastMessage
+            final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
-        BroadcastMessageEntity broadcastMessage = transformToBroadcastMessageEntity(newBroadcastMessage);
+        if (StringUtils.isEmpty(broadcastMessageUpdate.getTitle())) {
+            throw new CreateBroadcastMessageException(
+                    "Can't create broadCastMessage because title is empty",
+                    Error.BROADCAST_MESSAGE_TITLE_IS_EMPTY
+            );
+        }
+        BroadcastMessageEntity broadcastMessage = new BroadcastMessageEntity();
         BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
         ChatChannelEntity chatChannel = chatChannelService.getChatChannel(botScheme, tamBot, chatChannelId);
         broadcastMessage.setBotSchemeId(botScheme.getId());
         broadcastMessage.setTamBotId(tamBot.getId().getBotId());
         broadcastMessage.setChatChannelId(chatChannel.getId().getChatId());
-        broadcastMessage.setState(BroadcastMessageState.SCHEDULED);
+        broadcastMessage.setTitle(broadcastMessageUpdate.getTitle());
+        broadcastMessage.setState(BroadcastMessageState.CREATED);
+
         return new SuccessResponseWrapper<>(broadcastMessageRepository.save(broadcastMessage));
-    }
-
-    private static BroadcastMessageEntity transformToBroadcastMessageEntity(
-            final NewBroadcastMessage newBroadcastMessage
-    ) {
-        // @todo #CC-63 Expand broadcastMessage filtering(payload check etc.)
-        if (StringUtils.isEmpty(newBroadcastMessage.getTitle())) {
-            throw new CreateBroadcastMessageException(
-                    "Can't create broadCastMessage because title is empty",
-                    Error.BROADCAST_MESSAGE_TITLE_IS_EMPTY
-            );
-        }
-        if (newBroadcastMessage.getFiringTime() == null) {
-            throw new ChatBotConstructorException(
-                    "Can't create broadCastMessage because firing time is null",
-                    Error.BROADCAST_MESSAGE_FIRING_TIME_IS_NULL
-            );
-        }
-        Timestamp localTimestamp = Timestamp.valueOf(LocalDateTime.now());
-        Timestamp firingTimestamp = getTimestamp(
-                newBroadcastMessage::getFiringTime,
-                localTimestamp,
-                "Can't create broadCastMessage because firing time=%d is in past and local time=%d",
-                Error.BROADCAST_MESSAGE_FIRING_TIME_IS_IN_PAST
-        );
-        Timestamp erasingTimestamp = null;
-        if (newBroadcastMessage.getErasingTime() != null) {
-            erasingTimestamp =
-                    getTimestamp(
-                            newBroadcastMessage::getErasingTime,
-                            firingTimestamp,
-                            "Can't create broadCastMessage because erasing time=%d is before then firing time=%d",
-                            Error.BROADCAST_MESSAGE_ERASING_TIME_IS_BEFORE_THEN_FIRING_TIME
-                    );
-        }
-        BroadcastMessageEntity broadcastMessage = new BroadcastMessageEntity();
-        broadcastMessage.setTitle(newBroadcastMessage.getTitle());
-        broadcastMessage.setFiringTime(firingTimestamp);
-        broadcastMessage.setErasingTime(erasingTimestamp);
-        broadcastMessage.setText(newBroadcastMessage.getText());
-        return broadcastMessage;
-    }
-
-    private static Timestamp getTimestamp(
-            final Supplier<Long> supplier,
-            final Timestamp baseTime,
-            final String baseTimeAfterSuppliedTimeMessageFormat,
-            final Error baseTimeAfterSuppliedTimeError
-    ) {
-        // @todo #CC-63 Add value to props that will be minimal diff between base-time and supplied-time
-        // @todo #CC-63 Fix timestamp representation, now it builds time-date string using wrong timezone
-        Timestamp futureActionTimestamp = new Timestamp(baseTime.getTime() + supplier.get());
-        if (!futureActionTimestamp.after(baseTime)) {
-            throw new CreateBroadcastMessageException(
-                    String.format(
-                            baseTimeAfterSuppliedTimeMessageFormat,
-                            futureActionTimestamp.getTime(),
-                            baseTime.getTime()
-                    ),
-                    baseTimeAfterSuppliedTimeError
-            );
-        }
-        return futureActionTimestamp;
     }
 }

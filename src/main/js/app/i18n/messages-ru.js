@@ -69,6 +69,11 @@ export default {
     'errors.broadcast.message.illegal.state': 'Невозможно изменить сообщение',
     'errors.broadcast.message.send.error': 'Во время отправки произошла ошибка',
     'errors.broadcast.message.erase.error': 'Во время удаления произошла ошибка',
+    'errors.broadcast.message.send.already.discarded': 'Отправка уже отменена',
+    'errors.broadcast.message.erase.already.discarded': 'Удаление уже отменено',
+    'errors.broadcast.message.firing.time.is.malformed': 'Ошибка во времени отправки',
+    'errors.broadcast.message.erasing.time.is.malformed': 'Ошибка во времени удаления',
+    'errors.broadcast.message.erasing.time.is.in.the.past': 'Время удаления в прошлом',
 
     //Success messages
     'app.successmessage.successsumary': 'Успешно',

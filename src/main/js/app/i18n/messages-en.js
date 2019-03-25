@@ -69,7 +69,12 @@ export default {
     'errors.broadcast.message.illegal.state': 'You cannot change message now',
     'errors.broadcast.message.send.error': 'Error occurs at message sending',
     'errors.broadcast.message.erase.error': 'Error occurs at message erasing',
-
+    'errors.broadcast.message.send.already.discarded': 'Send is already aborted',
+    'errors.broadcast.message.erase.already.discarded': 'Erase is already aborted',
+    'errors.broadcast.message.firing.time.is.malformed': 'Sending time is malformed',
+    'errors.broadcast.message.erasing.time.is.malformed': 'Erasing time is malformed',
+    'errors.broadcast.message.erasing.time.is.in.the.past': 'Erasing time is in the past',
+    
     //Success messages
     'app.successmessage.successsumary': 'Success',
     'app.successmessage.successoperaton': 'Success operation',
