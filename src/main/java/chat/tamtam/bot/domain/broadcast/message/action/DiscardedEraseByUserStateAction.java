@@ -15,10 +15,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public final class DiscardedEraseByUserStateAction extends BroadcastMessageStateAction {
     @Override
+    protected void setText(
+            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessageUpdate broadcastMessageUpdate
+    ) {
+        throw new UpdateBroadcastMessageException(
+                String.format(
+                        "Can't update broadcast message text, because message with id=%d is in state=%s",
+                        broadcastMessage.getId(),
+                        BroadcastMessageState.getById(broadcastMessage.getState()).name()
+                ),
+                Error.BROADCAST_MESSAGE_ILLEGAL_STATE
+        );
+    }
+
+    @Override
     public void doAction(
             final BroadcastMessageEntity broadcastMessage,
             final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
+        updateText(broadcastMessage, broadcastMessageUpdate);
+
         if (broadcastMessageUpdate.getErasingTime() == null) {
             throw new UpdateBroadcastMessageException(
                     String.format(

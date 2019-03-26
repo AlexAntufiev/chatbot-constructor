@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
+import chat.tamtam.bot.domain.exception.UpdateBroadcastMessageException;
 import chat.tamtam.bot.service.Error;
 import lombok.NoArgsConstructor;
 
@@ -14,10 +15,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public final class SentStateAction extends BroadcastMessageStateAction {
     @Override
+    protected void setText(
+            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessageUpdate broadcastMessageUpdate
+    ) {
+        throw new UpdateBroadcastMessageException(
+                String.format(
+                        "Can't update broadcast message text, because message with id=%d is in state=%s",
+                        broadcastMessage.getId(),
+                        BroadcastMessageState.getById(broadcastMessage.getState()).name()
+                ),
+                Error.BROADCAST_MESSAGE_ILLEGAL_STATE
+        );
+    }
+
+    @Override
     public void doAction(
             final BroadcastMessageEntity broadcastMessage,
             final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
+        updateText(broadcastMessage, broadcastMessageUpdate);
+
         if (broadcastMessageUpdate.getErasingTime() == null) {
             broadcastMessage.setErasingTime(null);
             broadcastMessage.setState(BroadcastMessageState.DISCARDED_ERASE_BY_USER);

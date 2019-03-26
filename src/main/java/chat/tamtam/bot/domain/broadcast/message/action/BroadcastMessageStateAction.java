@@ -70,4 +70,19 @@ public abstract class BroadcastMessageStateAction {
         }
         return Timestamp.valueOf(futureTime.toLocalDateTime());
     }
+
+    protected void updateText(
+            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessageUpdate broadcastMessageUpdate
+    ) {
+        if (broadcastMessageUpdate.getText() == null) {
+            return;
+        }
+        setText(broadcastMessage, broadcastMessageUpdate);
+    }
+
+    protected abstract void setText(
+            BroadcastMessageEntity broadcastMessage,
+            BroadcastMessageUpdate broadcastMessageUpdate
+    );
 }
