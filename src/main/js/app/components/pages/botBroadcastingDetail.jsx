@@ -61,7 +61,7 @@ class BotBroadcastingDetail extends Component {
         const {intl} = this.props;
         switch (message.state) {
             case BroadcastMessageState.SHEDULED:
-                const dateTimeFormat = this.props.locale === 'ru' ? "dd-mm-yyyy hh:MM" : "dd-mm-yyyy h:MM TT";
+                const dateTimeFormat = this.props.locale === 'ru' ? "dd-mm-yyyy H:MM" : "dd-mm-yyyy h:MM TT";
                 labelText = intl.formatMessage({id: 'app.broadcastmessage.send.wait'})
                     + ' ' + dateFormat(new Date(message.firingTime), dateTimeFormat);
                 labelClass = 'pi pi-clock sheduled';
