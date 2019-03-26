@@ -2,6 +2,8 @@ package chat.tamtam.bot.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import chat.tamtam.bot.controller.Endpoint;
@@ -115,9 +117,10 @@ public class TamBotService {
                     ).execute();
             if (result.isSuccess()) {
                 bot.setBotId(tamBot.getId().getBotId());
-                // @todo #CC-52 wrap save operations into transaction
-                tamBotRepository.save(tamBot);
-                botSchemaRepository.save(bot);
+                transactionalOperation(() -> {
+                    tamBotRepository.save(tamBot);
+                    botSchemaRepository.save(bot);
+                });
                 return new SuccessResponseWrapper<>(tamBot);
             } else {
                 throw new ChatBotConstructorException(
@@ -168,9 +171,10 @@ public class TamBotService {
                     .execute();
             if (result.isSuccess()) {
                 bot.setBotId(null);
-                // @todo #CC-52 wrap delete and save operations into transaction
-                tamBotRepository.deleteById(new TamBotEntity.Id(bot.getBotId(), bot.getUserId()));
-                botSchemaRepository.save(bot);
+                transactionalOperation(() -> {
+                    tamBotRepository.deleteById(new TamBotEntity.Id(bot.getBotId(), bot.getUserId()));
+                    botSchemaRepository.save(bot);
+                });
                 return new SuccessResponseWrapper<>(tamBot);
             } else {
                 throw new ChatBotConstructorException(
@@ -190,5 +194,10 @@ public class TamBotService {
                     Error.TAM_SERVICE_ERROR
             );
         }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+    protected void transactionalOperation(final Runnable runnable) {
+        runnable.run();
     }
 }
