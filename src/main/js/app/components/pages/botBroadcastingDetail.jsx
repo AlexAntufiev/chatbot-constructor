@@ -72,7 +72,7 @@ class BotBroadcastingDetail extends Component {
                 labelClass = 'pi pi-check sent';
                 break;
             case BroadcastMessageState.ERROR:
-                labelText = message.error;
+                labelText = intl.formatMessage({id: message.error});
                 labelClass = 'pi pi-info error';
                 break;
             case BroadcastMessageState.PROCESSING:
