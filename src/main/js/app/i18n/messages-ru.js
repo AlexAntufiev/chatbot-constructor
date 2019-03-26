@@ -74,6 +74,8 @@ export default {
     'errors.broadcast.message.firing.time.is.malformed': 'Ошибка во времени отправки',
     'errors.broadcast.message.erasing.time.is.malformed': 'Ошибка во времени удаления',
     'errors.broadcast.message.erasing.time.is.in.the.past': 'Время удаления в прошлом',
+    'errors.broadcast.message.text.is.empty': 'Пустой текст сообщения',
+    'error.broadcast.message.need.fill.text.and.posttime': 'Заполните текст и время постинга',
 
     //Success messages
     'app.successmessage.successsumary': 'Успешно',
@@ -81,6 +83,14 @@ export default {
     'success.tam.bot.name.changed': 'Имя изменено',
     'success.tam.bot.subscribed': 'Бот подключен',
     'success.tam.bot.unsubscribed': 'Бот отключен',
+
+    'app.broadcastmessage.send.wait': 'Ждет отправки',
+    'app.broadcastmessage.sent': 'Отправлено',
+    'app.broadcastmessage.processing': 'Обработка',
+    'app.broadcastmessage.postingtime': 'Время постинга',
+    'app.broadcastmessage.erasingtime': 'Время удаления',
+    'app.broadcastmessage.text': 'Текст сообщения',
+    'app.broadcastmessage.saved': 'Сообщение сохранено',
 
     //Common
     'app.common.sigin.message': 'Необходима авторизация'

@@ -4,8 +4,14 @@ import TextMessage from "app/components/constructor/textMessage";
 import * as BroadcastMessageService from "app/service/broadcastMessage";
 import * as routers from 'app/constants/routes';
 import makeUrl from "app/utils/makeUrl";
+import BroadcastMessageState from 'app/utils/broadcastMessageState'
+import dateFormat from 'dateformat';
+import {withRouter} from "react-router";
+import {connect} from "react-redux";
+import {injectIntl} from "react-intl";
+import {Growl} from "primereact/growl";
 
-export default class BotBroadcastingDetail extends Component {
+class BotBroadcastingDetail extends Component {
     constructor(props) {
         super(props);
 
@@ -15,12 +21,13 @@ export default class BotBroadcastingDetail extends Component {
         };
         this.onAddMessage = this.onAddMessage.bind(this);
         this.createMessagesList = this.createMessagesList.bind(this);
+        this.refreshMessageList = this.refreshMessageList.bind(this);
     }
 
     onAddMessage() {
         const defaultName = 'Broadcast message';
         BroadcastMessageService.addBroadcastMessage(this.props.match.params.id, this.props.match.params.chatChannelId,
-            {title: defaultName, firingTime: 1000000000}, (res) => {
+            {title: defaultName}, (res) => {
                 const newMessUrl = makeUrl(routers.botBroadcastingDetailMessage(), {
                     id: this.props.match.params.id,
                     chatChannelId: this.props.match.params.chatChannelId,
@@ -33,7 +40,7 @@ export default class BotBroadcastingDetail extends Component {
             });
     }
 
-    componentDidMount() {
+    refreshMessageList() {
         BroadcastMessageService.getBroadcastMessages(this.props.match.params.id, this.props.match.params.chatChannelId,
             (res) => {
                 let messageList = {};
@@ -42,6 +49,44 @@ export default class BotBroadcastingDetail extends Component {
                 });
                 this.setState({messageList: messageList});
             });
+    }
+
+    componentDidMount() {
+        this.refreshMessageList();
+    }
+
+    getLabelByState(message) {
+        let labelText = '';
+        let labelClass = '';
+        const {intl} = this.props;
+        switch (message.state) {
+            case BroadcastMessageState.SHEDULED:
+                const dateTimeFormat = this.props.locale === 'ru' ? "dd-mm-yyyy hh:MM" : "dd-mm-yyyy h:MM TT";
+                labelText = intl.formatMessage({id: 'app.broadcastmessage.send.wait'})
+                    + ' ' + dateFormat(new Date(message.firingTime), dateTimeFormat);
+                labelClass = 'pi pi-clock sheduled';
+                break;
+            case BroadcastMessageState.SENT:
+            case BroadcastMessageState.ERASED_BY_SCHEDULE:
+                labelText = intl.formatMessage({id: 'app.broadcastmessage.sent'});
+                labelClass = 'pi pi-check sent';
+                break;
+            case BroadcastMessageState.ERROR:
+                labelText = message.error;
+                labelClass = 'pi pi-info error';
+                break;
+            case BroadcastMessageState.PROCESSING:
+                labelText = intl.formatMessage({id: 'app.broadcastmessage.processing'});
+                labelClass = 'pi pi-ellipsis-h processing';
+        }
+
+        if (labelClass !== '' && labelText !== '') {
+            labelClass += ' message-label';
+            return (
+                <span className={labelClass}>{labelText}</span>
+            );
+        }
+        return null;
     }
 
     createMessagesList() {
@@ -55,8 +100,14 @@ export default class BotBroadcastingDetail extends Component {
             });
             renderMessageList.push(
                 <div className="bot-broadcasting_elements-container_element">
+                    <div>
+                        {this.getLabelByState(message)}
+                    </div>
                     <Button label={message.title} icon='pi pi-envelope'
-                            onClick={() => this.props.history.push(messUrl)}/>
+                            onClick={() => {
+                                this.props.history.push(messUrl);
+                                this.refreshMessageList()
+                            }}/>
                 </div>
             );
         }
@@ -65,20 +116,36 @@ export default class BotBroadcastingDetail extends Component {
 
     render() {
         const channelsList = this.createMessagesList();
-
+        const {intl} = this.props;
         const message = Number(this.props.match.params.messageId)
             ? this.state.messageList[Number(this.props.match.params.messageId)]
             : null;
         return (<div className="p-grid p-align-start bot-broadcasting">
+            <Growl ref={(el) => this.growl = el}/>
             <div className="p-col bot-broadcasting_elements-container">
+                <div className="bot-broadcasting_elements-container_element">
+                    <Button label={intl.formatMessage({id: 'app.dialog.refresh'})} icon='pi pi-refresh'
+                            onClick={this.refreshMessageList}/>
+                </div>
                 {channelsList}
                 <div className="bot-broadcasting_elements-container_element">
-                    <Button label={'Добавить'} icon='pi pi-plus' onClick={this.onAddMessage}/>
+                    <Button label={intl.formatMessage({id: 'app.dialog.append'})} icon='pi pi-plus'
+                            onClick={this.onAddMessage}/>
                 </div>
             </div>
             <div className="p-col">
-                <TextMessage message={message}/>
+                <TextMessage botSchemeId={this.props.match.params.id}
+                             botId={this.props.match.params.id}
+                             chatChannelId={this.props.match.params.chatChannelId}
+                             refreshMessageList={this.refreshMessageList}
+                             message={message}/>
             </div>
         </div>);
     }
 }
+
+const mapStateToProps = state => ({
+    locale: state.locale.locale
+});
+
+export default withRouter(connect(mapStateToProps)(injectIntl(BotBroadcastingDetail)));

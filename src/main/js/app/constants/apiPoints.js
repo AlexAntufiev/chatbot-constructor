@@ -22,5 +22,5 @@ export const BOT_WHERE_ADMIN_LIST = CHAT_CHANNEL + "admin/list";
 
 export const ADD_BROADCAST_MESSAGE = CHAT_CHANNEL + ":chatChannelId/message";
 export const GET_BROADCAST_MESSAGE_LIST = CHAT_CHANNEL + ":chatChannelId/message/list";
-export const GET_BROADCAST_MESSAGE = CHAT_CHANNEL + ":chatChannelId/message/:messageId";
+export const BROADCAST_MESSAGE = CHAT_CHANNEL + ":chatChannelId/message/:messageId";
 export const DELETE_BROADCAST_MESSAGE = CHAT_CHANNEL + ":chatChannelId/message/:messageId/delete";

@@ -9,7 +9,7 @@ export function addBroadcastMessage(botSchemeId, chatChannelId, broadcastMessage
 }
 
 export function getBroadcastMessage(botSchemeId, chatChannelId, messageId, callbackSuccess, callbackFail, context) {
-    const url = makeUrl(ApiPoints.GET_BROADCAST_MESSAGE, {
+    const url = makeUrl(ApiPoints.BROADCAST_MESSAGE, {
         id: botSchemeId,
         chatChannelId: chatChannelId,
         messageId: messageId
@@ -29,4 +29,13 @@ export function removeBroadcastMessage(botSchemeId, chatChannelId, messageId, ca
         messageId: messageId
     });
     handleRequest(axios.post(url), callbackSuccess, callbackFail, context);
+}
+
+export function updateBroadcastMessage(botSchemeId, chatChannelId, messageId, message, callbackSuccess, callbackFail, context) {
+    const url = makeUrl(ApiPoints.BROADCAST_MESSAGE, {
+        id: botSchemeId,
+        chatChannelId: chatChannelId,
+        messageId: messageId
+    });
+    handleRequest(axios.post(url, message), callbackSuccess, callbackFail, context);
 }

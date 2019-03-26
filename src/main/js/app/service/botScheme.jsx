@@ -14,8 +14,8 @@ export function disconnect(botSchemeId, callbackSuccess, callbackFail, context) 
 }
 
 export function saveBot(botSchemeId, botId, name, callbackSuccess, callbackFail, context) {
-    const url = makeUrl(ApiPoints.SAVE_BOT, {id: botSchemeId, botId: botId});
-    handleRequest(axios.post(url, {name: name}), callbackSuccess, callbackFail, context);
+    const url = makeUrl(ApiPoints.SAVE_BOT, {id: botSchemeId});
+    handleRequest(axios.post(url, {name: name, botId: botId}), callbackSuccess, callbackFail, context);
 }
 
 export function getBotScheme(botSchemeId, callbackSuccess, callbackFail, context) {
