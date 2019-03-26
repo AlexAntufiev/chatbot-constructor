@@ -241,7 +241,7 @@ public class BroadcastMessageService {
     ) {
         if (StringUtils.isEmpty(broadcastMessageUpdate.getTitle())) {
             throw new CreateBroadcastMessageException(
-                    "Can't create broadCastMessage because title is empty",
+                    "Can't create broadcast message because title is empty",
                     Error.BROADCAST_MESSAGE_TITLE_IS_EMPTY
             );
         }
