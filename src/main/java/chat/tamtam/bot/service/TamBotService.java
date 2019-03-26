@@ -2,8 +2,6 @@ package chat.tamtam.bot.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import chat.tamtam.bot.controller.Endpoint;
@@ -30,6 +28,7 @@ public class TamBotService {
     private final BotSchemaRepository botSchemaRepository;
     private final UserService userService;
     private final BotSchemeService botSchemeService;
+    private final TransactionalUtils transactionalUtils;
 
     @Value("${tamtam.host}")
     private String host;
@@ -117,10 +116,11 @@ public class TamBotService {
                     ).execute();
             if (result.isSuccess()) {
                 bot.setBotId(tamBot.getId().getBotId());
-                transactionalOperation(() -> {
-                    tamBotRepository.save(tamBot);
-                    botSchemaRepository.save(bot);
-                });
+                transactionalUtils
+                        .transactionalOperation(() -> {
+                            tamBotRepository.save(tamBot);
+                            botSchemaRepository.save(bot);
+                        });
                 return new SuccessResponseWrapper<>(tamBot);
             } else {
                 throw new ChatBotConstructorException(
@@ -171,10 +171,11 @@ public class TamBotService {
                     .execute();
             if (result.isSuccess()) {
                 bot.setBotId(null);
-                transactionalOperation(() -> {
-                    tamBotRepository.deleteById(new TamBotEntity.Id(bot.getBotId(), bot.getUserId()));
-                    botSchemaRepository.save(bot);
-                });
+                transactionalUtils
+                        .transactionalOperation(() -> {
+                            tamBotRepository.deleteById(new TamBotEntity.Id(bot.getBotId(), bot.getUserId()));
+                            botSchemaRepository.save(bot);
+                        });
                 return new SuccessResponseWrapper<>(tamBot);
             } else {
                 throw new ChatBotConstructorException(
@@ -194,10 +195,5 @@ public class TamBotService {
                     Error.TAM_SERVICE_ERROR
             );
         }
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-    protected void transactionalOperation(final Runnable runnable) {
-        runnable.run();
     }
 }
