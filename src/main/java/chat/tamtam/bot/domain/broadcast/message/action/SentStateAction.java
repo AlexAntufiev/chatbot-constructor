@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
-import chat.tamtam.bot.domain.exception.UpdateBroadcastMessageException;
 import chat.tamtam.bot.service.Error;
 import lombok.NoArgsConstructor;
 
@@ -19,14 +18,7 @@ public final class SentStateAction extends BroadcastMessageStateAction {
             final BroadcastMessageEntity broadcastMessage,
             final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
-        throw new UpdateBroadcastMessageException(
-                String.format(
-                        "Can't update broadcast message text, because message with id=%d is in state=%s",
-                        broadcastMessage.getId(),
-                        BroadcastMessageState.getById(broadcastMessage.getState()).name()
-                ),
-                Error.BROADCAST_MESSAGE_ILLEGAL_STATE
-        );
+        rejectTextUpdate(broadcastMessage, broadcastMessageUpdate);
     }
 
     @Override

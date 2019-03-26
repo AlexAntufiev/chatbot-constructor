@@ -20,16 +20,7 @@ public final class CreatedStateAction extends BroadcastMessageStateAction {
             final BroadcastMessageEntity broadcastMessage,
             final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
-        if (broadcastMessageUpdate.getText().isEmpty()) {
-            throw new UpdateBroadcastMessageException(
-                    String.format(
-                            "Can't update broadcastMessage's text with id=%d because new title is empty",
-                            broadcastMessage.getId()
-                    ),
-                    Error.BROADCAST_MESSAGE_TEXT_IS_EMPTY
-            );
-        }
-        broadcastMessage.setText(broadcastMessageUpdate.getText());
+        applyTextUpdate(broadcastMessage, broadcastMessageUpdate);
     }
 
     @Override

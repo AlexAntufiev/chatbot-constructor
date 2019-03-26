@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
-import chat.tamtam.bot.domain.exception.UpdateBroadcastMessageException;
 import chat.tamtam.bot.service.Error;
 import lombok.NoArgsConstructor;
 
@@ -19,16 +18,7 @@ public final class ScheduledStateAction extends BroadcastMessageStateAction {
             final BroadcastMessageEntity broadcastMessage,
             final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
-        if (broadcastMessageUpdate.getText().isEmpty()) {
-            throw new UpdateBroadcastMessageException(
-                    String.format(
-                            "Can't update broadcastMessage's text with id=%d because text is empty",
-                            broadcastMessage.getId()
-                    ),
-                    Error.BROADCAST_MESSAGE_TEXT_IS_EMPTY
-            );
-        }
-        broadcastMessage.setText(broadcastMessageUpdate.getText());
+        applyTextUpdate(broadcastMessage, broadcastMessageUpdate);
     }
 
     @Override
