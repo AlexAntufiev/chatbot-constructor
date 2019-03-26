@@ -37,13 +37,7 @@ public final class DiscardedEraseByUserStateAction extends BroadcastMessageState
         updateText(broadcastMessage, broadcastMessageUpdate);
 
         if (broadcastMessageUpdate.getErasingTime() == null) {
-            throw new UpdateBroadcastMessageException(
-                    String.format(
-                            "Broadcast message with id=%d has discarded erasing utils already",
-                            broadcastMessage.getId()
-                    ),
-                    Error.BROADCAST_MESSAGE_ERASE_ALREADY_DISCARDED
-            );
+            return;
         }
 
         ZonedDateTime erasingTime = getDateTimeAtLocalZone(
