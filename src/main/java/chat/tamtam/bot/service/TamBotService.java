@@ -129,7 +129,7 @@ public class TamBotService {
             if (result.isSuccess()) {
                 bot.setBotId(tamBot.getId().getBotId());
                 transactionalUtils
-                        .transactionalOperation(() -> {
+                        .invokeRunnable(() -> {
                             tamBotRepository.save(tamBot);
                             botSchemaRepository.save(bot);
                         });
@@ -183,7 +183,7 @@ public class TamBotService {
                     .execute();
             if (result.isSuccess()) {
                 transactionalUtils
-                        .transactionalOperation(() -> {
+                        .invokeRunnable(() -> {
                             tamBotRepository.deleteById(new TamBotEntity.Id(bot.getBotId(), bot.getUserId()));
                             botSchemaRepository.save(bot);
                         });
