@@ -57,6 +57,7 @@ export default {
     'errors.tam.bot.subscribed.already': 'Бот уже подключен',
     'errors.tam.bot.unsubscribed.already': 'Бот уже отключен',
     'errors.tam.bot.not.subscribed': "Бот не подключен",
+    'errors.tam.bot.connected.to.other.bot.scheme': 'Бот уже подключен к другой схеме',
     'errors.chatChannel.selected.empty': 'Id канала не указан',
     'errors.chatChannel.permission': 'Бот не является администратором канала',
     'errors.chatChannel.does.not.exist': 'Канал не существует',

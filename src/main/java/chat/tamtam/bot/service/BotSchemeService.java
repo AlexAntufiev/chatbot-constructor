@@ -6,9 +6,12 @@ import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
+import chat.tamtam.bot.domain.response.SuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
 import chat.tamtam.bot.repository.BotSchemaRepository;
+import chat.tamtam.bot.repository.TamBotRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -16,7 +19,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BotSchemeService {
     private final @NonNull BotSchemaRepository botSchemaRepository;
+    private final @NonNull TamBotRepository tamBotRepository;
+
     private final @NonNull UserService userService;
+
+    private final @NonNull TransactionalUtils transactionalUtils;
 
     public BotSchemeEntity addBot(final BotSchemeEntity bot, Long userId) throws IllegalArgumentException {
         if (bot.getName().isEmpty() || bot.getId() != null) {
@@ -56,8 +63,23 @@ public class BotSchemeService {
         botSchemaRepository.deleteByUserIdAndId(userId, id);
     }
 
-    public boolean deleteBot(final BotSchemeEntity bot) {
-        return false;
+    public SuccessResponse deleteBot(
+            final String authToken,
+            final int botSchemeId
+    ) {
+        BotSchemeEntity botScheme = getBotScheme(authToken, botSchemeId);
+        transactionalUtils.transactionalOperation(() -> {
+            if (botScheme.getBotId() != null) {
+                TamBotEntity tamBot = tamBotRepository.findById(
+                        new TamBotEntity.Id(botScheme.getBotId(), botScheme.getUserId())
+                );
+                if (tamBot != null) {
+                    tamBotRepository.deleteById(tamBot.getId());
+                }
+            }
+            botSchemaRepository.deleteByUserIdAndId(botScheme.getUserId(), botScheme.getId());
+        });
+        return new SuccessResponse();
     }
 
     public SuccessResponseWrapper<List<BotSchemeEntity>> getList(final Long userId) {
