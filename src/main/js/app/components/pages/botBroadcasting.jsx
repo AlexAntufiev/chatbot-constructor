@@ -28,10 +28,10 @@ class BotBroadcasting extends Component {
         }, null, this);
     }
 
-    onChannelClick(channelId) {
+    onChannelClick(chatChannelId) {
         const url = makeUrl(routes.botBroadcastingDetail(), {
             id: this.props.match.params.id,
-            channelId: channelId
+            chatChannelId: chatChannelId
         });
 
         this.props.history.push(url);

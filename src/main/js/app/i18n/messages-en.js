@@ -74,6 +74,8 @@ export default {
     'errors.broadcast.message.firing.time.is.malformed': 'Sending time is malformed',
     'errors.broadcast.message.erasing.time.is.malformed': 'Erasing time is malformed',
     'errors.broadcast.message.erasing.time.is.in.the.past': 'Erasing time is in the past',
+    'errors.broadcast.message.text.is.empty': 'Message text is empty',
+    'error.broadcast.message.need.fill.text.and.posttime': 'Fill text and posting time',
     
     //Success messages
     'app.successmessage.successsumary': 'Success',
@@ -81,6 +83,14 @@ export default {
     'success.tam.bot.name.changed': 'Name changed',
     'success.tam.bot.subscribed': 'Bot subscribed',
     'success.tam.bot.unsubscribed': 'Bot unsubscribed',
+
+    'app.broadcastmessage.send.wait': 'Waiting to be sent',
+    'app.broadcastmessage.sent': 'Sent',
+    'app.broadcastmessage.processing': 'Processing',
+    'app.broadcastmessage.postingtime': 'Posting time',
+    'app.broadcastmessage.erasingtime': 'Erasing time',
+    'app.broadcastmessage.text': 'Message text',
+    'app.broadcastmessage.saved': 'Message saved',
 
     //Common
     'app.common.sigin.message': 'Please, sign in'
