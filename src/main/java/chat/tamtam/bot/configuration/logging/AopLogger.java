@@ -16,8 +16,6 @@ import org.springframework.context.annotation.Configuration;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
-
 @Slf4j
 @Aspect
 @Configuration
@@ -47,7 +45,7 @@ public class AopLogger {
                 "Entered  method '{}' with arguments [{}] at {}",
                 joinPoint.getSignature().getName(),
                 getCallArgumentsAsString(joinPoint),
-                ISO_DATE_TIME.format(evaluationStartTime)
+                evaluationStartTime
         );
 
         Object evaluationResult;
@@ -59,7 +57,7 @@ public class AopLogger {
                     "Exited method '{}' with exception [{}] at {} ({} elapsed)",
                     joinPoint.getSignature().getName(),
                     e.getLocalizedMessage(),
-                    ISO_DATE_TIME.format(evaluationEndTime),
+                    evaluationEndTime,
                     formatDurationBetween(evaluationStartTime, evaluationEndTime)
             );
             throw e;
@@ -70,7 +68,7 @@ public class AopLogger {
                 "Exited method '{}' with result [{}] at {} ({} elapsed)",
                 joinPoint.getSignature().getName(),
                 evaluationResult,
-                ISO_DATE_TIME.format(evaluationEndTime),
+                evaluationEndTime,
                 formatDurationBetween(evaluationStartTime, evaluationEndTime)
         );
 

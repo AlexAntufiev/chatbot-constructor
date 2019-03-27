@@ -7,7 +7,6 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.stereotype.Service;
 
-import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.custom.bot.AbstractCustomBot;
 import chat.tamtam.bot.custom.bot.BotType;
 import chat.tamtam.bot.custom.bot.RegistrationBot;
@@ -24,7 +23,6 @@ public class WebHookBotService {
     private final RegistrationBot registrationBot;
     private final StubBot stubBot;
 
-    @Loggable
     public void submit(
             final String botId,
             final Message message
@@ -38,7 +36,6 @@ public class WebHookBotService {
         ).processMessage(message);
     }
 
-    @Loggable
     @PostConstruct
     public void insertRegBot() {
         typeMap.put(registrationBot.getId(), registrationBot.getType());

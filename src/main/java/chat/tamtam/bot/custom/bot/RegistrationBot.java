@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 import com.auth0.jwt.JWT;
 
 import chat.tamtam.bot.configuration.Profiles;
-import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.controller.Endpoint;
 import chat.tamtam.bot.domain.session.SessionEntity;
 import chat.tamtam.bot.domain.user.UserEntity;
@@ -88,7 +87,6 @@ public class RegistrationBot extends AbstractCustomBot {
         botAPI = TamTamBotAPI.create(token);
     }
 
-    @Loggable
     @Override
     public void processMessage(final Message message) {
         try {
@@ -212,7 +210,6 @@ public class RegistrationBot extends AbstractCustomBot {
 
     @Profile(Profiles.PRODUCTION)
     @Bean
-    @Loggable
     public void subscribeRegBotOnAppReadyProduction() {
         try {
             url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
@@ -228,7 +225,6 @@ public class RegistrationBot extends AbstractCustomBot {
 
     @Profile(Profiles.PRODUCTION)
     @PreDestroy
-    @Loggable
     public void unsubscribeRegBotOnAppShutdown() {
         if (!subscribed) {
             return;
