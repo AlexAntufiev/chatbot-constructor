@@ -5,10 +5,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class NewBroadcastMessage {
+public class BroadcastMessageUpdate {
     private String title;
-    private Long firingTime;
-    private Long erasingTime;
     private String text;
+    private String firingTime;
+    private String erasingTime;
     // @todo #CC-63 Add payload field
 }

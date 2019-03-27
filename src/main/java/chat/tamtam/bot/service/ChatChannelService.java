@@ -77,7 +77,7 @@ public class ChatChannelService {
             throw new ChatBotConstructorException(
                     "Can't fetch chatChannels where tam bot with id="
                             + botScheme.getBotId()
-                            + "is participant",
+                            + " is participant",
                     Error.TAM_SERVICE_ERROR
             );
         }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import chat.tamtam.bot.domain.broadcast.message.NewBroadcastMessage;
+import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
 import chat.tamtam.bot.domain.chatchannel.SelectedChatChannelEntity;
 import chat.tamtam.bot.service.BroadcastMessageService;
 import chat.tamtam.bot.service.ChatChannelService;
@@ -103,11 +103,31 @@ public class BroadcastController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final Integer botSchemeId,
             @PathVariable("chatchannel_id") final Long channelId,
-            @RequestBody final NewBroadcastMessage newBroadcastMessage
+            @RequestBody final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
         return new ResponseEntity<>(
                 broadcastMessageService
-                        .addBroadcastMessage(authToken, botSchemeId, channelId, newBroadcastMessage),
+                        .addBroadcastMessage(authToken, botSchemeId, channelId, broadcastMessageUpdate),
+                HttpStatus.OK
+        );
+    }
+
+    @PostMapping(Endpoint.CHATCHANNEL_ID + Endpoint.MESSAGE + Endpoint.MESSAGE_ID)
+    public ResponseEntity<?> updateBroadcastMessage(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable("id") final int botSchemeId,
+            @PathVariable("chatchannel_id") final long channelId,
+            @PathVariable("message_id") long messageId,
+            @RequestBody final BroadcastMessageUpdate broadcastMessageUpdate
+    ) {
+        return new ResponseEntity<>(
+                broadcastMessageService.updateBroadcastMessage(
+                        authToken,
+                        botSchemeId,
+                        channelId,
+                        messageId,
+                        broadcastMessageUpdate
+                ),
                 HttpStatus.OK
         );
     }
