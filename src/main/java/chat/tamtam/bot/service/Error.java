@@ -38,6 +38,9 @@ public enum Error {
     BROADCAST_MESSAGE_SEND_ALREADY_DISCARDED("errors.broadcast.message.send.already.discarded"),
     BROADCAST_MESSAGE_ERASE_ALREADY_DISCARDED("errors.broadcast.message.erase.already.discarded"),
 
+    ATTACHMENT_TYPE_EMPTY("errors.attachment.type.is.empty"),
+    ATTACHMENT_TYPE_ILLEGAL("errors.attachment.type.is.illegal"),
+    ATTACHMENT_UPLOAD_SERVICE_ERROR("errors.attachment.upload.service.error"),
     ;
 
     @Getter

@@ -8,6 +8,7 @@ import chat.tamtam.bot.controller.Endpoint;
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.exception.ChatBotConstructorException;
+import chat.tamtam.bot.domain.exception.GenerateUploadLinkException;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
 import chat.tamtam.bot.domain.response.SuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
@@ -18,6 +19,8 @@ import chat.tamtam.botapi.exceptions.APIException;
 import chat.tamtam.botapi.exceptions.ClientException;
 import chat.tamtam.botapi.model.SimpleQueryResult;
 import chat.tamtam.botapi.model.SubscriptionRequestBody;
+import chat.tamtam.botapi.model.UploadEndpoint;
+import chat.tamtam.botapi.model.UploadType;
 import chat.tamtam.botapi.model.UserWithPhoto;
 import lombok.RequiredArgsConstructor;
 
@@ -121,12 +124,12 @@ public class TamBotService {
             }
             SimpleQueryResult result = tamTamBotAPI
                     .subscribe(
-                            new SubscriptionRequestBody(host + Endpoint.TAM_BOT_WEBHOOK + "/" + bot.getId())
+                            new SubscriptionRequestBody(host + Endpoint.TAM_BOT + "/" + bot.getId())
                     ).execute();
             if (result.isSuccess()) {
                 bot.setBotId(tamBot.getId().getBotId());
                 transactionalUtils
-                        .transactionalOperation(() -> {
+                        .invokeRunnable(() -> {
                             tamBotRepository.save(tamBot);
                             botSchemaRepository.save(bot);
                         });
@@ -176,11 +179,11 @@ public class TamBotService {
         TamTamBotAPI tamTamBotAPI = TamTamBotAPI.create(tamBot.getToken());
         try {
             SimpleQueryResult result = tamTamBotAPI
-                    .unsubscribe(host + Endpoint.TAM_BOT_WEBHOOK + "/" + bot.getId())
+                    .unsubscribe(host + Endpoint.TAM_BOT + "/" + bot.getId())
                     .execute();
             if (result.isSuccess()) {
                 transactionalUtils
-                        .transactionalOperation(() -> {
+                        .invokeRunnable(() -> {
                             tamBotRepository.deleteById(new TamBotEntity.Id(bot.getBotId(), bot.getUserId()));
                             botSchemaRepository.save(bot);
                         });
@@ -202,6 +205,36 @@ public class TamBotService {
                             + " cause "
                             + e.getLocalizedMessage(),
                     Error.TAM_SERVICE_ERROR
+            );
+        }
+    }
+
+    public SuccessResponse getUploadUrl(
+            final String authToken,
+            final int botSchemeId,
+            final String attachmentType
+    ) {
+        if (StringUtils.isEmpty(attachmentType)) {
+            throw new GenerateUploadLinkException(
+                    "Attachment type is empty",
+                    Error.ATTACHMENT_TYPE_EMPTY
+            );
+        }
+        TamBotEntity tamBot = getTamBot(botSchemeService.getBotScheme(authToken, botSchemeId));
+        TamTamBotAPI tamTamBotAPI = TamTamBotAPI.create(tamBot.getToken());
+        try {
+            UploadType uploadType = UploadType.create(attachmentType);
+            UploadEndpoint uploadEndpoint = tamTamBotAPI.getUploadUrl(uploadType).execute();
+            return new SuccessResponseWrapper<>(uploadEndpoint);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new GenerateUploadLinkException(
+                    String.format("Attachment type is illegal %s", illegalArgumentException.getLocalizedMessage()),
+                    Error.ATTACHMENT_TYPE_ILLEGAL
+            );
+        } catch (ClientException | APIException serviceException) {
+            throw new GenerateUploadLinkException(
+                    String.format("Service error %s", serviceException.getLocalizedMessage()),
+                    Error.ATTACHMENT_UPLOAD_SERVICE_ERROR
             );
         }
     }
