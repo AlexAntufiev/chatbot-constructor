@@ -12,4 +12,5 @@ export const botSettings = () => '/bot/:id/settings/';
 export const botSetup = () => '/bot/:id/setup/';
 export const botStatistic = () => '/bot/:id/statistic/';
 export const botBroadcasting = () => '/bot/:id/broadcasting/';
-export const botBroadcastingDetail = () => '/bot/:id/broadcasting/:channelId/';
+export const botBroadcastingDetail = () => '/bot/:id/broadcasting/:chatChannelId/';
+export const botBroadcastingDetailMessage = () => '/bot/:id/broadcasting/:chatChannelId/message/:messageId';

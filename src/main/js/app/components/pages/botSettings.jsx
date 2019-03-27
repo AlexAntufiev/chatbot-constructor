@@ -89,7 +89,7 @@ class BotSettings extends Component {
         this.setState({saveAjaxProcess: true});
         const self = this;
 
-        BotSchemeService.saveBot(this.props.match.params.id, self.state.name,
+        BotSchemeService.saveBot(this.props.match.params.id, this.state.botId, self.state.name,
             (res) => {
                 self.setState({saveAjaxProcess: false});
                 self.setState({initialName: self.state.name});

@@ -1,5 +1,6 @@
 package chat.tamtam.bot.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -36,6 +37,8 @@ public class BroadcastMessageService {
     private final BotSchemeService botSchemeService;
     private final TamBotService tamBotService;
     private final ChatChannelService chatChannelService;
+    private static final List<Byte> EXCLUDED_STATES =
+            Collections.singletonList(BroadcastMessageState.DELETED.getValue());
 
     // Broadcast message actions
     private final CreatedStateAction createdStateAction;
@@ -52,11 +55,12 @@ public class BroadcastMessageService {
         ChatChannelEntity chatChannel = chatChannelService.getChatChannel(botScheme, tamBot, chatChannelId);
         BroadcastMessageEntity broadcastMessage =
                 broadcastMessageRepository
-                        .findByBotSchemeIdAndTamBotIdAndChatChannelIdAndId(
+                        .findByBotSchemeIdAndTamBotIdAndChatChannelIdAndIdAndStateIsNotIn(
                                 botScheme.getId(),
                                 tamBot.getId().getBotId(),
                                 chatChannel.getId().getChatId(),
-                                broadcastMessageId
+                                broadcastMessageId,
+                                EXCLUDED_STATES
                         );
         if (broadcastMessage == null) {
             // @todo #CC-63 Wrap all exception's messages into string format pattern
@@ -102,10 +106,11 @@ public class BroadcastMessageService {
         ChatChannelEntity chatChannel = chatChannelService.getChatChannel(botScheme, tamBot, chatChannelId);
         List<BroadcastMessageEntity> broadcastMessages =
                 broadcastMessageRepository
-                        .findAllByBotSchemeIdAndTamBotIdAndChatChannelId(
+                        .findAllByBotSchemeIdAndTamBotIdAndChatChannelIdAndStateIsNotIn(
                                 botScheme.getId(),
                                 tamBot.getId().getBotId(),
-                                chatChannel.getId().getChatId()
+                                chatChannel.getId().getChatId(),
+                                EXCLUDED_STATES
                         );
         return new SuccessResponseWrapper<>(broadcastMessages);
     }
