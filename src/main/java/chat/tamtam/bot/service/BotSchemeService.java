@@ -68,7 +68,7 @@ public class BotSchemeService {
             final int botSchemeId
     ) {
         BotSchemeEntity botScheme = getBotScheme(authToken, botSchemeId);
-        transactionalUtils.transactionalOperation(() -> {
+        transactionalUtils.invokeRunnable(() -> {
             if (botScheme.getBotId() != null) {
                 TamBotEntity tamBot = tamBotRepository.findById(
                         new TamBotEntity.Id(botScheme.getBotId(), botScheme.getUserId())
