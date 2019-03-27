@@ -6,8 +6,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
@@ -39,6 +37,8 @@ public class BroadcastMessageService {
     private final ChatChannelService chatChannelService;
     private static final List<Byte> EXCLUDED_STATES =
             Collections.singletonList(BroadcastMessageState.DELETED.getValue());
+
+    private final TransactionalUtils transactionalUtils;
 
     // Broadcast message actions
     private final CreatedStateAction createdStateAction;
@@ -124,18 +124,19 @@ public class BroadcastMessageService {
         BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
         return new SuccessResponseWrapper<>(
-                setBroadcastMessageStateAttempt(
-                        () -> getBroadcastMessage(botScheme, tamBot, chatChannelId, broadcastMessageId),
-                        message -> BroadcastMessageState.isRemovable(
-                                BroadcastMessageState.getById(message.getState())
-                        ),
-                        BroadcastMessageState.DELETED
+                transactionalUtils.invokeCallable(
+                        () -> setBroadcastMessageStateAttempt(
+                                () -> getBroadcastMessage(botScheme, tamBot, chatChannelId, broadcastMessageId),
+                                message -> BroadcastMessageState.isRemovable(
+                                        BroadcastMessageState.getById(message.getState())
+                                ),
+                                BroadcastMessageState.DELETED
+                        )
                 )
         );
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-    protected BroadcastMessageEntity setBroadcastMessageStateAttempt(
+    private BroadcastMessageEntity setBroadcastMessageStateAttempt(
             Supplier<BroadcastMessageEntity> broadcastMessageSupplier,
             Predicate<BroadcastMessageEntity> broadcastMessagePredicate,
             final BroadcastMessageState targetState
@@ -175,11 +176,14 @@ public class BroadcastMessageService {
                         chatChannelId,
                         messageId
                 );
-        return new SuccessResponseWrapper<>(updateMessageAttempt(broadcastMessageUpdate, messageId));
+        return new SuccessResponseWrapper<>(
+                transactionalUtils.invokeCallable(
+                        () -> updateMessageAttempt(broadcastMessageUpdate, messageId)
+                )
+        );
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-    protected BroadcastMessageEntity updateMessageAttempt(
+    private BroadcastMessageEntity updateMessageAttempt(
             final BroadcastMessageUpdate broadcastMessageUpdate,
             long messageId
     ) {
