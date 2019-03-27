@@ -15,7 +15,7 @@ import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
-import chat.tamtam.bot.domain.broadcast.message.action.CreatedStateBroadcastMessageStateAction;
+import chat.tamtam.bot.domain.broadcast.message.action.CreatedStateAction;
 import chat.tamtam.bot.domain.broadcast.message.action.DiscardedEraseByUserStateAction;
 import chat.tamtam.bot.domain.broadcast.message.action.ScheduledStateAction;
 import chat.tamtam.bot.domain.broadcast.message.action.SentStateAction;
@@ -41,7 +41,7 @@ public class BroadcastMessageService {
             Collections.singletonList(BroadcastMessageState.DELETED.getValue());
 
     // Broadcast message actions
-    private final CreatedStateBroadcastMessageStateAction createdStateBroadcastMessageStateAction;
+    private final CreatedStateAction createdStateAction;
     private final DiscardedEraseByUserStateAction discardedEraseByUserStateAction;
     private final ScheduledStateAction scheduledStateAction;
     private final SentStateAction sentStateAction;
@@ -175,24 +175,6 @@ public class BroadcastMessageService {
                         chatChannelId,
                         messageId
                 );
-        if (StringUtils.isEmpty(broadcastMessageUpdate.getTitle())) {
-            throw new UpdateBroadcastMessageException(
-                    String.format(
-                            "Can't update broadcastMessage's title with id=%d because new title is empty",
-                            messageId
-                    ),
-                    Error.BROADCAST_MESSAGE_TITLE_IS_EMPTY
-            );
-        }
-        if (StringUtils.isEmpty(broadcastMessageUpdate.getText())) {
-            throw new UpdateBroadcastMessageException(
-                    String.format(
-                            "Can't update broadcastMessage's title with id=%d because new title is empty",
-                            messageId
-                    ),
-                    Error.BROADCAST_MESSAGE_TEXT_IS_EMPTY
-            );
-        }
         return new SuccessResponseWrapper<>(updateMessageAttempt(broadcastMessageUpdate, messageId));
     }
 
@@ -213,12 +195,24 @@ public class BroadcastMessageService {
                                         Error.BROADCAST_MESSAGE_DOES_NOT_EXIST
                                 )
                         );
-        broadcastMessage.setTitle(broadcastMessageUpdate.getTitle());
-        broadcastMessage.setText(broadcastMessageUpdate.getText());
+
+        if (broadcastMessageUpdate.getTitle() != null) {
+            if (!broadcastMessageUpdate.getTitle().isEmpty()) {
+                broadcastMessage.setTitle(broadcastMessageUpdate.getTitle());
+            } else {
+                throw new UpdateBroadcastMessageException(
+                        String.format(
+                                "Can't update title because it is empty, message id=%d",
+                                messageId
+                        ),
+                        Error.BROADCAST_MESSAGE_TITLE_IS_EMPTY
+                );
+            }
+        }
 
         switch (BroadcastMessageState.getById(broadcastMessage.getState())) {
             case CREATED:
-                createdStateBroadcastMessageStateAction.doAction(broadcastMessage, broadcastMessageUpdate);
+                createdStateAction.doAction(broadcastMessage, broadcastMessageUpdate);
                 break;
 
             case SCHEDULED:
@@ -252,7 +246,7 @@ public class BroadcastMessageService {
     ) {
         if (StringUtils.isEmpty(broadcastMessageUpdate.getTitle())) {
             throw new CreateBroadcastMessageException(
-                    "Can't create broadCastMessage because title is empty",
+                    "Can't create broadcast message because title is empty",
                     Error.BROADCAST_MESSAGE_TITLE_IS_EMPTY
             );
         }

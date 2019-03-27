@@ -14,10 +14,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public final class ScheduledStateAction extends BroadcastMessageStateAction {
     @Override
+    protected void setText(
+            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessageUpdate broadcastMessageUpdate
+    ) {
+        applyTextUpdate(broadcastMessage, broadcastMessageUpdate);
+    }
+
+    @Override
     public void doAction(
             final BroadcastMessageEntity broadcastMessage,
             final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
+        updateText(broadcastMessage, broadcastMessageUpdate);
+
         if (broadcastMessageUpdate.getFiringTime() == null) {
             broadcastMessage.setFiringTime(null);
             broadcastMessage.setErasingTime(null);

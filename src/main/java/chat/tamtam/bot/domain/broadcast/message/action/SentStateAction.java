@@ -14,10 +14,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public final class SentStateAction extends BroadcastMessageStateAction {
     @Override
+    protected void setText(
+            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessageUpdate broadcastMessageUpdate
+    ) {
+        rejectTextUpdate(broadcastMessage, broadcastMessageUpdate);
+    }
+
+    @Override
     public void doAction(
             final BroadcastMessageEntity broadcastMessage,
             final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
+        updateText(broadcastMessage, broadcastMessageUpdate);
+
         if (broadcastMessageUpdate.getErasingTime() == null) {
             broadcastMessage.setErasingTime(null);
             broadcastMessage.setState(BroadcastMessageState.DISCARDED_ERASE_BY_USER);

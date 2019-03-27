@@ -8,6 +8,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
+import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
 import chat.tamtam.bot.domain.exception.UpdateBroadcastMessageException;
 import chat.tamtam.bot.service.Error;
@@ -69,5 +70,50 @@ public abstract class BroadcastMessageStateAction {
             );
         }
         return Timestamp.valueOf(futureTime.toLocalDateTime());
+    }
+
+    protected void updateText(
+            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessageUpdate broadcastMessageUpdate
+    ) {
+        if (broadcastMessageUpdate.getText() == null) {
+            return;
+        }
+        setText(broadcastMessage, broadcastMessageUpdate);
+    }
+
+    protected abstract void setText(
+            BroadcastMessageEntity broadcastMessage,
+            BroadcastMessageUpdate broadcastMessageUpdate
+    );
+
+    protected void rejectTextUpdate(
+            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessageUpdate broadcastMessageUpdate
+    ) {
+        throw new UpdateBroadcastMessageException(
+                String.format(
+                        "Can't update broadcast message text, because message with id=%d is in state=%s",
+                        broadcastMessage.getId(),
+                        BroadcastMessageState.getById(broadcastMessage.getState()).name()
+                ),
+                Error.BROADCAST_MESSAGE_ILLEGAL_STATE
+        );
+    }
+
+    protected void applyTextUpdate(
+            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessageUpdate broadcastMessageUpdate
+    ) {
+        if (broadcastMessageUpdate.getText().isEmpty()) {
+            throw new UpdateBroadcastMessageException(
+                    String.format(
+                            "Can't update broadcastMessage's text with id=%d because new title is empty",
+                            broadcastMessage.getId()
+                    ),
+                    Error.BROADCAST_MESSAGE_TEXT_IS_EMPTY
+            );
+        }
+        broadcastMessage.setText(broadcastMessageUpdate.getText());
     }
 }
