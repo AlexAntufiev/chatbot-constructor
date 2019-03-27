@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.chatchannel.ChatChannelEntity;
@@ -39,6 +40,7 @@ public class ChatChannelService {
     @Value("${tamtam.chatChannel.chatsFetchAmount:10}")
     private int chatChannelsFetchAmount;
 
+    @Loggable
     public SuccessResponse getChatsWhereBotIsAdmin(
             final String authToken,
             int botSchemeId,
@@ -81,6 +83,7 @@ public class ChatChannelService {
         }
     }
 
+    @Loggable
     public SuccessResponse saveChatChannel(
             final String authToken,
             int botSchemeId,
@@ -139,6 +142,7 @@ public class ChatChannelService {
         }
     }
 
+    @Loggable
     public SuccessResponse getChatChannels(
             final String authToken,
             int botSchemeId
@@ -152,6 +156,7 @@ public class ChatChannelService {
         );
     }
 
+    @Loggable
     public SuccessResponse getChatChannel(
             final String authToken,
             int botSchemeId,
@@ -179,6 +184,7 @@ public class ChatChannelService {
         return new SuccessResponseWrapper<>(chatChannel);
     }
 
+    @Loggable
     public SuccessResponse removeChatChannel(
             final String authToken,
             int botSchemeId,
@@ -212,6 +218,7 @@ public class ChatChannelService {
         return new SuccessResponse();
     }
 
+    @Loggable
     public ChatChannelEntity getChatChannel(
             final BotSchemeEntity botScheme,
             final TamBotEntity tamBot,

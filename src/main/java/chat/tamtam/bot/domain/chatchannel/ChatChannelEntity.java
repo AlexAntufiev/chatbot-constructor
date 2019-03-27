@@ -8,6 +8,7 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 
+import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.botapi.model.Chat;
 import chat.tamtam.botapi.model.ChatAdminPermission;
 import chat.tamtam.botapi.model.ChatMember;
@@ -54,6 +55,7 @@ public class ChatChannelEntity {
         link = chat.getLink();
     }
 
+    @Loggable
     public void setOptions(final Chat chat, final ChatMember chatMember) {
         int opts = 0;
         opts = ChatChannelOption.setOption(opts, chat.getType() == ChatType.CHANNEL, ChatChannelOption.CHANNEL);
