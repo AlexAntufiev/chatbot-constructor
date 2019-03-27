@@ -28,6 +28,7 @@ public class TamBotService {
     private final BotSchemaRepository botSchemaRepository;
     private final UserService userService;
     private final BotSchemeService botSchemeService;
+    private final TransactionalUtils transactionalUtils;
 
     @Value("${tamtam.host}")
     private String host;
@@ -115,9 +116,11 @@ public class TamBotService {
                     ).execute();
             if (result.isSuccess()) {
                 bot.setBotId(tamBot.getId().getBotId());
-                // @todo #CC-52 wrap save operations into transaction
-                tamBotRepository.save(tamBot);
-                botSchemaRepository.save(bot);
+                transactionalUtils
+                        .transactionalOperation(() -> {
+                            tamBotRepository.save(tamBot);
+                            botSchemaRepository.save(bot);
+                        });
                 return new SuccessResponseWrapper<>(tamBot);
             } else {
                 throw new ChatBotConstructorException(
@@ -168,9 +171,11 @@ public class TamBotService {
                     .execute();
             if (result.isSuccess()) {
                 bot.setBotId(null);
-                // @todo #CC-52 wrap delete and save operations into transaction
-                tamBotRepository.deleteById(new TamBotEntity.Id(bot.getBotId(), bot.getUserId()));
-                botSchemaRepository.save(bot);
+                transactionalUtils
+                        .transactionalOperation(() -> {
+                            tamBotRepository.deleteById(new TamBotEntity.Id(bot.getBotId(), bot.getUserId()));
+                            botSchemaRepository.save(bot);
+                        });
                 return new SuccessResponseWrapper<>(tamBot);
             } else {
                 throw new ChatBotConstructorException(
