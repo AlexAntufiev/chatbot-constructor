@@ -40,7 +40,7 @@ public class RestSecurity extends WebSecurityConfigurerAdapter {
                         Endpoint.API_REGISTRATION,
                         Endpoint.API_LOGIN,
                         Endpoint.TAM_CUSTOM_BOT_WEBHOOK + Endpoint.ID,
-                        Endpoint.TAM_BOT_WEBHOOK + Endpoint.ID
+                        Endpoint.TAM_BOT + Endpoint.ID
                 )
                 .permitAll()
                 .antMatchers(HttpMethod.GET, Endpoint.STATIC_INDEX, Endpoint.STATIC_RESOURCES, Endpoint.HEALTH)
