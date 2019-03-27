@@ -14,7 +14,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping(path = Endpoint.TAM_BOT_WEBHOOK,
+@RequestMapping(path = Endpoint.TAM_BOT,
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.ALL_VALUE)
 public class WebHookBotController {
