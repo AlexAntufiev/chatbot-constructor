@@ -30,6 +30,7 @@ class BotDetail extends React.Component {
                             <Route path={routes.botSettings()} component={BotSettings}/>
                             <Route path={routes.botSetup()} component={BotConstructor}/>
                             <Route path={routes.botStatistic()} component={BotStatistic}/>
+                            <Route path={routes.botBroadcastingDetailMessage()} component={BotBroadcastingDetail}/>
                             <Route path={routes.botBroadcastingDetail()} component={BotBroadcastingDetail}/>
                             <Route path={routes.botBroadcasting()} component={BotBroadcasting}/>
                             <Redirect to={routes.botSettings()}/>
