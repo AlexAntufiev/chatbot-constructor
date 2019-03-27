@@ -1,6 +1,7 @@
 package chat.tamtam.bot.repository;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
@@ -12,17 +13,19 @@ import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
 
 @Repository
 public interface BroadcastMessageRepository extends CrudRepository<BroadcastMessageEntity, Long> {
-    BroadcastMessageEntity findByBotSchemeIdAndTamBotIdAndChatChannelIdAndId(
+    BroadcastMessageEntity findByBotSchemeIdAndTamBotIdAndChatChannelIdAndIdAndStateIsNotIn(
             int botSchemeId,
             long tamBotId,
             long chatChannelId,
-            long messageId
+            long messageId,
+            Collection<Byte> excludedStates
     );
 
-    List<BroadcastMessageEntity> findAllByBotSchemeIdAndTamBotIdAndChatChannelId(
+    List<BroadcastMessageEntity> findAllByBotSchemeIdAndTamBotIdAndChatChannelIdAndStateIsNotIn(
             int botSchemeId,
             long tamBotId,
-            long chatChannelId
+            long chatChannelId,
+            Collection<Byte> excludedStates
     );
 
     boolean existsByBotSchemeIdAndTamBotIdAndChatChannelIdAndId(
