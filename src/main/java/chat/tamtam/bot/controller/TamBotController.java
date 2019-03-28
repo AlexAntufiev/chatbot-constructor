@@ -39,7 +39,7 @@ public class TamBotController {
     @PostMapping(Endpoint.ID + Endpoint.TAM_CONNECT)
     public ResponseEntity<?> connectBot(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
-            @PathVariable("id") final Integer botSchemeId,
+            @PathVariable("id") final int botSchemeId,
             @RequestBody final BotTokenEntity tokenEntity
     ) {
         return new ResponseEntity<>(
@@ -51,10 +51,26 @@ public class TamBotController {
     @PostMapping(path = Endpoint.ID + Endpoint.TAM_DISCONNECT, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> disconnectBot(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
-            @PathVariable("id") final Integer botSchemeId
+            @PathVariable("id") final int botSchemeId
     ) {
         return new ResponseEntity<>(
                 tamBotService.disconnect(authToken, botSchemeId),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping(
+            path = Endpoint.ID + Endpoint.TAM_UPLOAD + Endpoint.ATTACHMENT_TYPE,
+            consumes = MediaType.ALL_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> getUploadUrl(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable("id") final int botSchemeId,
+            @PathVariable("attachment_type") final String attachmentType
+    ) {
+        return new ResponseEntity<>(
+                tamBotService.getUploadUrl(authToken, botSchemeId, attachmentType),
                 HttpStatus.OK
         );
     }
