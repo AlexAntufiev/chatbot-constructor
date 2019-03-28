@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
-import chat.tamtam.bot.domain.broadcast.message.attachment.BroadcastMessageAttachment;
+import chat.tamtam.bot.domain.broadcast.message.attachment.BroadcastMessageAttachmentUpdate;
 import chat.tamtam.bot.domain.chatchannel.SelectedChatChannelEntity;
 import chat.tamtam.bot.service.BroadcastMessageService;
 import chat.tamtam.bot.service.ChatChannelService;
@@ -185,8 +185,8 @@ public class BroadcastController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final Integer botSchemeId,
             @PathVariable("chatchannel_id") final Long channelId,
-            @PathVariable("message_id") long messageId,
-            @RequestBody final BroadcastMessageAttachment broadcastMessageAttachment
+            @PathVariable("message_id") final long messageId,
+            @RequestBody final BroadcastMessageAttachmentUpdate broadcastMessageAttachmentUpdate
     ) {
         return new ResponseEntity<>(
                 broadcastMessageService.addBroadcastMessageAttachment(
@@ -194,7 +194,53 @@ public class BroadcastController {
                         botSchemeId,
                         channelId,
                         messageId,
-                        broadcastMessageAttachment
+                        broadcastMessageAttachmentUpdate
+                ),
+                HttpStatus.OK
+        );
+    }
+
+    @PostMapping(
+            path = Endpoint.CHATCHANNEL_ID + Endpoint.MESSAGE + Endpoint.MESSAGE_ID
+                    + Endpoint.ATTACHMENT + Endpoint.ATTACHMENT_ID + Endpoint.DELETE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public ResponseEntity<?> removeAttachment(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable("id") final Integer botSchemeId,
+            @PathVariable("chatchannel_id") final Long channelId,
+            @PathVariable("message_id") final long messageId,
+            @PathVariable("attachment_id") final long attachmentId
+    ) {
+        return new ResponseEntity<>(
+                broadcastMessageService.removeBroadcastMessageAttachment(
+                        authToken,
+                        botSchemeId,
+                        channelId,
+                        messageId,
+                        attachmentId
+                ),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping(
+            path = Endpoint.CHATCHANNEL_ID + Endpoint.MESSAGE + Endpoint.MESSAGE_ID
+                    + Endpoint.ATTACHMENT + Endpoint.LIST,
+            consumes = MediaType.ALL_VALUE
+    )
+    public ResponseEntity<?> getAttachments(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable("id") final Integer botSchemeId,
+            @PathVariable("chatchannel_id") final Long channelId,
+            @PathVariable("message_id") final long messageId
+    ) {
+        return new ResponseEntity<>(
+                broadcastMessageService.getBroadcastMessageAttachments(
+                        authToken,
+                        botSchemeId,
+                        channelId,
+                        messageId
                 ),
                 HttpStatus.OK
         );

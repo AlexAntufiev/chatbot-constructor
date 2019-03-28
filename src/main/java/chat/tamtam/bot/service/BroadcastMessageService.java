@@ -19,6 +19,7 @@ import chat.tamtam.bot.domain.broadcast.message.action.DiscardedEraseByUserState
 import chat.tamtam.bot.domain.broadcast.message.action.ScheduledStateAction;
 import chat.tamtam.bot.domain.broadcast.message.action.SentStateAction;
 import chat.tamtam.bot.domain.broadcast.message.attachment.BroadcastMessageAttachment;
+import chat.tamtam.bot.domain.broadcast.message.attachment.BroadcastMessageAttachmentUpdate;
 import chat.tamtam.bot.domain.chatchannel.ChatChannelEntity;
 import chat.tamtam.bot.domain.exception.BroadcastMessageIllegalStateException;
 import chat.tamtam.bot.domain.exception.CreateBroadcastMessageException;
@@ -282,7 +283,7 @@ public class BroadcastMessageService {
             final int botSchemeId,
             final long chatChannelId,
             final long broadcastMessageId,
-            final BroadcastMessageAttachment broadcastMessageAttachment
+            final BroadcastMessageAttachmentUpdate broadcastMessageAttachmentUpdate
     ) {
         BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
@@ -300,8 +301,83 @@ public class BroadcastMessageService {
                         Error.BROADCAST_MESSAGE_ILLEGAL_STATE
                 );
             }
-            broadcastMessageAttachment.setBroadcastMessageId(broadcastMessage.getId());
-            return new SuccessResponse();
+            BroadcastMessageAttachment attachment = new BroadcastMessageAttachment(
+                    broadcastMessageAttachmentUpdate.getType(),
+                    broadcastMessageAttachmentUpdate.getToken(),
+                    broadcastMessage.getId()
+            );
+            return new SuccessResponseWrapper<>(
+                    broadcastMessageAttachmentRepository.save(attachment)
+            );
         });
+    }
+
+    public SuccessResponse removeBroadcastMessageAttachment(
+            final String authToken,
+            final int botSchemeId,
+            final long chatChannelId,
+            final long broadcastMessageId,
+            final long attachmentId
+    ) {
+        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
+        transactionalUtils.invokeRunnable(() -> {
+            BroadcastMessageEntity broadcastMessage =
+                    getBroadcastMessage(botScheme, tamBot, chatChannelId, broadcastMessageId);
+            BroadcastMessageState state = BroadcastMessageState.getById(broadcastMessage.getState());
+            if (!BroadcastMessageState.isAttachmentUpdatable(state)) {
+                throw new UpdateBroadcastMessageException(
+                        String.format(
+                                "Can't remove attachment with id=%d "
+                                        + "because broadcast message with id=%d is in state=%s",
+                                attachmentId,
+                                broadcastMessageId,
+                                state.name()
+                        ),
+                        Error.BROADCAST_MESSAGE_ILLEGAL_STATE
+                );
+            }
+            BroadcastMessageAttachment attachment = getAttachment(attachmentId, broadcastMessage.getId());
+            attachment.setBroadcastMessageId(null);
+            broadcastMessageAttachmentRepository.save(attachment);
+        });
+        return new SuccessResponse();
+    }
+
+    private BroadcastMessageAttachment getAttachment(
+            final long attachmentId,
+            final long messageId
+    ) {
+        return broadcastMessageAttachmentRepository
+                .findById(attachmentId)
+                .filter(o -> {
+                    if (o.getBroadcastMessageId() == null) {
+                        return false;
+                    }
+                    return o.getBroadcastMessageId() == messageId;
+                })
+                .orElseThrow(() -> new NotFoundEntityException(
+                        String.format(
+                                "Can't find broadcast message attachment with id=%d and messageId=%d",
+                                attachmentId,
+                                messageId
+                        ),
+                        Error.ATTACHMENT_DOES_NOT_EXIST
+                ));
+    }
+
+    public SuccessResponse getBroadcastMessageAttachments(
+            final String authToken,
+            final int botSchemeId,
+            final long chatChannelId,
+            final long broadcastMessageId
+    ) {
+        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
+        BroadcastMessageEntity broadcastMessage =
+                getBroadcastMessage(botScheme, tamBot, chatChannelId, broadcastMessageId);
+        return new SuccessResponseWrapper<>(
+                broadcastMessageAttachmentRepository.findAllByBroadcastMessageId(broadcastMessageId)
+        );
     }
 }
