@@ -11,8 +11,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
@@ -22,6 +20,7 @@ import chat.tamtam.bot.repository.BotSchemaRepository;
 import chat.tamtam.bot.repository.BroadcastMessageRepository;
 import chat.tamtam.bot.repository.TamBotRepository;
 import chat.tamtam.bot.service.Error;
+import chat.tamtam.bot.service.TransactionalUtils;
 import chat.tamtam.botapi.TamTamBotAPI;
 import chat.tamtam.botapi.exceptions.APIException;
 import chat.tamtam.botapi.exceptions.ClientException;
@@ -37,10 +36,11 @@ public class BroadcastMessageScheduler {
     private static final long DEFAULT_SENDING_RATE = 10_000L;
     private static final long DEFAULT_ERASING_RATE = 10_000L;
 
-
     private final BroadcastMessageRepository broadcastMessageRepository;
     private final BotSchemaRepository botSchemaRepository;
     private final TamBotRepository tamBotRepository;
+
+    private final TransactionalUtils transactionalUtils;
 
     private final Executor executor;
     @Value("${tamtam.broadcast.executor.corePoolSize:1}")
@@ -64,7 +64,9 @@ public class BroadcastMessageScheduler {
                                 TamTamBotAPI tamTamBotAPI = getTamTamBotAPI(e, botScheme);
                                 if (tamTamBotAPI != null) {
                                     try {
-                                        setProcessingStateAttempt(e, BroadcastMessageState.SCHEDULED);
+                                        transactionalUtils.invokeRunnable(
+                                                () -> setProcessingStateAttempt(e, BroadcastMessageState.SCHEDULED)
+                                        );
                                         executor.execute(() -> sendBroadcastMessage(tamTamBotAPI, e));
                                     } catch (IllegalStateException iSE) {
                                         log.error(String.format(
@@ -78,20 +80,17 @@ public class BroadcastMessageScheduler {
                                     broadcastMessageRepository.save(e);
                                 }
                             },
-                            () -> {
-                                log.error(
-                                        String.format(
-                                                "Can't send message with id=%d because botScheme is not presented",
-                                                e.getBotSchemeId()
-                                        ));
-                            }
+                            () -> log.error(
+                                    String.format(
+                                            "Can't send message with id=%d because botScheme is not presented",
+                                            e.getBotSchemeId()
+                                    )
+                            )
                     );
 
         });
     }
 
-    // @todo #CC-90 fix @Transactional methods
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
     protected void setProcessingStateAttempt(
             final BroadcastMessageEntity broadcastMessage,
             final BroadcastMessageState requiredState
@@ -126,7 +125,9 @@ public class BroadcastMessageScheduler {
                                 TamTamBotAPI tamTamBotAPI = getTamTamBotAPI(e, botScheme);
                                 if (tamTamBotAPI != null) {
                                     try {
-                                        setProcessingStateAttempt(e, BroadcastMessageState.SENT);
+                                        transactionalUtils.invokeRunnable(
+                                                () -> setProcessingStateAttempt(e, BroadcastMessageState.SENT)
+                                        );
                                         executor.execute(() -> eraseBroadcastMessage(tamTamBotAPI, e));
                                     } catch (IllegalStateException iSE) {
                                         log.error(String.format(
@@ -140,13 +141,12 @@ public class BroadcastMessageScheduler {
                                     broadcastMessageRepository.save(e);
                                 }
                             },
-                            () -> {
-                                log.error(
-                                        String.format(
-                                                "Can't erase message with id=%d because botScheme is not presented",
-                                                e.getBotSchemeId()
-                                        ));
-                            }
+                            () -> log.error(
+                                    String.format(
+                                            "Can't erase message with id=%d because botScheme is not presented",
+                                            e.getBotSchemeId()
+                                    )
+                            )
                     );
 
         });
