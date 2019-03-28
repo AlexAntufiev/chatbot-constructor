@@ -179,7 +179,6 @@ public class BroadcastMessageScheduler {
             final BroadcastMessageEntity broadcastMessage
     ) {
         try {
-            // @todo #CC-63 Replace editMessage method with removeMessage method when it become available
             tamTamBotAPI
                     .deleteMessage(broadcastMessage.getMessageId())
                     .execute();
