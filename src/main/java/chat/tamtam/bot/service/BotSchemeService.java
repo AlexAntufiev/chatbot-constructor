@@ -23,9 +23,9 @@ public class BotSchemeService {
     private final @NonNull TamBotRepository tamBotRepository;
 
     private final @NonNull UserService userService;
-  
+
     private final @NonNull TransactionalUtils transactionalUtils;
-  
+
     @Loggable
     public BotSchemeEntity addBot(final BotSchemeEntity bot, Long userId) throws IllegalArgumentException {
         if (bot.getName().isEmpty() || bot.getId() != null) {
@@ -67,7 +67,7 @@ public class BotSchemeService {
         }
         botSchemaRepository.deleteByUserIdAndId(userId, id);
     }
-  
+
     @Loggable
     public SuccessResponse deleteBot(
             final String authToken,
@@ -86,6 +86,7 @@ public class BotSchemeService {
             botSchemaRepository.deleteByUserIdAndId(botScheme.getUserId(), botScheme.getId());
         });
         return new SuccessResponse();
+    }
 
     @Loggable
     public SuccessResponseWrapper<List<BotSchemeEntity>> getList(final Long userId) {

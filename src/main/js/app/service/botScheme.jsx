@@ -35,5 +35,5 @@ export function getList(callbackSuccess, callbackFail, context) {
 
 export function removeBot(botSchemeId, callbackSuccess, callbackFail, context) {
     const url = makeUrl(ApiPoints.DELETE_BOT, {id: botSchemeId});
-    handleRequest(axios.post(url, null), callbackSuccess, callbackFail, context);
+    handleRequest(axios.post(url), callbackSuccess, callbackFail, context);
 }
