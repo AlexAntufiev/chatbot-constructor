@@ -27,6 +27,9 @@ public interface Endpoint {
     String MESSAGE = "/message";
     String MESSAGE_ID = "/{message_id}";
 
+    String ATTACHMENT = "/attachment";
+    String ATTACHMENT_ID = "/{attachment_id}";
+
     String STATIC_INDEX = "/index.html";
     String STATIC_RESOURCES = "/assets/**";
 
