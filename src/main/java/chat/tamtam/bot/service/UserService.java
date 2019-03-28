@@ -3,6 +3,7 @@ package chat.tamtam.bot.service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.domain.user.UserAuthEntity;
 import chat.tamtam.bot.domain.user.UserEntity;
 import chat.tamtam.bot.repository.SessionRepository;
@@ -16,6 +17,7 @@ public class UserService {
     private final SessionRepository sessionRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Loggable
     public boolean addUser(final UserAuthEntity userAuthEntity) {
         String login = userAuthEntity.getLogin();
         if (!userRepository.findUserEntitiesByLogin(login).isEmpty()) {
@@ -31,6 +33,7 @@ public class UserService {
         return true;
     }
 
+    @Loggable
     public long getUserIdByToken(final String token) {
         return sessionRepository.findByToken(token).getUserId();
     }
