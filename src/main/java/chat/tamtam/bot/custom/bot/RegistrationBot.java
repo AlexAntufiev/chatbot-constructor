@@ -107,7 +107,7 @@ public class RegistrationBot extends AbstractCustomBot {
 
     private NewMessageBody resolve(final Message message) {
         String[] cmd = Optional
-                .ofNullable(message.getMessage().getText())
+                .ofNullable(message.getBody().getText())
                 .orElseGet(() -> "")
                 .split(" ");
         switch (cmd[0]) {

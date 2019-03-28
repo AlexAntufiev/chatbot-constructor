@@ -12,6 +12,7 @@ public enum Error {
     TAM_BOT_SUBSCRIBED_ALREADY("errors.tam.bot.subscribed.already"),
     TAM_BOT_UNSUBSCRIBED_ALREADY("errors.tam.bot.unsubscribed.already"),
     TAM_BOT_NOT_SUBSCRIBED("errors.tam.bot.not.subscribed"),
+    TAM_BOT_CONNECTED_TO_OTHER_BOT_SCHEME("errors.tam.bot.connected.to.other.bot.scheme"),
 
     CHATCHANNEL_SELECTED_EMPTY("errors.chatChannel.selected.empty"),
     CHATCHANNEL_PERMISSIONS_ERROR("errors.chatChannel.permission"),
