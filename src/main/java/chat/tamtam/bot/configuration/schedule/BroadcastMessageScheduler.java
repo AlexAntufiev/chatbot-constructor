@@ -1,7 +1,6 @@
 package chat.tamtam.bot.configuration.schedule;
 
 import java.sql.Timestamp;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -164,7 +163,7 @@ public class BroadcastMessageScheduler {
                             .sendMessage(new NewMessageBody(broadcastMessage.getText(), null))
                             .chatId(broadcastMessage.getChatChannelId())
                             .execute();
-            broadcastMessage.setMessageId(sendMessageResult.getMessageId());
+            broadcastMessage.setMessageId(sendMessageResult.getMessage().getBody().getMid());
             broadcastMessage.setState(BroadcastMessageState.SENT);
         } catch (APIException | ClientException ex) {
             log.error(String.format("Can't send scheduled message with id=%d", broadcastMessage.getId()), ex);
@@ -182,10 +181,8 @@ public class BroadcastMessageScheduler {
         try {
             // @todo #CC-63 Replace editMessage method with removeMessage method when it become available
             tamTamBotAPI
-                    .editMessage(
-                            new NewMessageBody(".", Collections.emptyList()),
-                            broadcastMessage.getMessageId()
-                    ).execute();
+                    .deleteMessage(broadcastMessage.getMessageId())
+                    .execute();
             broadcastMessage.setState(BroadcastMessageState.ERASED_BY_SCHEDULE);
         } catch (APIException | ClientException ex) {
             log.error(String.format("Can't erase scheduled message with id=%d", broadcastMessage.getId()), ex);
