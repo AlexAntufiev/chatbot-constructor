@@ -18,6 +18,7 @@ import chat.tamtam.bot.domain.broadcast.message.action.CreatedStateAction;
 import chat.tamtam.bot.domain.broadcast.message.action.DiscardedEraseByUserStateAction;
 import chat.tamtam.bot.domain.broadcast.message.action.ScheduledStateAction;
 import chat.tamtam.bot.domain.broadcast.message.action.SentStateAction;
+import chat.tamtam.bot.domain.broadcast.message.attachment.BroadcastMessageAttachment;
 import chat.tamtam.bot.domain.chatchannel.ChatChannelEntity;
 import chat.tamtam.bot.domain.exception.BroadcastMessageIllegalStateException;
 import chat.tamtam.bot.domain.exception.CreateBroadcastMessageException;
@@ -25,6 +26,7 @@ import chat.tamtam.bot.domain.exception.NotFoundEntityException;
 import chat.tamtam.bot.domain.exception.UpdateBroadcastMessageException;
 import chat.tamtam.bot.domain.response.SuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
+import chat.tamtam.bot.repository.BroadcastMessageAttachmentRepository;
 import chat.tamtam.bot.repository.BroadcastMessageRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 public class BroadcastMessageService {
     private static final String ZONED_DATE_TIME_PATTERN = "EEE MMM dd uuuu HH:mm:ss 'GMT'x";
     private final BroadcastMessageRepository broadcastMessageRepository;
+    private final BroadcastMessageAttachmentRepository broadcastMessageAttachmentRepository;
     private final BotSchemeService botSchemeService;
     private final TamBotService tamBotService;
     private final ChatChannelService chatChannelService;
@@ -272,5 +275,33 @@ public class BroadcastMessageService {
         broadcastMessage.setState(BroadcastMessageState.CREATED);
 
         return new SuccessResponseWrapper<>(broadcastMessageRepository.save(broadcastMessage));
+    }
+
+    public SuccessResponse addBroadcastMessageAttachment(
+            final String authToken,
+            final int botSchemeId,
+            final long chatChannelId,
+            final long broadcastMessageId,
+            final BroadcastMessageAttachment broadcastMessageAttachment
+    ) {
+        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
+        return (SuccessResponse) transactionalUtils.invokeCallable(() -> {
+            BroadcastMessageEntity broadcastMessage =
+                    getBroadcastMessage(botScheme, tamBot, chatChannelId, broadcastMessageId);
+            BroadcastMessageState state = BroadcastMessageState.getById(broadcastMessage.getState());
+            if (!BroadcastMessageState.isAttachmentUpdatable(state)) {
+                throw new UpdateBroadcastMessageException(
+                        String.format(
+                                "Can't update broadcast message(id=%d) attachments because it is in state=%s",
+                                broadcastMessageId,
+                                state.name()
+                        ),
+                        Error.BROADCAST_MESSAGE_ILLEGAL_STATE
+                );
+            }
+            broadcastMessageAttachment.setBroadcastMessageId(broadcastMessage.getId());
+            return new SuccessResponse();
+        });
     }
 }
