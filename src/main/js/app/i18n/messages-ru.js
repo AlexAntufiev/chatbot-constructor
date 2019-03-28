@@ -79,6 +79,7 @@ export default {
     'errors.attachment.type.is.empty': 'Укажите тип приложения',
     'errors.attachment.type.is.illegal': 'Тип приложения не поддерживается',
     'errors.attachment.upload.service.error': 'Ошибка сервиса загрузки',
+    'errors.attachment.does.not.exist': 'Приложение не существует',
 
     //Success messages
     'app.successmessage.successsumary': 'Успешно',

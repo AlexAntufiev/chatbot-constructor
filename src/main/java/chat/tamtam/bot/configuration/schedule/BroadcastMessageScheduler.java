@@ -20,6 +20,7 @@ import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.repository.BotSchemaRepository;
+import chat.tamtam.bot.repository.BroadcastMessageAttachmentRepository;
 import chat.tamtam.bot.repository.BroadcastMessageRepository;
 import chat.tamtam.bot.repository.TamBotRepository;
 import chat.tamtam.bot.service.Error;
@@ -42,6 +43,7 @@ public class BroadcastMessageScheduler {
     private final BroadcastMessageRepository broadcastMessageRepository;
     private final BotSchemaRepository botSchemaRepository;
     private final TamBotRepository tamBotRepository;
+    private final BroadcastMessageAttachmentRepository broadcastMessageAttachmentRepositor;
 
     private final Executor executor;
     @Value("${tamtam.broadcast.executor.corePoolSize:1}")

@@ -79,7 +79,8 @@ export default {
     'errors.attachment.type.is.empty': 'Provide correct attachment type',
     'errors.attachment.type.is.illegal': 'Attachment type is illegal',
     'errors.attachment.upload.service.error': 'Upload service error',
-    
+    'errors.attachment.does.not.exist': 'Attachment does not exist',
+
     //Success messages
     'app.successmessage.successsumary': 'Success',
     'app.successmessage.successoperaton': 'Success operation',
