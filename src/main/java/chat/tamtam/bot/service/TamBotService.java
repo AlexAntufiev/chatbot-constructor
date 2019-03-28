@@ -117,6 +117,15 @@ public class TamBotService {
         TamTamBotAPI tamTamBotAPI = TamTamBotAPI.create(botToken);
         try {
             TamBotEntity tamBot = fetchTamBotInfo(tamTamBotAPI, bot.getUserId(), botToken);
+            if (tamBotRepository.existsByIdBotId(tamBot.getId().getBotId())) {
+                throw new ChatBotConstructorException(
+                        String.format(
+                                "Tam bot with botId=%d already connected to other bot scheme",
+                                tamBot.getId().getBotId()
+                        ),
+                        Error.TAM_BOT_CONNECTED_TO_OTHER_BOT_SCHEME
+                );
+            }
             SimpleQueryResult result = tamTamBotAPI
                     .subscribe(
                             new SubscriptionRequestBody(host + Endpoint.TAM_BOT + "/" + bot.getId())
@@ -178,12 +187,12 @@ public class TamBotService {
                     .unsubscribe(host + Endpoint.TAM_BOT + "/" + bot.getId())
                     .execute();
             if (result.isSuccess()) {
-                bot.setBotId(null);
                 transactionalUtils
                         .invokeRunnable(() -> {
                             tamBotRepository.deleteById(new TamBotEntity.Id(bot.getBotId(), bot.getUserId()));
                             botSchemaRepository.save(bot);
                         });
+                bot.setBotId(null);
                 return new SuccessResponseWrapper<>(tamBot);
             } else {
                 throw new ChatBotConstructorException(

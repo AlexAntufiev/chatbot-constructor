@@ -11,6 +11,8 @@ import chat.tamtam.bot.domain.bot.TamBotEntity;
 public interface TamBotRepository extends CrudRepository<TamBotEntity, Integer> {
     TamBotEntity findById(TamBotEntity.Id id);
 
+    boolean existsByIdBotId(long botId);
+
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
     void deleteById(TamBotEntity.Id id);
 }
