@@ -90,7 +90,7 @@ public class BroadcastMessageScheduler {
         });
     }
 
-    // @todo CC-90 fix @Transactional methods
+    // @todo #CC-90 fix @Transactional methods
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
     protected void setProcessingStateAttempt(
             final BroadcastMessageEntity broadcastMessage,
