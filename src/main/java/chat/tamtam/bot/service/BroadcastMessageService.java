@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
@@ -46,6 +47,7 @@ public class BroadcastMessageService {
     private final ScheduledStateAction scheduledStateAction;
     private final SentStateAction sentStateAction;
 
+    @Loggable
     public BroadcastMessageEntity getBroadcastMessage(
             final BotSchemeEntity botScheme,
             final TamBotEntity tamBot,
@@ -79,6 +81,7 @@ public class BroadcastMessageService {
         return broadcastMessage;
     }
 
+    @Loggable
     public SuccessResponse getBroadcastMessage(
             final String authToken,
             int botSchemeId,
@@ -96,6 +99,7 @@ public class BroadcastMessageService {
         return new SuccessResponseWrapper<>(broadcastMessage);
     }
 
+    @Loggable
     public SuccessResponse getBroadcastMessages(
             final String authToken,
             int botSchemeId,
@@ -115,6 +119,7 @@ public class BroadcastMessageService {
         return new SuccessResponseWrapper<>(broadcastMessages);
     }
 
+    @Loggable
     public SuccessResponse removeBroadcastMessage(
             final String authToken,
             int botSchemeId,
@@ -160,6 +165,7 @@ public class BroadcastMessageService {
         }
     }
 
+    @Loggable
     public SuccessResponse updateBroadcastMessage(
             final String authToken,
             int botSchemeId,
@@ -242,6 +248,7 @@ public class BroadcastMessageService {
         return broadcastMessage;
     }
 
+    @Loggable
     public SuccessResponse addBroadcastMessage(
             final String authToken,
             int botSchemeId,
