@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.controller.Endpoint;
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
@@ -65,12 +66,14 @@ public class TamBotService {
         return new TamBotEntity(userId, token, userWithPhoto);
     }
 
+    @Loggable
     public TamBotEntity status(final String authToken, final int botSchemeId) {
         long userId = userService.getUserIdByToken(authToken);
         BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         return getTamBot(botScheme.getBotId(), userId);
     }
 
+    @Loggable
     public TamBotEntity getTamBot(final BotSchemeEntity botScheme) {
         if (botScheme.getBotId() == null) {
             throw new ChatBotConstructorException(
@@ -92,6 +95,7 @@ public class TamBotService {
         return tamBot;
     }
 
+    @Loggable
     public SuccessResponse connect(final String authToken, int id, final String botToken) {
         if (StringUtils.isEmpty(botToken)) {
             throw new ChatBotConstructorException(
@@ -155,6 +159,7 @@ public class TamBotService {
         }
     }
 
+    @Loggable
     public SuccessResponse disconnect(final String authToken, int id) {
         BotSchemeEntity bot = botSchemeService.getBotScheme(authToken, id);
         if (bot.getBotId() == null) {
