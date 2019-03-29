@@ -137,7 +137,9 @@ class ChannelList extends React.Component {
                     {userChannels}
                 </div>
                 <Button label={intl.formatMessage({id: 'app.dialog.refresh'})} disabled={this.state.ajaxRefreshProcess}
-                        className="channel-list_refresh-button" icon="pi pi-refresh" onClick={this.refreshChannels}/>
+                        className={"channel-list_refresh-button"}
+                        icon={"pi pi-refresh" + (this.state.ajaxRefreshProcess ? " pi-spin" : "")}
+                        onClick={this.refreshChannels}/>
                 <div className={"p-grid p-align-start"}>
                     {availableChannels}
                 </div>
