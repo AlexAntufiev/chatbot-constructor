@@ -27,3 +27,4 @@ package-lock.json
 lombok.config
 .DS_Store
 chatbot-constructor.pid
+chatbot-constructor.jar
