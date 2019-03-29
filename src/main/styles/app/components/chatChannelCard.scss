@@ -41,6 +41,7 @@
   text-overflow: ellipsis;
   overflow: hidden;
   text-align: center;
+  max-width: 176px;
 }
 
 .channel-list-element .p-card-content {
@@ -53,6 +54,8 @@
   display: flex;
   align-items: flex-start;
   width: 370px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .channel-list-element_overlay-panel .p-overlaypanel-content .image-container{
