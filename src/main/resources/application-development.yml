@@ -18,9 +18,3 @@ logging:
     chat:
       tamtam:
         bot: DEBUG
-  
-tamtam:
-  registration:
-    bot:
-      onlyTrustedUsers: true
-      trustedUsers: 555537636725, 590435433004, 575868018573, 577949140156
