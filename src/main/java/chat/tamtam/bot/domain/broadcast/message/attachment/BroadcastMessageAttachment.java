@@ -86,6 +86,19 @@ public class BroadcastMessageAttachment {
         this.title = title;
     }
 
+    public UploadType getUploadType() {
+        UploadType uploadType = BYTE_TO_TYPE.get(type);
+        if (uploadType == null) {
+            throw new IllegalStateException(
+                    String.format(
+                            "No type matches to id=",
+                            id
+                    )
+            );
+        }
+        return uploadType;
+    }
+
     private static @NotNull UploadType getUploadType(final String type) {
         try {
             return UploadType.create(type);
@@ -143,18 +156,5 @@ public class BroadcastMessageAttachment {
             BYTE_TO_TYPE.put(typeNumber, type);
             typeNumber++;
         }
-    }
-
-    public UploadType getUploadType() {
-        UploadType uploadType = BYTE_TO_TYPE.get(type);
-        if (uploadType == null) {
-            throw new IllegalStateException(
-                    String.format(
-                            "No type matches to id=",
-                            id
-                    )
-            );
-        }
-        return uploadType;
     }
 }
