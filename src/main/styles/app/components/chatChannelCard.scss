@@ -3,7 +3,6 @@
   margin: 10px;
   flex-grow: 0;
   position: relative;
-  max-width: 200px;
 }
 
 .channel-list-element .full-info {
@@ -21,6 +20,8 @@
 
 .channel-list-element .channel-list-element_link {
   display: block;
+  word-break: break-word;
+  text-overflow: ellipsis;
 }
 
 .channel-list-element .p-card-body {
@@ -35,6 +36,7 @@
   text-overflow: ellipsis;
   overflow: hidden;
   max-height: 40px;
+  word-break: break-word;
 }
 
 .channel-list-element .p-card-header {
@@ -75,8 +77,10 @@
   margin-bottom: 6px;
   margin-top: 6px;
   text-align: left;
+  word-break: break-word;
 }
 
 .channel-list-element_overlay-panel .channel-list-element_overlay-panel_title {
   font-weight: bold;
+  word-break: break-word;
 }
