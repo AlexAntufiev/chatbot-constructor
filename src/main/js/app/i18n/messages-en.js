@@ -57,6 +57,7 @@ export default {
     'errors.tam.bot.subscribed.already': 'Bot is already subscribed',
     'errors.tam.bot.unsubscribed.already': 'Bot is already unsubscribed',
     'errors.tam.bot.not.subscribed': 'Bot not subscribed',
+    'errors.tam.bot.connected.to.other.bot.scheme': 'Bot already connected to other scheme',
     'errors.chatChannel.selected.empty': 'Provided channel id is empty',
     'errors.chatChannel.permission': 'Bot not an administrator of the channel',
     'errors.chatChannel.does.not.exist': 'This channel does not exist',
@@ -79,7 +80,9 @@ export default {
     'errors.attachment.type.is.empty': 'Provide correct attachment type',
     'errors.attachment.type.is.illegal': 'Attachment type is illegal',
     'errors.attachment.upload.service.error': 'Upload service error',
-    
+    'errors.attachment.does.not.exist': 'Attachment does not exist',
+    'errors.attachment.token.is.not.valid': 'Attachment identifier is not valid',
+
     //Success messages
     'app.successmessage.successsumary': 'Success',
     'app.successmessage.successoperaton': 'Success operation',

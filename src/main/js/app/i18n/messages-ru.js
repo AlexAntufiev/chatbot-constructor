@@ -57,6 +57,7 @@ export default {
     'errors.tam.bot.subscribed.already': 'Бот уже подключен',
     'errors.tam.bot.unsubscribed.already': 'Бот уже отключен',
     'errors.tam.bot.not.subscribed': "Бот не подключен",
+    'errors.tam.bot.connected.to.other.bot.scheme': 'Бот уже подключен к другой схеме',
     'errors.chatChannel.selected.empty': 'Id канала не указан',
     'errors.chatChannel.permission': 'Бот не является администратором канала',
     'errors.chatChannel.does.not.exist': 'Канал не существует',
@@ -79,6 +80,8 @@ export default {
     'errors.attachment.type.is.empty': 'Укажите тип приложения',
     'errors.attachment.type.is.illegal': 'Тип приложения не поддерживается',
     'errors.attachment.upload.service.error': 'Ошибка сервиса загрузки',
+    'errors.attachment.does.not.exist': 'Приложение не существует',
+    'errors.attachment.token.is.not.valid': 'Неверный идентификатор приложения',
 
     //Success messages
     'app.successmessage.successsumary': 'Успешно',

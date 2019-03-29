@@ -6,7 +6,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,22 +56,15 @@ public class BotSchemeController {
         }
     }
 
-    @DeleteMapping(Endpoint.DELETE)
+    @PostMapping(path = Endpoint.ID + Endpoint.DELETE, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> deleteBot(
-            @RequestBody final BotSchemeEntity bot,
-            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable("id") final int botSchemeId
     ) {
-        if (bot.getId() != null) {
-            try {
-                botSchemeService.deleteByUserIdAndId(userService.getUserIdByToken(authToken), bot.getId());
-                return new ResponseEntity<>(HttpStatus.OK);
-            } catch (NoSuchElementException e) {
-                log.error("deleteBot {}", e.getMessage());
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-        }
-        log.error("invalid deleteBot request {}", bot);
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(
+                botSchemeService.deleteBot(authToken, botSchemeId),
+                HttpStatus.OK
+        );
     }
 
     @PostMapping(Endpoint.ID + Endpoint.SAVE)
