@@ -60,7 +60,6 @@ public class ChatChannelService {
                         .execute();
                 marker = chatList.getMarker();
                 chatList.getChats().forEach(chat -> {
-                    // @todo #CC-63 enable ownerId check when it will be available
                     if (chat.getOwnerId() != null
                             && chat.getStatus() == ChatStatus.ACTIVE
                             && chat.getType() == ChatType.CHANNEL) {
