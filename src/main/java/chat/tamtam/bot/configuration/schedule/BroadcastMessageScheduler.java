@@ -18,7 +18,6 @@ import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
-import chat.tamtam.bot.domain.broadcast.message.attachment.BroadcastMessageAttachment;
 import chat.tamtam.bot.repository.BotSchemaRepository;
 import chat.tamtam.bot.repository.BroadcastMessageAttachmentRepository;
 import chat.tamtam.bot.repository.BroadcastMessageRepository;
@@ -172,53 +171,52 @@ public class BroadcastMessageScheduler {
             final BroadcastMessageEntity broadcastMessage
     ) {
         try {
-            Iterable<BroadcastMessageAttachment> attachments =
-                    broadcastMessageAttachmentRepository
-                            .findAllByBroadcastMessageId(broadcastMessage.getId());
-
             List<AttachmentRequest> attachmentRequests = new ArrayList<>();
 
-            attachments.iterator().forEachRemaining(attachment -> {
-                AttachmentRequest attachmentRequest = null;
+            broadcastMessageAttachmentRepository
+                    .findAllByBroadcastMessageId(broadcastMessage.getId())
+                    .iterator()
+                    .forEachRemaining(attachment -> {
+                        AttachmentRequest attachmentRequest = null;
 
-                UploadType uploadType = attachment.getUploadType();
+                        UploadType uploadType = attachment.getUploadType();
 
-                switch (uploadType) {
-                    case PHOTO:
-                        attachmentRequest =
-                                new PhotoAttachmentRequest(
-                                        new PhotoAttachmentRequestPayload().token(
-                                                new String(attachment.getAttachmentIdentifier())
-                                        )
-                                );
-                        break;
-                    case FILE:
-                        attachmentRequest =
-                                new FileAttachmentRequest(
-                                        new UploadedFileInfo(
-                                                ByteBuffer.wrap(attachment.getAttachmentIdentifier()).getLong()
-                                        )
-                                );
-                        break;
-                    case AUDIO:
-                        attachmentRequest =
-                                new AudioAttachmentRequest(
-                                        new UploadedInfo(
-                                                ByteBuffer.wrap(attachment.getAttachmentIdentifier()).getLong()
-                                        )
-                                );
-                        break;
-                    case VIDEO:
-                        attachmentRequest =
-                                new VideoAttachmentRequest(
-                                        new UploadedInfo(
-                                                ByteBuffer.wrap(attachment.getAttachmentIdentifier()).getLong()
-                                        )
-                                );
-                        break;
-                }
+                        switch (uploadType) {
+                            case PHOTO:
+                                attachmentRequest =
+                                        new PhotoAttachmentRequest(
+                                                new PhotoAttachmentRequestPayload().token(
+                                                        new String(attachment.getAttachmentIdentifier())
+                                                )
+                                        );
+                                break;
+                            case FILE:
+                                attachmentRequest =
+                                        new FileAttachmentRequest(
+                                                new UploadedFileInfo(
+                                                        ByteBuffer.wrap(attachment.getAttachmentIdentifier()).getLong()
+                                                )
+                                        );
+                                break;
+                            case AUDIO:
+                                attachmentRequest =
+                                        new AudioAttachmentRequest(
+                                                new UploadedInfo(
+                                                        ByteBuffer.wrap(attachment.getAttachmentIdentifier()).getLong()
+                                                )
+                                        );
+                                break;
+                            case VIDEO:
+                                attachmentRequest =
+                                        new VideoAttachmentRequest(
+                                                new UploadedInfo(
+                                                        ByteBuffer.wrap(attachment.getAttachmentIdentifier()).getLong()
+                                                )
+                                        );
+                                break;
+                        }
 
-                attachmentRequests.add(attachmentRequest);
+                        attachmentRequests.add(attachmentRequest);
             });
 
             SendMessageResult sendMessageResult =
