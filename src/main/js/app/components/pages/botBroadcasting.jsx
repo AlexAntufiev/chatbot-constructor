@@ -1,14 +1,13 @@
 import React, {Component} from 'react';
 import {Growl} from "primereact/growl";
 import {Button} from "primereact/button";
-import {Card} from "primereact/card";
 import {withRouter} from "react-router";
 import {connect} from "react-redux";
 import {injectIntl} from "react-intl";
 import * as routes from 'app/constants/routes';
 import makeUrl from 'app/utils/makeUrl';
 import * as ChatChannelService from 'app/service/chatChannel';
-import ChatChannelCard from "../chatChannelCard";
+import ChatChannelCard from "app/components/chatChannelCard";
 
 class BotBroadcasting extends Component {
     constructor(props) {
@@ -27,13 +26,13 @@ class BotBroadcasting extends Component {
         ChatChannelService.getChannels(this.props.match.params.id, (res) => {
             let chatChannels = [];
             res.data.payload.forEach((chatChannel) => {
-               chatChannels.push({
-                   chat_id: chatChannel.id.chatId,
-                   title: chatChannel.title,
-                   description: chatChannel.description,
-                   icon: chatChannel.iconUrl,
-                   link: chatChannel.link
-               });
+                chatChannels.push({
+                    chat_id: chatChannel.id.chatId,
+                    title: chatChannel.title,
+                    description: chatChannel.description,
+                    icon: chatChannel.iconUrl,
+                    link: chatChannel.link
+                });
             });
             self.setState({chatChannels: chatChannels});
         }, null, this);
