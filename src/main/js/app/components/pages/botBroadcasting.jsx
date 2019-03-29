@@ -53,7 +53,7 @@ class BotBroadcasting extends Component {
 
             const footer = (
                 <Button label={intl.formatMessage({id: 'app.bot.edit'})} icon="pi pi-pencil"
-                        className={"p-col"} onClick={() => this.onChannelClick(channel.chat_id)}/>
+                        onClick={() => this.onChannelClick(channel.chat_id)}/>
             );
 
             return (
