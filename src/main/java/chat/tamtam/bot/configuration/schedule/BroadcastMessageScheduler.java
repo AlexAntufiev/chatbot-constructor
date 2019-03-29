@@ -1,7 +1,8 @@
 package chat.tamtam.bot.configuration.schedule;
 
+import java.nio.ByteBuffer;
 import java.sql.Timestamp;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -12,22 +13,31 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.repository.BotSchemaRepository;
+import chat.tamtam.bot.repository.BroadcastMessageAttachmentRepository;
 import chat.tamtam.bot.repository.BroadcastMessageRepository;
 import chat.tamtam.bot.repository.TamBotRepository;
 import chat.tamtam.bot.service.Error;
+import chat.tamtam.bot.service.TransactionalUtils;
 import chat.tamtam.botapi.TamTamBotAPI;
 import chat.tamtam.botapi.exceptions.APIException;
 import chat.tamtam.botapi.exceptions.ClientException;
+import chat.tamtam.botapi.model.AttachmentRequest;
+import chat.tamtam.botapi.model.AudioAttachmentRequest;
+import chat.tamtam.botapi.model.FileAttachmentRequest;
 import chat.tamtam.botapi.model.NewMessageBody;
+import chat.tamtam.botapi.model.PhotoAttachmentRequest;
+import chat.tamtam.botapi.model.PhotoAttachmentRequestPayload;
 import chat.tamtam.botapi.model.SendMessageResult;
+import chat.tamtam.botapi.model.UploadType;
+import chat.tamtam.botapi.model.UploadedFileInfo;
+import chat.tamtam.botapi.model.UploadedInfo;
+import chat.tamtam.botapi.model.VideoAttachmentRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -38,10 +48,12 @@ public class BroadcastMessageScheduler {
     private static final long DEFAULT_SENDING_RATE = 10_000L;
     private static final long DEFAULT_ERASING_RATE = 10_000L;
 
-
     private final BroadcastMessageRepository broadcastMessageRepository;
     private final BotSchemaRepository botSchemaRepository;
     private final TamBotRepository tamBotRepository;
+    private final BroadcastMessageAttachmentRepository broadcastMessageAttachmentRepository;
+
+    private final TransactionalUtils transactionalUtils;
 
     private final Executor executor;
     @Value("${tamtam.broadcast.executor.corePoolSize:1}")
@@ -65,7 +77,9 @@ public class BroadcastMessageScheduler {
                                 TamTamBotAPI tamTamBotAPI = getTamTamBotAPI(e, botScheme);
                                 if (tamTamBotAPI != null) {
                                     try {
-                                        setProcessingStateAttempt(e, BroadcastMessageState.SCHEDULED);
+                                        transactionalUtils.invokeRunnable(
+                                                () -> setProcessingStateAttempt(e, BroadcastMessageState.SCHEDULED)
+                                        );
                                         executor.execute(() -> sendBroadcastMessage(tamTamBotAPI, e));
                                     } catch (IllegalStateException iSE) {
                                         log.error(String.format(
@@ -79,20 +93,17 @@ public class BroadcastMessageScheduler {
                                     broadcastMessageRepository.save(e);
                                 }
                             },
-                            () -> {
-                                log.error(
-                                        String.format(
-                                                "Can't send message with id=%d because botScheme is not presented",
-                                                e.getBotSchemeId()
-                                        ));
-                            }
+                            () -> log.error(
+                                    String.format(
+                                            "Can't send message with id=%d because botScheme is not presented",
+                                            e.getBotSchemeId()
+                                    )
+                            )
                     );
 
         });
     }
 
-    // @todo CC-90 fix @Transactional methods
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
     protected void setProcessingStateAttempt(
             final BroadcastMessageEntity broadcastMessage,
             final BroadcastMessageState requiredState
@@ -127,7 +138,9 @@ public class BroadcastMessageScheduler {
                                 TamTamBotAPI tamTamBotAPI = getTamTamBotAPI(e, botScheme);
                                 if (tamTamBotAPI != null) {
                                     try {
-                                        setProcessingStateAttempt(e, BroadcastMessageState.SENT);
+                                        transactionalUtils.invokeRunnable(
+                                                () -> setProcessingStateAttempt(e, BroadcastMessageState.SENT)
+                                        );
                                         executor.execute(() -> eraseBroadcastMessage(tamTamBotAPI, e));
                                     } catch (IllegalStateException iSE) {
                                         log.error(String.format(
@@ -141,13 +154,12 @@ public class BroadcastMessageScheduler {
                                     broadcastMessageRepository.save(e);
                                 }
                             },
-                            () -> {
-                                log.error(
-                                        String.format(
-                                                "Can't erase message with id=%d because botScheme is not presented",
-                                                e.getBotSchemeId()
-                                        ));
-                            }
+                            () -> log.error(
+                                    String.format(
+                                            "Can't erase message with id=%d because botScheme is not presented",
+                                            e.getBotSchemeId()
+                                    )
+                            )
                     );
 
         });
@@ -159,14 +171,70 @@ public class BroadcastMessageScheduler {
             final BroadcastMessageEntity broadcastMessage
     ) {
         try {
+            List<AttachmentRequest> attachmentRequests = new ArrayList<>();
+
+            broadcastMessageAttachmentRepository
+                    .findAllByBroadcastMessageId(broadcastMessage.getId())
+                    .iterator()
+                    .forEachRemaining(attachment -> {
+                        AttachmentRequest attachmentRequest = null;
+
+                        UploadType uploadType = attachment.getUploadType();
+
+                        switch (uploadType) {
+                            case PHOTO:
+                                attachmentRequest =
+                                        new PhotoAttachmentRequest(
+                                                new PhotoAttachmentRequestPayload().token(
+                                                        new String(attachment.getAttachmentIdentifier())
+                                                )
+                                        );
+                                break;
+                            case FILE:
+                                attachmentRequest =
+                                        new FileAttachmentRequest(
+                                                new UploadedFileInfo(
+                                                        ByteBuffer.wrap(attachment.getAttachmentIdentifier()).getLong()
+                                                )
+                                        );
+                                break;
+                            case AUDIO:
+                                attachmentRequest =
+                                        new AudioAttachmentRequest(
+                                                new UploadedInfo(
+                                                        ByteBuffer.wrap(attachment.getAttachmentIdentifier()).getLong()
+                                                )
+                                        );
+                                break;
+                            case VIDEO:
+                                attachmentRequest =
+                                        new VideoAttachmentRequest(
+                                                new UploadedInfo(
+                                                        ByteBuffer.wrap(attachment.getAttachmentIdentifier()).getLong()
+                                                )
+                                        );
+                                break;
+                            default:
+                                throw new IllegalStateException(
+                                        String.format(
+                                                "Illegal type %s of attachment with id=%d",
+                                                uploadType,
+                                                attachment.getId()
+                                        )
+                                );
+                        }
+
+                        attachmentRequests.add(attachmentRequest);
+            });
+
             SendMessageResult sendMessageResult =
                     tamTamBotAPI
-                            .sendMessage(new NewMessageBody(broadcastMessage.getText(), null))
+                            .sendMessage(new NewMessageBody(broadcastMessage.getText(), attachmentRequests))
                             .chatId(broadcastMessage.getChatChannelId())
                             .execute();
-            broadcastMessage.setMessageId(sendMessageResult.getMessageId());
+            broadcastMessage.setMessageId(sendMessageResult.getMessage().getBody().getMid());
             broadcastMessage.setState(BroadcastMessageState.SENT);
-        } catch (APIException | ClientException ex) {
+        } catch (APIException | ClientException | IllegalStateException ex) {
             log.error(String.format("Can't send scheduled message with id=%d", broadcastMessage.getId()), ex);
             broadcastMessage.setState(BroadcastMessageState.ERROR);
             broadcastMessage.setError(Error.BROADCAST_MESSAGE_SEND_ERROR.getErrorKey());
@@ -180,12 +248,9 @@ public class BroadcastMessageScheduler {
             final BroadcastMessageEntity broadcastMessage
     ) {
         try {
-            // @todo #CC-63 Replace editMessage method with removeMessage method when it become available
             tamTamBotAPI
-                    .editMessage(
-                            new NewMessageBody(".", Collections.emptyList()),
-                            broadcastMessage.getMessageId()
-                    ).execute();
+                    .deleteMessage(broadcastMessage.getMessageId())
+                    .execute();
             broadcastMessage.setState(BroadcastMessageState.ERASED_BY_SCHEDULE);
         } catch (APIException | ClientException ex) {
             log.error(String.format("Can't erase scheduled message with id=%d", broadcastMessage.getId()), ex);

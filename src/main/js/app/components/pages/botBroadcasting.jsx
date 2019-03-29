@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 import {Growl} from "primereact/growl";
 import {Button} from "primereact/button";
-import {Card} from "primereact/card";
 import {withRouter} from "react-router";
 import {connect} from "react-redux";
 import {injectIntl} from "react-intl";
 import * as routes from 'app/constants/routes';
 import makeUrl from 'app/utils/makeUrl';
 import * as ChatChannelService from 'app/service/chatChannel';
+import ChatChannelCard from "app/components/chatChannelCard";
 
 class BotBroadcasting extends Component {
     constructor(props) {
@@ -24,7 +24,17 @@ class BotBroadcasting extends Component {
     componentDidMount() {
         const self = this;
         ChatChannelService.getChannels(this.props.match.params.id, (res) => {
-            self.setState({chatChannels: res.data.payload});
+            let chatChannels = [];
+            res.data.payload.forEach((chatChannel) => {
+                chatChannels.push({
+                    chat_id: chatChannel.id.chatId,
+                    title: chatChannel.title,
+                    description: chatChannel.description,
+                    icon: chatChannel.iconUrl,
+                    link: chatChannel.link
+                });
+            });
+            self.setState({chatChannels: chatChannels});
         }, null, this);
     }
 
@@ -43,16 +53,11 @@ class BotBroadcasting extends Component {
 
             const footer = (
                 <Button label={intl.formatMessage({id: 'app.bot.edit'})} icon="pi pi-pencil"
-                        className={"p-col"} onClick={() => this.onChannelClick(channel.id.chatId)}/>
+                        onClick={() => this.onChannelClick(channel.chat_id)}/>
             );
-            const header = (
-                channel.iconUrl && <img src={channel.iconUrl} className="channel-list-element_image"/>
-            );
+
             return (
-                <Card title={channel.title} header={header}
-                      className="ui-card-shadow channel-list-element p-col" footer={footer}>
-                    {channel.description}
-                </Card>
+                <ChatChannelCard chatChannel={channel} footer={footer}/>
             );
         })
     }

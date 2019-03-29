@@ -40,6 +40,7 @@ public enum BroadcastMessageState {
 
     private static final Map<Byte, BroadcastMessageState> BY_ID = new HashMap<>();
     private static final EnumSet<BroadcastMessageState> REMOVABLE_STATES;
+    private static final EnumSet<BroadcastMessageState> UPDATABLE_ATTACHMENT_STATES;
 
     static {
         REMOVABLE_STATES = EnumSet.of(
@@ -50,6 +51,10 @@ public enum BroadcastMessageState {
                 CREATED,
                 DISCARDED_ERASE_BY_USER
         );
+        UPDATABLE_ATTACHMENT_STATES = EnumSet.of(
+                SCHEDULED,
+                CREATED
+        );
         for (BroadcastMessageState state : BroadcastMessageState.values()) {
             if (BY_ID.put(state.value, state) != null) {
                 throw new IllegalArgumentException("Duplicate id=" + state.value);
@@ -59,6 +64,10 @@ public enum BroadcastMessageState {
 
     public static boolean isRemovable(final BroadcastMessageState state) {
         return REMOVABLE_STATES.contains(state);
+    }
+
+    public static boolean isAttachmentUpdatable(final BroadcastMessageState state) {
+        return UPDATABLE_ATTACHMENT_STATES.contains(state);
     }
 
     public static BroadcastMessageState getById(byte id) {

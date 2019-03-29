@@ -12,6 +12,7 @@ public enum Error {
     TAM_BOT_SUBSCRIBED_ALREADY("errors.tam.bot.subscribed.already"),
     TAM_BOT_UNSUBSCRIBED_ALREADY("errors.tam.bot.unsubscribed.already"),
     TAM_BOT_NOT_SUBSCRIBED("errors.tam.bot.not.subscribed"),
+    TAM_BOT_CONNECTED_TO_OTHER_BOT_SCHEME("errors.tam.bot.connected.to.other.bot.scheme"),
 
     CHATCHANNEL_SELECTED_EMPTY("errors.chatChannel.selected.empty"),
     CHATCHANNEL_PERMISSIONS_ERROR("errors.chatChannel.permission"),
@@ -40,6 +41,8 @@ public enum Error {
     ATTACHMENT_TYPE_EMPTY("errors.attachment.type.is.empty"),
     ATTACHMENT_TYPE_ILLEGAL("errors.attachment.type.is.illegal"),
     ATTACHMENT_UPLOAD_SERVICE_ERROR("errors.attachment.upload.service.error"),
+    ATTACHMENT_DOES_NOT_EXIST("errors.attachment.does.not.exist"),
+    ATTACHMENT_IDENTIFIER_IS_NOT_VALID("errors.attachment.token.is.not.valid"),
     ;
 
     @Getter

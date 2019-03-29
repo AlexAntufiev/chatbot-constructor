@@ -17,7 +17,8 @@ class BotBroadcastingDetail extends Component {
 
         this.state = {
             messageList: [],
-            editedMessage: {}
+            editedMessage: {},
+            ajaxRefreshProcess: false
         };
         this.onAddMessage = this.onAddMessage.bind(this);
         this.createMessagesList = this.createMessagesList.bind(this);
@@ -41,14 +42,20 @@ class BotBroadcastingDetail extends Component {
     }
 
     refreshMessageList() {
+        this.setState({ajaxRefreshProcess: true});
         BroadcastMessageService.getBroadcastMessages(this.props.match.params.id, this.props.match.params.chatChannelId,
             (res) => {
                 let messageList = {};
                 res.data.payload.forEach((message) => {
                     messageList[message.id] = message;
                 });
-                this.setState({messageList: messageList});
-            });
+                this.setState({
+                    messageList: messageList,
+                    ajaxRefreshProcess: false
+                });
+            }, (error) => {
+                this.setState({ajaxRefreshProcess: false})
+            }, this);
     }
 
     componentDidMount() {
@@ -124,7 +131,9 @@ class BotBroadcastingDetail extends Component {
             <Growl ref={(el) => this.growl = el}/>
             <div className="p-col bot-broadcasting_elements-container">
                 <div className="bot-broadcasting_elements-container_element">
-                    <Button label={intl.formatMessage({id: 'app.dialog.refresh'})} icon='pi pi-refresh'
+                    <Button label={intl.formatMessage({id: 'app.dialog.refresh'})}
+                            icon={"pi pi-refresh" + (this.state.ajaxRefreshProcess ? " pi-spin" : "")}
+                            disabled={this.state.ajaxRefreshProcess}
                             onClick={this.refreshMessageList}/>
                 </div>
                 {channelsList}

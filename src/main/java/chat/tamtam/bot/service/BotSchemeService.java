@@ -7,9 +7,12 @@ import org.springframework.stereotype.Service;
 
 import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
+import chat.tamtam.bot.domain.response.SuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
 import chat.tamtam.bot.repository.BotSchemaRepository;
+import chat.tamtam.bot.repository.TamBotRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +20,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BotSchemeService {
     private final @NonNull BotSchemaRepository botSchemaRepository;
+    private final @NonNull TamBotRepository tamBotRepository;
+
     private final @NonNull UserService userService;
+
+    private final @NonNull TransactionalUtils transactionalUtils;
 
     @Loggable
     public BotSchemeEntity addBot(final BotSchemeEntity bot, Long userId) throws IllegalArgumentException {
@@ -62,8 +69,23 @@ public class BotSchemeService {
     }
 
     @Loggable
-    public boolean deleteBot(final BotSchemeEntity bot) {
-        return false;
+    public SuccessResponse deleteBot(
+            final String authToken,
+            final int botSchemeId
+    ) {
+        BotSchemeEntity botScheme = getBotScheme(authToken, botSchemeId);
+        transactionalUtils.invokeRunnable(() -> {
+            if (botScheme.getBotId() != null) {
+                TamBotEntity tamBot = tamBotRepository.findById(
+                        new TamBotEntity.Id(botScheme.getBotId(), botScheme.getUserId())
+                );
+                if (tamBot != null) {
+                    tamBotRepository.deleteById(tamBot.getId());
+                }
+            }
+            botSchemaRepository.deleteByUserIdAndId(botScheme.getUserId(), botScheme.getId());
+        });
+        return new SuccessResponse();
     }
 
     @Loggable

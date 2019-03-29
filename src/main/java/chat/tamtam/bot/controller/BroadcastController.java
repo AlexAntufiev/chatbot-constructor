@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
+import chat.tamtam.bot.domain.broadcast.message.attachment.BroadcastMessageAttachmentUpdate;
 import chat.tamtam.bot.domain.chatchannel.SelectedChatChannelEntity;
 import chat.tamtam.bot.service.BroadcastMessageService;
 import chat.tamtam.bot.service.ChatChannelService;
@@ -42,7 +43,7 @@ public class BroadcastController {
     )
     public ResponseEntity<?> getChatChannelsWhereBotIsAdmin(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
-            @PathVariable("id") final Integer botSchemeId,
+            @PathVariable("id") final int botSchemeId,
             @PathVariable(required = false) final Long marker
     ) {
         return new ResponseEntity<>(
@@ -54,7 +55,7 @@ public class BroadcastController {
     @PostMapping(Endpoint.SAVE)
     public ResponseEntity<?> saveChatChannel(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
-            @PathVariable("id") final Integer botSchemeId,
+            @PathVariable("id") final int botSchemeId,
             @RequestBody final SelectedChatChannelEntity selectedChannel
     ) {
         return new ResponseEntity<>(
@@ -66,7 +67,7 @@ public class BroadcastController {
     @GetMapping(path = Endpoint.LIST, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> getChatChannels(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
-            @PathVariable("id") final Integer botSchemeId
+            @PathVariable("id") final int botSchemeId
     ) {
         return new ResponseEntity<>(
                 chatChannelService.getChatChannels(authToken, botSchemeId),
@@ -77,8 +78,8 @@ public class BroadcastController {
     @GetMapping(path = Endpoint.CHATCHANNEL_ID, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> getChatChannel(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
-            @PathVariable("id") final Integer botSchemeId,
-            @PathVariable("chatchannel_id") final Long channelId
+            @PathVariable("id") final int botSchemeId,
+            @PathVariable("chatchannel_id") final long channelId
     ) {
         return new ResponseEntity<>(
                 chatChannelService.getChatChannel(authToken, botSchemeId, channelId),
@@ -89,8 +90,8 @@ public class BroadcastController {
     @PostMapping(path = Endpoint.CHATCHANNEL_ID + Endpoint.DELETE, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> removeChatChannel(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
-            @PathVariable("id") final Integer botSchemeId,
-            @PathVariable("chatchannel_id") final Long channelId
+            @PathVariable("id") final int botSchemeId,
+            @PathVariable("chatchannel_id") final long channelId
     ) {
         return new ResponseEntity<>(
                 chatChannelService.removeChatChannel(authToken, botSchemeId, channelId),
@@ -101,8 +102,8 @@ public class BroadcastController {
     @PostMapping(path = Endpoint.CHATCHANNEL_ID + Endpoint.MESSAGE)
     public ResponseEntity<?> addBroadcastMessage(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
-            @PathVariable("id") final Integer botSchemeId,
-            @PathVariable("chatchannel_id") final Long channelId,
+            @PathVariable("id") final int botSchemeId,
+            @PathVariable("chatchannel_id") final long channelId,
             @RequestBody final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
         return new ResponseEntity<>(
@@ -117,7 +118,7 @@ public class BroadcastController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final int botSchemeId,
             @PathVariable("chatchannel_id") final long channelId,
-            @PathVariable("message_id") long messageId,
+            @PathVariable("message_id") final long messageId,
             @RequestBody final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
         return new ResponseEntity<>(
@@ -139,8 +140,8 @@ public class BroadcastController {
     public ResponseEntity<?> getBroadcastMessage(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final Integer botSchemeId,
-            @PathVariable("chatchannel_id") final Long chatchannelId,
-            @PathVariable("message_id") long messageId
+            @PathVariable("chatchannel_id") final long chatchannelId,
+            @PathVariable("message_id") final long messageId
     ) {
         return new ResponseEntity<>(
                 broadcastMessageService.getBroadcastMessage(authToken, botSchemeId, chatchannelId, messageId),
@@ -154,8 +155,8 @@ public class BroadcastController {
     )
     public ResponseEntity<?> getBroadcastMessages(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
-            @PathVariable("id") final Integer botSchemeId,
-            @PathVariable("chatchannel_id") final Long channelId
+            @PathVariable("id") final int botSchemeId,
+            @PathVariable("chatchannel_id") final long channelId
     ) {
         return new ResponseEntity<>(
                 broadcastMessageService.getBroadcastMessages(authToken, botSchemeId, channelId),
@@ -169,12 +170,78 @@ public class BroadcastController {
     )
     public ResponseEntity<?> removeBroadcastMessage(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
-            @PathVariable("id") final Integer botSchemeId,
-            @PathVariable("chatchannel_id") final Long channelId,
+            @PathVariable("id") final int botSchemeId,
+            @PathVariable("chatchannel_id") final long channelId,
             @PathVariable("message_id") long messageId
     ) {
         return new ResponseEntity<>(
                 broadcastMessageService.removeBroadcastMessage(authToken, botSchemeId, channelId, messageId),
+                HttpStatus.OK
+        );
+    }
+
+    @PostMapping(path = Endpoint.CHATCHANNEL_ID + Endpoint.MESSAGE + Endpoint.MESSAGE_ID + Endpoint.ATTACHMENT)
+    public ResponseEntity<?> addAttachment(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable("id") final Integer botSchemeId,
+            @PathVariable("chatchannel_id") final Long channelId,
+            @PathVariable("message_id") final long messageId,
+            @RequestBody final BroadcastMessageAttachmentUpdate broadcastMessageAttachmentUpdate
+    ) {
+        return new ResponseEntity<>(
+                broadcastMessageService.addBroadcastMessageAttachment(
+                        authToken,
+                        botSchemeId,
+                        channelId,
+                        messageId,
+                        broadcastMessageAttachmentUpdate
+                ),
+                HttpStatus.OK
+        );
+    }
+
+    @PostMapping(
+            path = Endpoint.CHATCHANNEL_ID + Endpoint.MESSAGE + Endpoint.MESSAGE_ID
+                    + Endpoint.ATTACHMENT + Endpoint.ATTACHMENT_ID + Endpoint.DELETE,
+            consumes = MediaType.ALL_VALUE
+    )
+    public ResponseEntity<?> removeAttachment(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable("id") final Integer botSchemeId,
+            @PathVariable("chatchannel_id") final Long channelId,
+            @PathVariable("message_id") final long messageId,
+            @PathVariable("attachment_id") final long attachmentId
+    ) {
+        return new ResponseEntity<>(
+                broadcastMessageService.removeBroadcastMessageAttachment(
+                        authToken,
+                        botSchemeId,
+                        channelId,
+                        messageId,
+                        attachmentId
+                ),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping(
+            path = Endpoint.CHATCHANNEL_ID + Endpoint.MESSAGE + Endpoint.MESSAGE_ID
+                    + Endpoint.ATTACHMENT + Endpoint.LIST,
+            consumes = MediaType.ALL_VALUE
+    )
+    public ResponseEntity<?> getAttachments(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable("id") final Integer botSchemeId,
+            @PathVariable("chatchannel_id") final Long channelId,
+            @PathVariable("message_id") final long messageId
+    ) {
+        return new ResponseEntity<>(
+                broadcastMessageService.getBroadcastMessageAttachments(
+                        authToken,
+                        botSchemeId,
+                        channelId,
+                        messageId
+                ),
                 HttpStatus.OK
         );
     }
