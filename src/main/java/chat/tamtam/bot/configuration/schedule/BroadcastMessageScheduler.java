@@ -214,6 +214,14 @@ public class BroadcastMessageScheduler {
                                                 )
                                         );
                                 break;
+                            default:
+                                throw new IllegalStateException(
+                                        String.format(
+                                                "Illegal type %s of attachment with id=%d",
+                                                uploadType,
+                                                attachment.getId()
+                                        )
+                                );
                         }
 
                         attachmentRequests.add(attachmentRequest);
