@@ -145,7 +145,16 @@ public class BroadcastMessageAttachment {
         }
     }
 
-    public static @NotNull UploadType getUploadTypeById(final byte id) {
-        return BYTE_TO_TYPE.get(id);
+    public UploadType getUploadType() {
+        UploadType uploadType = BYTE_TO_TYPE.get(type);
+        if (uploadType == null) {
+            throw new IllegalStateException(
+                    String.format(
+                            "No type matches to id=",
+                            id
+                    )
+            );
+        }
+        return uploadType;
     }
 }
