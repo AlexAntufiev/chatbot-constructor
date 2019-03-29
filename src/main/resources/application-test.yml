@@ -1,0 +1,26 @@
+spring:
+  jpa:
+    properties:
+      hibernate:
+        show-sql: true
+        format_sql: true
+  datasource:
+    url: jdbc:hsqldb:file:testdb;sql.syntax_pgs=true
+    username: sa
+    password:
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+        type: TRACE
+    chat:
+      tamtam:
+        bot: DEBUG
+
+tamtam:
+  registration:
+    bot:
+      onlyTrustedUsers: true
+      trustedUsers: 555537636725, 590435433004, 575868018573, 577949140156
