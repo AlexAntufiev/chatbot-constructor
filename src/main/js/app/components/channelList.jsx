@@ -1,13 +1,12 @@
 import React from "react";
-import {Card} from "primereact/card";
 import {Button} from "primereact/button";
 import * as ChatChannelService from "app/service/chatChannel"
 import {Growl} from "primereact/growl";
 import {connect} from "react-redux";
 import {injectIntl} from "react-intl";
+import ChatChannelCard from "app/components/chatChannelCard"
 
 class ChannelList extends React.Component {
-    // @todo #CC-38 show link to tt, cut the long title and description
     constructor(props) {
         super(props);
 
@@ -22,14 +21,14 @@ class ChannelList extends React.Component {
     componentDidMount() {
         const self = this;
         ChatChannelService.getChannels(this.props.botSchemeId, (res) => {
-
             let channels = {};
             res.data.payload.forEach((channel) => {
                 channels[channel.id.chatId] = {
                     chat_id: channel.id.chatId,
                     title: channel.title,
                     description: channel.description,
-                    icon: channel.iconUrl
+                    icon: channel.iconUrl,
+                    link: channel.link
                 };
             });
             self.setState({userChannels: channels});
@@ -41,14 +40,14 @@ class ChannelList extends React.Component {
         this.setState({ajaxRefreshProcess: true});
         ChatChannelService.getTamChatsWhereAdmin(this.props.botSchemeId, (res) => {
             let channels = {};
-
             res.data.payload.forEach((channel) => {
                 if (!(channel.chat_id in self.state.userChannels)) {
                     channels[channel.chat_id] = {
                         chat_id: channel.chat_id,
                         title: channel.title,
                         description: channel.description,
-                        icon: ('icon' in channel) ? channel.icon.url : null
+                        icon: ('icon' in channel) ? channel.icon.url : null,
+                        link: channel.link
                     };
                 }
             });
@@ -85,15 +84,8 @@ class ChannelList extends React.Component {
                             onClick={() => append(currChannel)}/>
                 </span>
             );
-            const header = (
-                currChannel.icon && <img src={currChannel.icon} className="channel-list-element_image"/>
-            );
             renderedAvailableChannels.push(
-                <Card title={currChannel.title} footer={footer}
-                      header={header}
-                      className={"p-col channel-list-element"}>
-                    {currChannel.description}
-                </Card>
+                <ChatChannelCard chatChannel={currChannel} footer={footer}/>
             );
         }
         return renderedAvailableChannels;
@@ -104,7 +96,6 @@ class ChannelList extends React.Component {
 
         function remove(chat) {
             const chat_id = chat.chat_id;
-
             ChatChannelService.deleteChannel(self.props.botSchemeId, chat_id, (res) => {
                 let userChannels = self.state.userChannels;
                 let availableChannels = self.state.availableChannels;
@@ -127,15 +118,8 @@ class ChannelList extends React.Component {
                             onClick={() => remove(currChannel)} icon="pi pi-times"/>
                 </span>
             );
-            const header = (
-                currChannel.icon && <img src={currChannel.icon} className="channel-list-element_image"/>
-            );
             renderedUserChannels.push(
-                <Card footer={footer} title={currChannel.title}
-                      header={header}
-                      className={"p-col channel-list-element"}>
-                    {currChannel.description}
-                </Card>
+                <ChatChannelCard chatChannel={currChannel} footer={footer}/>
             );
         }
         return renderedUserChannels;
