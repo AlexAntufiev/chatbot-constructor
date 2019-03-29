@@ -121,8 +121,8 @@ public class BroadcastMessageAttachment {
         TYPE_TO_BYTE = new EnumMap<>(UploadType.class);
         BYTE_TO_TYPE = new HashMap<>();
         byte typeNumber = 0;
-        for (UploadType type :
-                UploadType.values()) {
+        for (UploadType type
+                : UploadType.values()) {
             if (TYPE_TO_BYTE.containsKey(type)) {
                 throw new IllegalStateException(
                         String.format(
