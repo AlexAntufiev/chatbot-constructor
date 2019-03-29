@@ -81,6 +81,7 @@ export default {
     'errors.attachment.type.is.illegal': 'Тип приложения не поддерживается',
     'errors.attachment.upload.service.error': 'Ошибка сервиса загрузки',
     'errors.attachment.does.not.exist': 'Приложение не существует',
+    'errors.attachment.token.is.not.valid': 'Неверный идентификатор приложения',
 
     //Success messages
     'app.successmessage.successsumary': 'Успешно',

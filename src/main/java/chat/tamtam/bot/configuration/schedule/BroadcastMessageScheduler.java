@@ -1,6 +1,8 @@
 package chat.tamtam.bot.configuration.schedule;
 
+import java.nio.ByteBuffer;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -25,8 +27,17 @@ import chat.tamtam.bot.service.TransactionalUtils;
 import chat.tamtam.botapi.TamTamBotAPI;
 import chat.tamtam.botapi.exceptions.APIException;
 import chat.tamtam.botapi.exceptions.ClientException;
+import chat.tamtam.botapi.model.AttachmentRequest;
+import chat.tamtam.botapi.model.AudioAttachmentRequest;
+import chat.tamtam.botapi.model.FileAttachmentRequest;
 import chat.tamtam.botapi.model.NewMessageBody;
+import chat.tamtam.botapi.model.PhotoAttachmentRequest;
+import chat.tamtam.botapi.model.PhotoAttachmentRequestPayload;
 import chat.tamtam.botapi.model.SendMessageResult;
+import chat.tamtam.botapi.model.UploadType;
+import chat.tamtam.botapi.model.UploadedFileInfo;
+import chat.tamtam.botapi.model.UploadedInfo;
+import chat.tamtam.botapi.model.VideoAttachmentRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -40,7 +51,7 @@ public class BroadcastMessageScheduler {
     private final BroadcastMessageRepository broadcastMessageRepository;
     private final BotSchemaRepository botSchemaRepository;
     private final TamBotRepository tamBotRepository;
-    private final BroadcastMessageAttachmentRepository broadcastMessageAttachmentRepositor;
+    private final BroadcastMessageAttachmentRepository broadcastMessageAttachmentRepository;
 
     private final TransactionalUtils transactionalUtils;
 
@@ -160,14 +171,70 @@ public class BroadcastMessageScheduler {
             final BroadcastMessageEntity broadcastMessage
     ) {
         try {
+            List<AttachmentRequest> attachmentRequests = new ArrayList<>();
+
+            broadcastMessageAttachmentRepository
+                    .findAllByBroadcastMessageId(broadcastMessage.getId())
+                    .iterator()
+                    .forEachRemaining(attachment -> {
+                        AttachmentRequest attachmentRequest = null;
+
+                        UploadType uploadType = attachment.getUploadType();
+
+                        switch (uploadType) {
+                            case PHOTO:
+                                attachmentRequest =
+                                        new PhotoAttachmentRequest(
+                                                new PhotoAttachmentRequestPayload().token(
+                                                        new String(attachment.getAttachmentIdentifier())
+                                                )
+                                        );
+                                break;
+                            case FILE:
+                                attachmentRequest =
+                                        new FileAttachmentRequest(
+                                                new UploadedFileInfo(
+                                                        ByteBuffer.wrap(attachment.getAttachmentIdentifier()).getLong()
+                                                )
+                                        );
+                                break;
+                            case AUDIO:
+                                attachmentRequest =
+                                        new AudioAttachmentRequest(
+                                                new UploadedInfo(
+                                                        ByteBuffer.wrap(attachment.getAttachmentIdentifier()).getLong()
+                                                )
+                                        );
+                                break;
+                            case VIDEO:
+                                attachmentRequest =
+                                        new VideoAttachmentRequest(
+                                                new UploadedInfo(
+                                                        ByteBuffer.wrap(attachment.getAttachmentIdentifier()).getLong()
+                                                )
+                                        );
+                                break;
+                            default:
+                                throw new IllegalStateException(
+                                        String.format(
+                                                "Illegal type %s of attachment with id=%d",
+                                                uploadType,
+                                                attachment.getId()
+                                        )
+                                );
+                        }
+
+                        attachmentRequests.add(attachmentRequest);
+            });
+
             SendMessageResult sendMessageResult =
                     tamTamBotAPI
-                            .sendMessage(new NewMessageBody(broadcastMessage.getText(), null))
+                            .sendMessage(new NewMessageBody(broadcastMessage.getText(), attachmentRequests))
                             .chatId(broadcastMessage.getChatChannelId())
                             .execute();
             broadcastMessage.setMessageId(sendMessageResult.getMessage().getBody().getMid());
             broadcastMessage.setState(BroadcastMessageState.SENT);
-        } catch (APIException | ClientException ex) {
+        } catch (APIException | ClientException | IllegalStateException ex) {
             log.error(String.format("Can't send scheduled message with id=%d", broadcastMessage.getId()), ex);
             broadcastMessage.setState(BroadcastMessageState.ERROR);
             broadcastMessage.setError(Error.BROADCAST_MESSAGE_SEND_ERROR.getErrorKey());

@@ -304,7 +304,8 @@ public class BroadcastMessageService {
             BroadcastMessageAttachment attachment = new BroadcastMessageAttachment(
                     broadcastMessageAttachmentUpdate.getType(),
                     broadcastMessageAttachmentUpdate.getToken(),
-                    broadcastMessage.getId()
+                    broadcastMessage.getId(),
+                    broadcastMessageAttachmentUpdate.getTitle()
             );
             return new SuccessResponseWrapper<>(
                     broadcastMessageAttachmentRepository.save(attachment)

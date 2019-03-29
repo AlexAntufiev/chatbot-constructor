@@ -42,6 +42,7 @@ public enum Error {
     ATTACHMENT_TYPE_ILLEGAL("errors.attachment.type.is.illegal"),
     ATTACHMENT_UPLOAD_SERVICE_ERROR("errors.attachment.upload.service.error"),
     ATTACHMENT_DOES_NOT_EXIST("errors.attachment.does.not.exist"),
+    ATTACHMENT_IDENTIFIER_IS_NOT_VALID("errors.attachment.token.is.not.valid"),
     ;
 
     @Getter
