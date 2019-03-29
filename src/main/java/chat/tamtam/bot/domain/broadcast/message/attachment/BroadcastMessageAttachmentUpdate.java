@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class BroadcastMessageAttachmentUpdate {
     private String type;
     private String token;
+    private String title;
 }

@@ -11,8 +11,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
@@ -42,10 +40,9 @@ public class BroadcastMessageScheduler {
     private final BroadcastMessageRepository broadcastMessageRepository;
     private final BotSchemaRepository botSchemaRepository;
     private final TamBotRepository tamBotRepository;
-    private final BroadcastMessageAttachmentRepository broadcastMessageAttachmentRepositor;
+    private final BroadcastMessageAttachmentRepository broadcastMessageAttachmentRepository;
 
     private final TransactionalUtils transactionalUtils;
-    private final BroadcastMessageAttachmentRepository broadcastMessageAttachmentRepositor;
 
     private final Executor executor;
     @Value("${tamtam.broadcast.executor.corePoolSize:1}")
