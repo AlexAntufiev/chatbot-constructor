@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:hsqldb:file:testdb;sql.syntax_pgs=true
+    username: sa
+    password:
+  servlet:
+    multipart:
+      max-file-size: 1000MB

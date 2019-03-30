@@ -208,7 +208,7 @@ public class RegistrationBot extends AbstractCustomBot {
         return BotType.Registration;
     }
 
-    @Profile(Profiles.PRODUCTION)
+    @Profile({Profiles.PRODUCTION, Profiles.TEST})
     @Bean
     public void subscribeRegBotOnAppReadyProduction() {
         try {
@@ -223,7 +223,7 @@ public class RegistrationBot extends AbstractCustomBot {
         }
     }
 
-    @Profile(Profiles.PRODUCTION)
+    @Profile({Profiles.PRODUCTION, Profiles.TEST})
     @PreDestroy
     public void unsubscribeRegBotOnAppShutdown() {
         if (!subscribed) {
