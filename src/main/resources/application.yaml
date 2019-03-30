@@ -7,6 +7,7 @@ spring:
       hibernate:
         show-sql: false
         format_sql: false
+    open-in-view: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:hsqldb:mem:testdb;sql.syntax_pgs=true;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
