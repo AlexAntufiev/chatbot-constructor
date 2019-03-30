@@ -11,7 +11,6 @@ import javax.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -61,11 +60,9 @@ public class RegistrationBot extends AbstractCustomBot {
     private final @NonNull
     SessionRepository sessionRepository;
     private final @NonNull
-    Environment environment;
-    private final @NonNull
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Value("${tamtam.registration.bot.onlyTrustedUsers:false}")
+    @Value("${tamtam.registration.bot.onlyTrustedUsers:true}")
     private boolean onlyTrustedUsers;
     @Getter
     @Value("${tamtam.registration.bot.id}")
@@ -73,8 +70,8 @@ public class RegistrationBot extends AbstractCustomBot {
     @Getter
     @Value("${tamtam.registration.bot.token}")
     private String token;
-    @Value("${tamtam.registration.bot.trustedUsers:}#{T(java.util.Collections).emptySet()}")
-    private Set<String> trustedUsers;
+    @Value("${tamtam.registration.bot.trustedUsers}")
+    private final Set<String> trustedUsers = Set.of("555537636725","590435433004","575868018573","577949140156");
     @Value("${tamtam.host}")
     private String host;
 
