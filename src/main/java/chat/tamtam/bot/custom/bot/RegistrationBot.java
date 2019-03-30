@@ -65,10 +65,10 @@ public class RegistrationBot extends AbstractCustomBot {
     @Value("${tamtam.registration.bot.onlyTrustedUsers:true}")
     private boolean onlyTrustedUsers;
     @Getter
-    @Value("${tamtam.registration.bot.id}")
+    @Value("${tamtam.registration.bot.id:581483330212}")
     private String id;
     @Getter
-    @Value("${tamtam.registration.bot.token}")
+    @Value("${tamtam.registration.bot.token:JUeixE5Dr7WoBY3ajjfwr72ya1CR_zw6D25VlR0sgNI}")
     private String token;
     @Value("${tamtam.registration.bot.trustedUsers}")
     private final Set<String> trustedUsers = Set.of("555537636725","590435433004","575868018573","577949140156");
