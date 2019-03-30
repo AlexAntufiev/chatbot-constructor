@@ -47,7 +47,6 @@ tamtam:
     bot:
       id: 581483330212
       token: JUeixE5Dr7WoBY3ajjfwr72ya1CR_zw6D25VlR0sgNI
-      botType: Registration
       onlyTrustedUsers: true
       trustedUsers: 555537636725, 590435433004, 575868018573, 577949140156
   broadcast:
