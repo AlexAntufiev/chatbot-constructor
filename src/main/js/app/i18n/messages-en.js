@@ -77,6 +77,7 @@ export default {
     'errors.broadcast.message.erasing.time.is.in.the.past': 'Erasing time is in the past',
     'errors.broadcast.message.text.is.empty': 'Message text is empty',
     'error.broadcast.message.need.fill.text.and.posttime': 'Fill text and posting time',
+    'errors.broadcast.message.has.too.much.attachments': 'Too much attachments',
     'errors.attachment.type.is.empty': 'Provide correct attachment type',
     'errors.attachment.type.is.illegal': 'Attachment type is illegal',
     'errors.attachment.upload.service.error': 'Upload service error',
