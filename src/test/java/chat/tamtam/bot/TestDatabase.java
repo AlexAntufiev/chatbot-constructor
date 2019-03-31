@@ -6,9 +6,7 @@ import java.util.Date;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
 
-import chat.tamtam.bot.configuration.Profiles;
 import chat.tamtam.bot.domain.session.SessionEntity;
 import chat.tamtam.bot.domain.user.UserAuthEntity;
 import chat.tamtam.bot.repository.BotSchemaRepository;
@@ -16,7 +14,6 @@ import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.service.UserService;
 import lombok.AllArgsConstructor;
 
-@Profile(Profiles.TEST)
 @AllArgsConstructor
 public class TestDatabase extends TestContext {
 

@@ -1,56 +1,42 @@
 spring:
-  profiles:
-    active: development
   jpa:
     generate-ddl: true
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
-        show-sql: true
-        format_sql: true
+        show-sql: false
+        format_sql: false
+    open-in-view: false
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:hsqldb:mem:testdb;sql.syntax_pgs=true;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.hsqldb.jdbc.JDBCDriver
+    username: sa
+    password:
+    hikari:
+      idle-timeout: 10000
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
   application:
     name: chatbot-constructor
+
 logging:
   level:
     org:
       springframework: INFO
       hibernate:
-        SQL: DEBUG
-        type: TRACE
+        SQL: OFF
+        type: OFF
     chat:
       tamtam:
-        bot: DEBUG
-  file: ${spring.application.name}
+        bot: INFO
+
 server:
   address: 0.0.0.0
   port: 8090
-
----
-
-spring:
-  profiles: development
-  datasource:
-    url: jdbc:hsqldb:file:~/db/Server
-    username: developer
-    password: developer
-    driverClassName: org.hsqldb.jdbcDriver
-
----
-
-spring:
-  profiles: production
-  datasource:
-    url: jdbc:hsqldb:mem:Server;sql.syntax_pgs=true
-    username: production
-    password: production
-    driverClassName: org.hsqldb.jdbcDriver
-
----
 
 tamtam:
   host: http://localhost:8090
@@ -61,7 +47,6 @@ tamtam:
     bot:
       id: 581483330212
       token: JUeixE5Dr7WoBY3ajjfwr72ya1CR_zw6D25VlR0sgNI
-      botType: Registration
       onlyTrustedUsers: true
       trustedUsers: 555537636725, 590435433004, 575868018573, 577949140156
   broadcast:

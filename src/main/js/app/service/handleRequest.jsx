@@ -26,6 +26,7 @@ export default function handleRequest(request, callbackSuccess, callbackFail, co
         }
 
     }).catch((error) => {
-        context && AxiosMessages.serverNotResponse(context)
+        callbackFail && callbackFail(error);
+        context && AxiosMessages.serverNotResponse(context);
     });
 }

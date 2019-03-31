@@ -11,7 +11,6 @@ import javax.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -61,19 +60,18 @@ public class RegistrationBot extends AbstractCustomBot {
     private final @NonNull
     SessionRepository sessionRepository;
     private final @NonNull
-    Environment environment;
-    private final @NonNull
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Value("${tamtam.registration.bot.onlyTrustedUsers:false}")
+    @Value("${tamtam.registration.bot.onlyTrustedUsers:true}")
     private boolean onlyTrustedUsers;
     @Getter
     @Value("${tamtam.registration.bot.id}")
     private String id;
+    // @todo #CC-91 dont create reg bot with nullable id and token
     @Getter
     @Value("${tamtam.registration.bot.token}")
     private String token;
-    @Value("${tamtam.registration.bot.trustedUsers:}#{T(java.util.Collections).emptySet()}")
+    @Value("${tamtam.registration.bot.trustedUsers:{555537636725, 590435433004, 575868018573, 577949140156}}")
     private Set<String> trustedUsers;
     @Value("${tamtam.host}")
     private String host;
@@ -208,7 +206,7 @@ public class RegistrationBot extends AbstractCustomBot {
         return BotType.Registration;
     }
 
-    @Profile(Profiles.PRODUCTION)
+    @Profile({Profiles.PRODUCTION, Profiles.TEST})
     @Bean
     public void subscribeRegBotOnAppReadyProduction() {
         try {
@@ -223,7 +221,7 @@ public class RegistrationBot extends AbstractCustomBot {
         }
     }
 
-    @Profile(Profiles.PRODUCTION)
+    @Profile({Profiles.PRODUCTION, Profiles.TEST})
     @PreDestroy
     public void unsubscribeRegBotOnAppShutdown() {
         if (!subscribed) {

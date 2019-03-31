@@ -7,7 +7,7 @@ application_arguments=""
 application_port="8090"
 
 profile_requested=false
-profile_name="development,production"
+profile_name="test"
 
 debug_requested=false
 debug_port="5005"
