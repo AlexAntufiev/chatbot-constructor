@@ -309,10 +309,10 @@ public class BroadcastMessageService {
                     broadcastMessageAttachmentUpdate.getTitle()
             );
 
-            int currentWeight = broadcastMessage.getWeight()
-                    + BroadcastMessageWeight.getWeight(attachment);
+            byte currentWeight = (byte) (broadcastMessage.getWeight()
+                    + BroadcastMessageWeight.getWeight(attachment));
 
-            if (BroadcastMessageWeight.isWeightExceedsMax((byte) currentWeight)) {
+            if (BroadcastMessageWeight.isWeightExceedsMax(currentWeight)) {
                 throw new UpdateBroadcastMessageException(
                         String.format(
                                 "Can't add attachment with type=%s to broadcast message with id=%d "
