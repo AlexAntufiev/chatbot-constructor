@@ -5,10 +5,10 @@ import lombok.Getter;
 
 @AllArgsConstructor
 public enum BroadcastMessageWeight {
-    PHOTO_ATTACHMENT_WEIGHT((byte) 1),
-    VIDEO_ATTACHMENT_WEIGHT((byte) 1),
-    AUDIO_ATTACHMENT_WEIGHT((byte) 10),
-    FILE_ATTACHMENT_WEIGHT((byte) 10),
+    PHOTO((byte) 1),
+    VIDEO((byte) 1),
+    AUDIO((byte) 10),
+    FILE((byte) 10),
     MAX_MESSAGE_WEIGHT((byte) 10),
     ;
 
