@@ -310,9 +310,8 @@ public class BroadcastMessageService {
             );
 
             int currentWeight = broadcastMessage.getWeight()
-                    + BroadcastMessageWeight.getWeight(attachment);
-
-            if (BroadcastMessageWeight.isWeightExceedsMax((byte) currentWeight)) {
+                    + BroadcastMessageWeight.valueOf(attachment.getUploadType().name()).getWeight();
+            if (currentWeight > BroadcastMessageWeight.MAX_MESSAGE_WEIGHT.getWeight()) {
                 throw new UpdateBroadcastMessageException(
                         String.format(
                                 "Can't add attachment with type=%s to broadcast message with id=%d "
@@ -365,8 +364,11 @@ public class BroadcastMessageService {
             BroadcastMessageAttachment attachment = getAttachment(attachmentId, broadcastMessage.getId());
             attachment.setBroadcastMessageId(null);
 
+            int currentWeight = broadcastMessage.getWeight()
+                    - BroadcastMessageWeight.valueOf(attachment.getUploadType().name()).getWeight();
+
             broadcastMessage.setWeight(
-                    (byte) (broadcastMessage.getWeight() - BroadcastMessageWeight.getWeight(attachment))
+                    currentWeight < 0 ? 0 : (byte) currentWeight
             );
 
             broadcastMessageRepository.save(broadcastMessage);
