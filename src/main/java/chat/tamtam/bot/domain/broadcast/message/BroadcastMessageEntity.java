@@ -10,6 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -46,7 +48,9 @@ public class BroadcastMessageEntity {
     private Byte state;
     @Column(name = "error")
     private String error;
-    // @todo #CC-63 Add payload field into BroadcastMessageEntity
+    @JsonIgnore
+    @Column(name = "weight", nullable = false)
+    private byte weight = 0;
 
     public void setState(final BroadcastMessageState state) {
         this.state = state.getValue();

@@ -20,6 +20,7 @@ import chat.tamtam.bot.domain.broadcast.message.action.ScheduledStateAction;
 import chat.tamtam.bot.domain.broadcast.message.action.SentStateAction;
 import chat.tamtam.bot.domain.broadcast.message.attachment.BroadcastMessageAttachment;
 import chat.tamtam.bot.domain.broadcast.message.attachment.BroadcastMessageAttachmentUpdate;
+import chat.tamtam.bot.domain.broadcast.message.attachment.BroadcastMessageWeight;
 import chat.tamtam.bot.domain.chatchannel.ChatChannelEntity;
 import chat.tamtam.bot.domain.exception.BroadcastMessageIllegalStateException;
 import chat.tamtam.bot.domain.exception.CreateBroadcastMessageException;
@@ -307,6 +308,27 @@ public class BroadcastMessageService {
                     broadcastMessage.getId(),
                     broadcastMessageAttachmentUpdate.getTitle()
             );
+
+            byte currentWeight = (byte) (broadcastMessage.getWeight()
+                    + BroadcastMessageWeight.getWeight(attachment));
+
+            if (BroadcastMessageWeight.isWeightExceedsMax(currentWeight)) {
+                throw new UpdateBroadcastMessageException(
+                        String.format(
+                                "Can't add attachment with type=%s to broadcast message with id=%d "
+                                        + "because it has enough attachments already(message weight=%d)",
+                                attachment.getUploadType(),
+                                broadcastMessage.getId(),
+                                broadcastMessage.getWeight()
+                        ),
+                        Error.BROADCAST_MESSAGE_HAS_TOO_MUCH_ATTACHMENTS
+                );
+            }
+
+            broadcastMessage.setWeight((byte) currentWeight);
+
+            broadcastMessageRepository.save(broadcastMessage);
+
             return new SuccessResponseWrapper<>(
                     broadcastMessageAttachmentRepository.save(attachment)
             );
@@ -326,6 +348,7 @@ public class BroadcastMessageService {
             BroadcastMessageEntity broadcastMessage =
                     getBroadcastMessage(botScheme, tamBot, chatChannelId, broadcastMessageId);
             BroadcastMessageState state = BroadcastMessageState.getById(broadcastMessage.getState());
+
             if (!BroadcastMessageState.isAttachmentUpdatable(state)) {
                 throw new UpdateBroadcastMessageException(
                         String.format(
@@ -338,8 +361,15 @@ public class BroadcastMessageService {
                         Error.BROADCAST_MESSAGE_ILLEGAL_STATE
                 );
             }
+
             BroadcastMessageAttachment attachment = getAttachment(attachmentId, broadcastMessage.getId());
             attachment.setBroadcastMessageId(null);
+
+            broadcastMessage.setWeight(
+                    (byte) (broadcastMessage.getWeight() - BroadcastMessageWeight.getWeight(attachment))
+            );
+
+            broadcastMessageRepository.save(broadcastMessage);
             broadcastMessageAttachmentRepository.save(attachment);
         });
         return new SuccessResponse();

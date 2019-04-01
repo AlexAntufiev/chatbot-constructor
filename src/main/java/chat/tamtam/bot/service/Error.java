@@ -37,6 +37,7 @@ public enum Error {
     BROADCAST_MESSAGE_ERASE_ERROR("errors.broadcast.message.erase.error"),
     BROADCAST_MESSAGE_SEND_ALREADY_DISCARDED("errors.broadcast.message.send.already.discarded"),
     BROADCAST_MESSAGE_ERASE_ALREADY_DISCARDED("errors.broadcast.message.erase.already.discarded"),
+    BROADCAST_MESSAGE_HAS_TOO_MUCH_ATTACHMENTS("errors.broadcast.message.has.too.much.attachments"),
 
     ATTACHMENT_TYPE_EMPTY("errors.attachment.type.is.empty"),
     ATTACHMENT_TYPE_ILLEGAL("errors.attachment.type.is.illegal"),
