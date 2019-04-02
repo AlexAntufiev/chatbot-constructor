@@ -130,7 +130,7 @@ class TextMessage extends React.Component {
         }
         const {intl} = this.props;
         const changeMessageField = (field, value) => {
-            let message = this.state.message;
+            let message = Object.assign({}, this.state.message);
             message[field] = value;
             this.setState({message: message});
         };
