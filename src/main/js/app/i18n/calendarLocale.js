@@ -1,5 +1,7 @@
 const localeRu = {
     firstDayOfWeek: 1,
+    today: "Сегодня",
+    clear: "Очистить",
     dayNames: ["воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота"],
     dayNamesShort: ["вск", "пн", "вт", "ср", "чт", "пт", "сб"],
     dayNamesMin: ["ВC", "ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ"],
@@ -9,6 +11,8 @@ const localeRu = {
 
 const localeEn = {
     firstDayOfWeek: 0,
+    today: "Today",
+    clear: "Clear",
     dayNames: ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
     dayNamesShort: ["sun", "mon", "tue", "wed", "thu", "fri", "sat"],
     dayNamesMin: ["SU", "M", "TU", "W", "TH", "F", "SA"],

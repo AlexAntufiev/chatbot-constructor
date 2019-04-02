@@ -144,12 +144,15 @@ class TextMessage extends React.Component {
                 </div>
                 <div className="text-card_detail-element">
                     <Calendar showTime={true} showSeconds={false}
+                              showButtonBar={true}
                               placeholder={intl.formatMessage({id: 'app.broadcastmessage.postingtime'})}
                               disabled={this.props.message.state === BroadcastMessageState.SENT}
                               onChange={(e) => {
                                   const newDate = e.value;
-                                  newDate.setSeconds(0);
-                                  changeMessageField('firingTime', newDate.getTime());
+                                  if (newDate) {
+                                      newDate.setSeconds(0);
+                                  }
+                                  changeMessageField('firingTime', newDate ? newDate.getTime() : null);
                               }}
                               dateFormat={"D, d M yy"}
                               hourFormat={this.props.locale === 'ru' ? "24" : "12"}
@@ -158,11 +161,14 @@ class TextMessage extends React.Component {
                 </div>
                 <div className="text-card_detail-element">
                     <Calendar showTime={true} showSeconds={false}
+                              showButtonBar={true}
                               placeholder={intl.formatMessage({id: 'app.broadcastmessage.erasingtime'})}
                               onChange={(e) => {
                                   const newDate = e.value;
-                                  newDate.setSeconds(0);
-                                  changeMessageField('erasingTime', newDate.getTime());
+                                  if (newDate) {
+                                      newDate.setSeconds(0);
+                                  }
+                                  changeMessageField('erasingTime', newDate ? newDate.getTime() : null);
                               }}
                               dateFormat={"D, d M yy"}
                               hourFormat={this.props.locale === 'ru' ? "24" : "12"}
