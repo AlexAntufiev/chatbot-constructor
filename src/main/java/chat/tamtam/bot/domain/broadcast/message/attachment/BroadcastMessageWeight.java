@@ -5,13 +5,22 @@ import lombok.Getter;
 
 @AllArgsConstructor
 public enum BroadcastMessageWeight {
-    PHOTO_ATTACHMENT_WEIGHT((byte) 1),
-    VIDEO_ATTACHMENT_WEIGHT((byte) 1),
-    AUDIO_ATTACHMENT_WEIGHT((byte) 10),
-    FILE_ATTACHMENT_WEIGHT((byte) 10),
-    MAX_MESSAGE_WEIGHT((byte) 10),
+    PHOTO((byte) 1),
+    VIDEO((byte) 1),
+    AUDIO((byte) 10),
+    FILE((byte) 10),
     ;
 
     @Getter
     private final byte weight;
+
+    private static final byte MAX_MESSAGE_WEIGHT = 10;
+
+    public static byte getWeight(final BroadcastMessageAttachment attachment) {
+        return valueOf(attachment.getUploadType().name()).weight;
+    }
+
+    public static boolean isWeightExceedsMax(final byte weight) {
+        return weight > MAX_MESSAGE_WEIGHT;
+    }
 }

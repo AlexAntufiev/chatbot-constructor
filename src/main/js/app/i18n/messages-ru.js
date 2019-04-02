@@ -77,6 +77,7 @@ export default {
     'errors.broadcast.message.erasing.time.is.in.the.past': 'Время удаления в прошлом',
     'errors.broadcast.message.text.is.empty': 'Пустой текст сообщения',
     'error.broadcast.message.need.fill.text.and.posttime': 'Заполните текст и время постинга',
+    'errors.broadcast.message.has.too.much.attachments': 'Слишком много вложений',
     'errors.attachment.type.is.empty': 'Укажите тип приложения',
     'errors.attachment.type.is.illegal': 'Тип приложения не поддерживается',
     'errors.attachment.upload.service.error': 'Ошибка сервиса загрузки',
