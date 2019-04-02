@@ -96,7 +96,7 @@ class TextMessage extends React.Component {
                 AxiosMessages.successOperation(this, 'app.broadcastmessage.saved');
                 this.setState({
                     ajaxUpdateProcess: false,
-                    initialMessage: this.state.message
+                    initialMessage: Object.assign({}, this.state.message)
                 });
             },
             () => this.setState({ajaxUpdateProcess: false}),
