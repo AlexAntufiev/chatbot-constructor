@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.CookieClearingLogoutHandler;
 
 import chat.tamtam.bot.configuration.swagger.SwaggerConfig;
+import chat.tamtam.bot.configuration.websocket.WebSocketEndpoint;
 import chat.tamtam.bot.controller.Endpoint;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.repository.UserRepository;
@@ -46,6 +47,8 @@ public class RestSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, Endpoint.STATIC_INDEX, Endpoint.STATIC_RESOURCES, Endpoint.HEALTH)
                 .permitAll()
                 .antMatchers(SwaggerConfig.SWAGGER_URLS)
+                .permitAll()
+                .antMatchers(HttpMethod.GET, WebSocketEndpoint.WEB_SOCKET + "/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

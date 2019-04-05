@@ -10,6 +10,7 @@ import {Cookies} from "react-cookie";
 import {AUTHORIZATION, USER_ID} from "app/constants/cookies";
 import setUserInfo from "app/actions/userInfo";
 
+
 class IndexLayout extends Component {
     constructor(props) {
         super(props);
@@ -41,13 +42,19 @@ class IndexLayout extends Component {
 
         return (
             <div>
+                {/* @todo #CC-63 Implement notification service with SockJsClient*/}
+                {/*<SockJsClient
+                    url= 'http://localhost:8090/ws'
+                    topics={['/user/queue/updates']}
+                    onConnect={ () => { console.log('connected'); }}
+                    onMessage={ (msg) => { console.log(msg); }}
+                    ref={ (client) => { this.clientRef = client }} />*/}
                 <div>
                     <Menubar model={menuItems}>
                         <div className="p-grid auth-locale-panel">
                             <AuthPanel/>
                             <Locale/>
                         </div>
-
                     </Menubar>
                 </div>
                 <ApplicationRouter/>
