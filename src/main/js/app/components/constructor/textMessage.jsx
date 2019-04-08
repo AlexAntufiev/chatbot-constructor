@@ -236,7 +236,6 @@ class TextMessage extends React.Component {
             message[field] = value;
             this.setState({message: message});
         };
-        console.log(this.attachButton);
         const attachments = this.createAttachElementsList();
         let disableSave = this.state.ajaxUpdateProcess || Object.keys(this.getUpdatedFields()).length === 0;
         if (this.state.attachmentsWasChanged) {
