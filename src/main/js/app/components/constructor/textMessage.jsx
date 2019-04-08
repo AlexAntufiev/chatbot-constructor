@@ -98,7 +98,9 @@ class TextMessage extends React.Component {
                 renderedList.push(<div className={"attach-element"}>
                     <div className={"table-cell attach-title"}>{attach.title}</div>
                     <div className={"table-cell"}><Button
-                        disabled={this.props.message.state === BroadcastMessageState.SENT} icon={"pi pi-times"}
+                        disabled={this.props.message.state === BroadcastMessageState.SENT
+                        || this.props.message.state === BroadcastMessageState.ERASED_BY_SCHEDULE}
+                        icon={"pi pi-times"}
                         onClick={() => {
                             const attachments = [...this.state.attachments];
                             attachments[i].removed = true;
@@ -300,7 +302,9 @@ class TextMessage extends React.Component {
                     <Button icon={"pi pi-paperclip"} className={'attach-button'} ref={(obj) => this.attachButton = obj}
                             label={intl.formatMessage({id: "app.dialog.attach"})}
                             onClick={() => this.uploadButton.click()}
-                            disabled={this.state.ajaxUploadAttachProcess || this.props.message.state === BroadcastMessageState.SENT}/>
+                            disabled={this.state.ajaxUploadAttachProcess
+                            || this.props.message.state === BroadcastMessageState.SENT
+                            || this.props.message.state === BroadcastMessageState.ERASED_BY_SCHEDULE}/>
                     {this.state.ajaxUploadAttachProcess &&
                     <ProgressBar mode="indeterminate" className={'attach-progressbar'}/>}
                     <input accept="image/*" className={"attach-input"} name={"data"}
