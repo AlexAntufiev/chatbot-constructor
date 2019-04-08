@@ -43,6 +43,7 @@ export default {
     'app.dialog.disconnect': 'Отключить',
     'app.dialog.append': 'Добавить',
     'app.dialog.refresh': 'Обновить',
+    'app.dialog.attach': 'Прикрепить',
 
     //Error messages
     'app.errormessage.errorsummary': 'Сообщение об ошибке',

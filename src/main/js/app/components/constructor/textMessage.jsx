@@ -24,7 +24,7 @@ class TextMessage extends React.Component {
                 title: "",
                 text: "",
                 firingTime: null,
-                erasingTime: null,
+                erasingTime: null
             },
             initialMessage: {
                 title: "",
@@ -44,11 +44,6 @@ class TextMessage extends React.Component {
         this.getUpdatedFields = this.getUpdatedFields.bind(this);
         this.uploadFilesToTam = this.uploadFilesToTam.bind(this);
         this.createAttachElementsList = this.createAttachElementsList.bind(this);
-    }
-
-    componentDidMount() {
-        TamBotService.getAttachmentUploadLink(this.props.botSchemeId, "photo",
-            (res) => this.setState({uploadLink: res.data.payload.url}), null, this);
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -123,30 +118,33 @@ class TextMessage extends React.Component {
         });
         let uploaded = 0;
         for (let i = 0; i < files.length; ++i) {
-            const data = new FormData();
-            const xhr = new XMLHttpRequest();
-            data.append('data', files[i]);
-            xhr.open('POST', this.state.uploadLink, true);
-            const self = this;
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                    const uploadedObj = JSON.parse(xhr.responseText);
-                    const firstKey = Object.keys(uploadedObj["photos"])[0];
-                    self.setState({
-                        attachments: [...self.state.attachments, {
-                            uploadedFileId: i,
-                            title: files[i].name,
-                            img: URL.createObjectURL(files[i]),
-                            token: uploadedObj["photos"][firstKey].token
-                        }]
-                    });
-                }
-                uploaded++;
-                if (uploaded === files.length) {
-                    self.setState({ajaxUploadAttachProcess: false});
-                }
-            };
-            xhr.send(data);
+            TamBotService.getAttachmentUploadLink(this.props.botSchemeId, "photo",
+                (res) => {
+                    const data = new FormData();
+                    const xhr = new XMLHttpRequest();
+                    data.append('data', files[i]);
+                    xhr.open('POST', res.data.payload.url, true);
+                    const self = this;
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                            const uploadedObj = JSON.parse(xhr.responseText);
+                            const firstKey = Object.keys(uploadedObj["photos"])[0];
+                            self.setState({
+                                attachments: [...self.state.attachments, {
+                                    uploadedFileId: i,
+                                    title: files[i].name,
+                                    img: URL.createObjectURL(files[i]),
+                                    token: uploadedObj["photos"][firstKey].token
+                                }]
+                            });
+                        }
+                        uploaded++;
+                        if (uploaded === files.length) {
+                            self.setState({ajaxUploadAttachProcess: false});
+                        }
+                    };
+                    xhr.send(data);
+                }, null, this);
         }
     }
 
@@ -170,19 +168,22 @@ class TextMessage extends React.Component {
         if (this.state.message.erasingTime) {
             message.erasingTime = new Date(this.state.message.erasingTime).toUTCString();
         }
-        BroadcastMessageService.updateBroadcastMessage(this.props.botSchemeId, this.props.chatChannelId, this.props.message.id,
+        BroadcastMessageService.updateBroadcastMessage(this.props.botSchemeId, this.props.chatChannelId,
+            this.props.message.id,
             message,
             () => {
                 this.state.attachments.forEach((attach) => {
                     if (!attach.id && !attach.removed) {
-                        BroadcastMessageService.addAttachment(this.props.botSchemeId, this.props.chatChannelId, this.props.message.id, {
-                            title: attach.title,
-                            token: attach.token,
-                            type: "photo"
-                        });
+                        BroadcastMessageService.addAttachment(this.props.botSchemeId, this.props.chatChannelId,
+                            this.props.message.id, {
+                                title: attach.title,
+                                token: attach.token,
+                                type: "photo"
+                            }, null, null, this);
                     } else {
                         if (attach.removed) {
-                            BroadcastMessageService.removeAttachment(this.props.botSchemeId, this.props.chatChannelId, this.props.message.id, attach.id);
+                            BroadcastMessageService.removeAttachment(this.props.botSchemeId, this.props.chatChannelId,
+                                this.props.message.id, attach.id, null, null, this);
                         }
                     }
                 });
@@ -284,9 +285,11 @@ class TextMessage extends React.Component {
                                    maxLength={3000}/>
                 </div>
                 <div className="text-card_detail-element">
-                    <Button icon={"pi pi-paperclip"} label={"Attach"} onClick={() => this.uploadButton.click()}
+                    <Button icon={"pi pi-paperclip"} label={intl.formatMessage({id: "app.dialog.attach"})}
+                            onClick={() => this.uploadButton.click()}
                             disabled={this.state.ajaxUploadAttachProcess}/>
-                    <input accept="image/*" className={"attach-input"} name={"data"} ref={(obj) => this.uploadButton = obj} type={"file"}
+                    <input accept="image/*" className={"attach-input"} name={"data"}
+                           ref={(obj) => this.uploadButton = obj} type={"file"}
                            multiple={true} onInput={(event) => this.uploadFilesToTam(event.target.files)}/>
                     <div className={"attach-container"}>
                         {attachments}
