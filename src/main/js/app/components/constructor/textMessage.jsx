@@ -179,20 +179,23 @@ class TextMessage extends React.Component {
             this.props.message.id,
             message,
             () => {
-                this.state.attachments.forEach((attach) => {
+                this.state.attachments.forEach((attach, i) => {
                     if (!attach.id && !attach.removed) {
                         BroadcastMessageService.addAttachment(this.props.botSchemeId, this.props.chatChannelId,
                             this.props.message.id, {
                                 title: attach.title,
                                 token: attach.token,
                                 type: "photo"
-                            }, null, null, this);
-                    } else {
-                        if (attach.removed && attach.id) {
-                            BroadcastMessageService.removeAttachment(this.props.botSchemeId, this.props.chatChannelId,
-                                this.props.message.id, attach.id, null, null, this);
-                        }
+                            }, (res) => {
+                                this.state.attachments[i].id = res.data.payload.id;
+                            }, null, this);
+                    } else if (attach.removed && attach.id) {
+                        BroadcastMessageService.removeAttachment(this.props.botSchemeId, this.props.chatChannelId,
+                            this.props.message.id, attach.id, (res) => {
+                                this.state.attachments.splice(i, 1);
+                            }, null, this);
                     }
+
                 });
                 this.props.refreshMessageList();
                 AxiosMessages.successOperation(this, 'app.broadcastmessage.saved');
