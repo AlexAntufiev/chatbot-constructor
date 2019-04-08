@@ -15,6 +15,7 @@ import getCalendar from "app/i18n/calendarLocale";
 import {withRouter} from "react-router";
 import {connect} from "react-redux";
 import {injectIntl} from "react-intl";
+import {ProgressBar} from 'primereact/progressbar';
 
 class TextMessage extends React.Component {
     constructor(props) {
@@ -111,6 +112,9 @@ class TextMessage extends React.Component {
     }
 
     uploadFilesToTam(files) {
+        if (files.length === 0) {
+            return;
+        }
         this.setState({
             ajaxUploadAttachProcess: true,
             attachmentsWasChanged: true
@@ -130,7 +134,6 @@ class TextMessage extends React.Component {
                             const firstKey = Object.keys(uploadedObj["photos"])[0];
                             self.setState({
                                 attachments: [...self.state.attachments, {
-                                    uploadedFileId: i,
                                     title: files[i].name,
                                     img: URL.createObjectURL(files[i]),
                                     token: uploadedObj["photos"][firstKey].token
@@ -143,7 +146,12 @@ class TextMessage extends React.Component {
                         }
                     };
                     xhr.send(data);
-                }, null, this);
+                }, () => {
+                    uploaded++;
+                    if (uploaded === files.length) {
+                        self.setState({ajaxUploadAttachProcess: false});
+                    }
+                }, this);
         }
     }
 
@@ -180,7 +188,7 @@ class TextMessage extends React.Component {
                                 type: "photo"
                             }, null, null, this);
                     } else {
-                        if (attach.removed) {
+                        if (attach.removed && attach.id) {
                             BroadcastMessageService.removeAttachment(this.props.botSchemeId, this.props.chatChannelId,
                                 this.props.message.id, attach.id, null, null, this);
                         }
@@ -228,12 +236,13 @@ class TextMessage extends React.Component {
             message[field] = value;
             this.setState({message: message});
         };
-
+        console.log(this.attachButton);
         const attachments = this.createAttachElementsList();
         let disableSave = this.state.ajaxUpdateProcess || Object.keys(this.getUpdatedFields()).length === 0;
         if (this.state.attachmentsWasChanged) {
             disableSave = false;
         }
+
         return (
             <div className='text-card'>
                 <Growl ref={(el) => this.growl = el}/>
@@ -284,9 +293,12 @@ class TextMessage extends React.Component {
                                    maxLength={3000}/>
                 </div>
                 <div className="text-card_detail-element">
-                    <Button icon={"pi pi-paperclip"} label={intl.formatMessage({id: "app.dialog.attach"})}
+                    <Button icon={"pi pi-paperclip"} className={'attach-button'} ref={(obj) => this.attachButton = obj}
+                            label={intl.formatMessage({id: "app.dialog.attach"})}
                             onClick={() => this.uploadButton.click()}
                             disabled={this.state.ajaxUploadAttachProcess}/>
+                    {this.state.ajaxUploadAttachProcess &&
+                    <ProgressBar mode="indeterminate" className={'attach-progressbar'}/>}
                     <input accept="image/*" className={"attach-input"} name={"data"}
                            ref={(obj) => this.uploadButton = obj} type={"file"}
                            multiple={true} onInput={(event) => this.uploadFilesToTam(event.target.files)}/>
