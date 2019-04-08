@@ -14,7 +14,7 @@ public class NotificationService {
     public void notifyUser(final long userId, final Object message) {
         simpMessagingTemplate.convertAndSendToUser(
                 Long.toString(userId),
-                SimpleBrokerDestinationPrefix.QUEUE + NotificationEndpoint.UPDATES_TOPIC,
+                SimpleBrokerDestinationPrefix.QUEUE + NotificationEndpoint.UPDATES,
                 message
         );
     }

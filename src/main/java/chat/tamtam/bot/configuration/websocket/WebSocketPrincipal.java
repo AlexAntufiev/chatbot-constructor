@@ -17,6 +17,9 @@ public class WebSocketPrincipal implements Principal {
 
     @Override
     public boolean equals(Object another) {
+        if (another instanceof WebSocketPrincipal) {
+            return ((WebSocketPrincipal) another).userId.equals(userId);
+        }
         return false;
     }
 
@@ -27,7 +30,7 @@ public class WebSocketPrincipal implements Principal {
 
     @Override
     public int hashCode() {
-        return 0;
+        return userId.hashCode();
     }
 
     @Override
