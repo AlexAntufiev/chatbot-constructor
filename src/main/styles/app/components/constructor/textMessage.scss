@@ -5,3 +5,24 @@
 .text-card .text-card_detail-element {
   margin-bottom: 18px;
 }
+
+.attach-container {
+  margin-top: 18px;
+}
+
+.attach-container .attach-element {
+  display: table-row;
+}
+
+.attach-container .attach-element .table-cell {
+  display: table-cell;
+  padding: 10px;
+}
+.attach-input {
+  display: none;
+}
+.attach-title {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
