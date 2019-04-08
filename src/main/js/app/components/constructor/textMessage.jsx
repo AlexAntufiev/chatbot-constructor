@@ -117,7 +117,6 @@ class TextMessage extends React.Component {
     }
 
     uploadFilesToTam(files) {
-        console.log(files);
         this.setState({
             ajaxUploadAttachProcess: true,
             attachmentsWasChanged: true
