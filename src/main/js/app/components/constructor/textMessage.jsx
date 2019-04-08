@@ -32,7 +32,6 @@ class TextMessage extends React.Component {
                 firingTime: null,
                 erasingTime: null
             },
-            uploadLink: "",
             attachments: [],
             attachmentsWasChanged: false,
             ajaxUploadAttachProcess: false,
