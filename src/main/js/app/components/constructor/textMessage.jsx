@@ -97,14 +97,16 @@ class TextMessage extends React.Component {
             if (!attach.removed) {
                 renderedList.push(<div className={"attach-element"}>
                     <div className={"table-cell attach-title"}>{attach.title}</div>
-                    <div className={"table-cell"}><Button icon={"pi pi-times"} onClick={() => {
-                        const attachments = [...this.state.attachments];
-                        attachments[i].removed = true;
-                        this.setState({
-                            attachments: attachments,
-                            attachmentsWasChanged: true
-                        });
-                    }}/></div>
+                    <div className={"table-cell"}><Button
+                        disabled={this.props.message.state === BroadcastMessageState.SENT} icon={"pi pi-times"}
+                        onClick={() => {
+                            const attachments = [...this.state.attachments];
+                            attachments[i].removed = true;
+                            this.setState({
+                                attachments: attachments,
+                                attachmentsWasChanged: true
+                            });
+                        }}/></div>
                 </div>)
             }
         }
@@ -298,7 +300,7 @@ class TextMessage extends React.Component {
                     <Button icon={"pi pi-paperclip"} className={'attach-button'} ref={(obj) => this.attachButton = obj}
                             label={intl.formatMessage({id: "app.dialog.attach"})}
                             onClick={() => this.uploadButton.click()}
-                            disabled={this.state.ajaxUploadAttachProcess}/>
+                            disabled={this.state.ajaxUploadAttachProcess || this.props.message.state === BroadcastMessageState.SENT}/>
                     {this.state.ajaxUploadAttachProcess &&
                     <ProgressBar mode="indeterminate" className={'attach-progressbar'}/>}
                     <input accept="image/*" className={"attach-input"} name={"data"}
