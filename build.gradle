@@ -41,6 +41,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-batch'
     implementation 'org.springframework.security:spring-security-core:5.1.4.RELEASE'
+    implementation 'org.springframework.security:spring-security-messaging:5.1.5.RELEASE'
+
     implementation 'org.jetbrains:annotations:16.0.3'
     implementation 'com.auth0:java-jwt:3.4.0'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.9.8'

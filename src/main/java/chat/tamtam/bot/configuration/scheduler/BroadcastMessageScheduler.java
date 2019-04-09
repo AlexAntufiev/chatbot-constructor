@@ -1,4 +1,4 @@
-package chat.tamtam.bot.configuration.schedule;
+package chat.tamtam.bot.configuration.scheduler;
 
 import java.nio.ByteBuffer;
 import java.sql.Timestamp;
@@ -7,23 +7,23 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 import org.jetbrains.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
+import chat.tamtam.bot.domain.notification.NotificationMessage;
+import chat.tamtam.bot.domain.notification.NotificationType;
 import chat.tamtam.bot.repository.BotSchemaRepository;
 import chat.tamtam.bot.repository.BroadcastMessageAttachmentRepository;
 import chat.tamtam.bot.repository.BroadcastMessageRepository;
 import chat.tamtam.bot.repository.TamBotRepository;
 import chat.tamtam.bot.service.Error;
 import chat.tamtam.bot.service.TransactionalUtils;
+import chat.tamtam.bot.service.notification.NotificationService;
 import chat.tamtam.botapi.TamTamBotAPI;
 import chat.tamtam.botapi.exceptions.APIException;
 import chat.tamtam.botapi.exceptions.ClientException;
@@ -52,14 +52,11 @@ public class BroadcastMessageScheduler {
     private final BotSchemaRepository botSchemaRepository;
     private final TamBotRepository tamBotRepository;
     private final BroadcastMessageAttachmentRepository broadcastMessageAttachmentRepository;
+    private final NotificationService notificationService;
 
     private final TransactionalUtils transactionalUtils;
 
-    private final Executor executor;
-    @Value("${tamtam.broadcast.executor.corePoolSize:1}")
-    private int corePoolSize;
-    @Value("${tamtam.broadcast.executor.maxPoolSize:1}")
-    private int maxPoolSize;
+    private final Executor scheduledMessagesExecutor;
 
     @Scheduled(fixedRate = DEFAULT_SENDING_RATE)
     public void fireScheduledMessages() {
@@ -69,34 +66,43 @@ public class BroadcastMessageScheduler {
                         currentTimestamp,
                         BroadcastMessageState.SCHEDULED.getValue()
                 );
-        scheduledMessages.forEach(e -> {
+        scheduledMessages.forEach(message -> {
             botSchemaRepository
-                    .findById(e.getBotSchemeId())
+                    .findById(message.getBotSchemeId())
                     .ifPresentOrElse(
                             botScheme -> {
-                                TamTamBotAPI tamTamBotAPI = getTamTamBotAPI(e, botScheme);
+                                TamTamBotAPI tamTamBotAPI = getTamTamBotAPI(message, botScheme);
                                 if (tamTamBotAPI != null) {
                                     try {
                                         transactionalUtils.invokeRunnable(
-                                                () -> setProcessingStateAttempt(e, BroadcastMessageState.SCHEDULED)
+                                                () -> setProcessingStateAttempt(
+                                                        message,
+                                                        BroadcastMessageState.SCHEDULED,
+                                                        botScheme.getUserId()
+                                                )
                                         );
-                                        executor.execute(() -> sendBroadcastMessage(tamTamBotAPI, e));
+                                        scheduledMessagesExecutor
+                                                .execute(() -> sendBroadcastMessage(
+                                                        tamTamBotAPI,
+                                                        message,
+                                                        botScheme.getUserId()
+                                                ));
                                     } catch (IllegalStateException iSE) {
                                         log.error(String.format(
                                                 "Can't change message state with id=%d",
-                                                e.getId()
+                                                message.getId()
                                         ), iSE);
                                     }
                                 } else {
-                                    e.setState(BroadcastMessageState.ERROR);
-                                    e.setError(Error.BROADCAST_MESSAGE_ILLEGAL_STATE.getErrorKey());
-                                    broadcastMessageRepository.save(e);
+                                    message.setState(BroadcastMessageState.ERROR);
+                                    message.setError(Error.BROADCAST_MESSAGE_ILLEGAL_STATE.getErrorKey());
+                                    broadcastMessageRepository.save(message);
                                 }
                             },
                             () -> log.error(
                                     String.format(
                                             "Can't send message with id=%d because botScheme is not presented",
-                                            e.getBotSchemeId()
+                                            message.getBotSchemeId()
                                     )
                             )
                     );
@@ -106,7 +112,8 @@ public class BroadcastMessageScheduler {
 
     protected void setProcessingStateAttempt(
             final BroadcastMessageEntity broadcastMessage,
-            final BroadcastMessageState requiredState
+            final BroadcastMessageState requiredState,
+            final long userId
     ) throws IllegalStateException {
         if (broadcastMessageRepository
                 .findById(broadcastMessage.getId())
@@ -114,6 +121,7 @@ public class BroadcastMessageScheduler {
                 .getState() == requiredState.getValue()) {
             broadcastMessage.setState(BroadcastMessageState.PROCESSING);
             broadcastMessageRepository.save(broadcastMessage);
+            notifyUser(userId, broadcastMessage);
         } else {
             throw new IllegalStateException(
                     "Can't set PROCESSING state because message is not in "
@@ -130,34 +138,43 @@ public class BroadcastMessageScheduler {
                         currentTimestamp,
                         BroadcastMessageState.SENT.getValue()
                 );
-        scheduledMessages.forEach(e -> {
+        scheduledMessages.forEach(message -> {
             botSchemaRepository
-                    .findById(e.getBotSchemeId())
+                    .findById(message.getBotSchemeId())
                     .ifPresentOrElse(
                             botScheme -> {
-                                TamTamBotAPI tamTamBotAPI = getTamTamBotAPI(e, botScheme);
+                                TamTamBotAPI tamTamBotAPI = getTamTamBotAPI(message, botScheme);
                                 if (tamTamBotAPI != null) {
                                     try {
                                         transactionalUtils.invokeRunnable(
-                                                () -> setProcessingStateAttempt(e, BroadcastMessageState.SENT)
+                                                () -> setProcessingStateAttempt(
+                                                        message,
+                                                        BroadcastMessageState.SENT,
+                                                        botScheme.getUserId()
+                                                )
                                         );
-                                        executor.execute(() -> eraseBroadcastMessage(tamTamBotAPI, e));
+                                        scheduledMessagesExecutor
+                                                .execute(() -> eraseBroadcastMessage(
+                                                        tamTamBotAPI,
+                                                        message,
+                                                        botScheme.getUserId()
+                                                ));
                                     } catch (IllegalStateException iSE) {
                                         log.error(String.format(
                                                 "Can't change message state with id=%d",
-                                                e.getId()
+                                                message.getId()
                                         ), iSE);
                                     }
                                 } else {
-                                    e.setState(BroadcastMessageState.ERROR);
-                                    e.setError(Error.BROADCAST_MESSAGE_ILLEGAL_STATE.getErrorKey());
-                                    broadcastMessageRepository.save(e);
+                                    message.setState(BroadcastMessageState.ERROR);
+                                    message.setError(Error.BROADCAST_MESSAGE_ILLEGAL_STATE.getErrorKey());
+                                    broadcastMessageRepository.save(message);
                                 }
                             },
                             () -> log.error(
                                     String.format(
                                             "Can't erase message with id=%d because botScheme is not presented",
-                                            e.getBotSchemeId()
+                                            message.getBotSchemeId()
                                     )
                             )
                     );
@@ -168,7 +185,8 @@ public class BroadcastMessageScheduler {
     @Async
     protected void sendBroadcastMessage(
             final TamTamBotAPI tamTamBotAPI,
-            final BroadcastMessageEntity broadcastMessage
+            final BroadcastMessageEntity broadcastMessage,
+            final long userId
     ) {
         try {
             List<AttachmentRequest> attachmentRequests = new ArrayList<>();
@@ -240,12 +258,14 @@ public class BroadcastMessageScheduler {
             broadcastMessage.setError(Error.BROADCAST_MESSAGE_SEND_ERROR.getErrorKey());
         }
         broadcastMessageRepository.save(broadcastMessage);
+        notifyUser(userId, broadcastMessage);
     }
 
     @Async
     protected void eraseBroadcastMessage(
             final TamTamBotAPI tamTamBotAPI,
-            final BroadcastMessageEntity broadcastMessage
+            final BroadcastMessageEntity broadcastMessage,
+            final long userId
     ) {
         try {
             tamTamBotAPI
@@ -258,6 +278,7 @@ public class BroadcastMessageScheduler {
             broadcastMessage.setError(Error.BROADCAST_MESSAGE_ERASE_ERROR.getErrorKey());
         }
         broadcastMessageRepository.save(broadcastMessage);
+        notifyUser(userId, broadcastMessage);
     }
 
     private @Nullable TamTamBotAPI getTamTamBotAPI(BroadcastMessageEntity e, BotSchemeEntity botScheme) {
@@ -276,13 +297,13 @@ public class BroadcastMessageScheduler {
         return TamTamBotAPI.create(tamBot.getToken());
     }
 
-    @Bean
-    public Executor taskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(corePoolSize);
-        executor.setMaxPoolSize(maxPoolSize);
-        executor.setThreadNamePrefix("ScheduledBroadcastMessageProcess-");
-        executor.initialize();
-        return executor;
+    private void notifyUser(final long userId, final BroadcastMessageEntity broadcastMessage) {
+        notificationService.notifyUser(
+                userId,
+                new NotificationMessage(
+                        NotificationType.BROADCAST_MESSAGE_NOTIFICATION,
+                        broadcastMessage
+                )
+        );
     }
 }
