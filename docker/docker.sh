@@ -7,7 +7,7 @@ url="https://botapi.tamtam.chat/messages?access_token=${token}&chat_id=${chat_id
 server_name="TEST-1"
 host="89.208.84.173"
 port="8090"
-config_service_port="8600"
+config_service_port="8500"
 body=""
 
 function set_message(){
