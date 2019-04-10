@@ -28,3 +28,4 @@ lombok.config
 .DS_Store
 chatbot-constructor.pid
 chatbot-constructor.jar
+!/src/main/resources/config.properties

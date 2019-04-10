@@ -40,6 +40,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-batch'
+    implementation 'org.springframework.cloud:spring-cloud-starter-consul-discovery:2.1.1.RELEASE'
+    implementation 'org.springframework.cloud:spring-cloud-starter-consul-config:2.1.1.RELEASE'
     implementation 'org.springframework.security:spring-security-core:5.1.4.RELEASE'
     implementation 'org.jetbrains:annotations:16.0.3'
     implementation 'com.auth0:java-jwt:3.4.0'

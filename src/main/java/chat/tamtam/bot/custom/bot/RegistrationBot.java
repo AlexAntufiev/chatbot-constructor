@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -44,9 +45,10 @@ import static chat.tamtam.bot.security.SecurityConstants.SECRET;
 import static chat.tamtam.bot.security.SecurityConstants.TOKEN_PREFIX;
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
-@Component
-@RequiredArgsConstructor
 @Log4j2
+@Component
+@RefreshScope
+@RequiredArgsConstructor
 public class RegistrationBot extends AbstractCustomBot {
     private static final String HELP_MESSAGE =
             "Available commands:\n\n"
@@ -68,7 +70,6 @@ public class RegistrationBot extends AbstractCustomBot {
     @Value("${tamtam.registration.bot.id}")
     private String id;
     // @todo #CC-91 dont create reg bot with nullable id and token
-    @Getter
     @Value("${tamtam.registration.bot.token}")
     private String token;
     @Value("${tamtam.registration.bot.trustedUsers:{555537636725, 590435433004, 575868018573, 577949140156}}")
@@ -106,7 +107,7 @@ public class RegistrationBot extends AbstractCustomBot {
     private NewMessageBody resolve(final Message message) {
         String[] cmd = Optional
                 .ofNullable(message.getBody().getText())
-                .orElseGet(() -> "")
+                .orElse("")
                 .split(" ");
         switch (cmd[0]) {
             case "/reg":
