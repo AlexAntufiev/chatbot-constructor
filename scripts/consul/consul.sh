@@ -9,9 +9,9 @@ docker pull ${docker_image}
 
 docker image rm -f ${container_name}
 
-docker run  -p 8400:8400 \
+docker run  -h \
+            -p 8400:8400 \
             -p 8500:8500 \
-            -p 8600:53/udp \
             -p 8600:53/udp \
             -h ${server_name} \
             -v ${path_to_config_file}:/consul/config/my_config.json:ro \
