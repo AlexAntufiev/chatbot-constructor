@@ -59,7 +59,7 @@ function start {
         error "Application executable [${application_name}.jar] not accessible or does not exists"
     fi
 
-    application_arguments="--server.port=${application_port} ${application_arguments}"
+    application_arguments="--server.port=${application_port} --spring.profiles.active=${profile_name} ${application_arguments}"
 
     startup_command="java ${jvm_arguments} -jar ${application_name}.jar ${application_arguments}"
 
@@ -217,10 +217,9 @@ function main {
                 ;;
             -p|--profile)
                 shift;
-                profile_requested=true
                 if [ -n "$1" ]; then
-                    if [[ "${1}" -ne "development" || "${1}" -ne "production" ]]; then
-                        error "Given profile should be 'development' or 'production'"
+                    if [[ "${1}" -ne "development" || "${1}" -ne "production" || "${1}" -ne "test" ]]; then
+                        error "Given profile should be 'development' or 'production' or 'test'"
                     fi
                     profile_name="${1}"
                     shift;
@@ -260,10 +259,6 @@ function main {
 
     if ${debug_requested}; then
         jvm_arguments="${jvm_arguments} -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=${debug_port}"
-    fi
-
-    if ${profile_requested}; then
-        application_arguments="${application_arguments} --spring.profiles.active=${profile_name}"
     fi
 
     case ${1} in

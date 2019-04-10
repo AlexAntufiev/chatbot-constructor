@@ -17,7 +17,6 @@ class BotBroadcastingDetail extends Component {
 
         this.state = {
             messageList: [],
-            editedMessage: {},
             ajaxRefreshProcess: false
         };
         this.onAddMessage = this.onAddMessage.bind(this);
