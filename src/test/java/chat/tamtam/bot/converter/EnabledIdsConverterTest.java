@@ -12,6 +12,7 @@ public class EnabledIdsConverterTest extends RunnableTestContext {
     @Autowired
     private EnabledIdsConverter converter;
 
+    // CHECKSTYLE_OFF: ALMOST_ALL
     @Test
     public void partitionsOnlyTest() {
         String parts = "0-12, 15-100";
@@ -100,4 +101,6 @@ public class EnabledIdsConverterTest extends RunnableTestContext {
             Assertions.assertFalse(enabledId.isEnabled(id + 1), String.format("Id=%d should be disabled", id));
         }, IllegalStateException::new);
     }
+
+    // CHECKSTYLE_ON: ALMOST_ALL
 }
