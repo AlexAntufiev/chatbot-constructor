@@ -86,6 +86,13 @@ public class RegistrationBot extends AbstractCustomBot {
     public void init() {
         enabledIds = enabledIdsConverter.convert(ids);
         botAPI = TamTamBotAPI.create(token);
+        log.info(
+                String.format(
+                        "Registration bot(id:%s, token:%s) initialized",
+                        registrationBotId,
+                        token
+                )
+        );
     }
 
     @Override
