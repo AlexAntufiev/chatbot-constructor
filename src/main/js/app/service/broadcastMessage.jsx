@@ -39,3 +39,32 @@ export function updateBroadcastMessage(botSchemeId, chatChannelId, messageId, me
     });
     handleRequest(axios.post(url, message), callbackSuccess, callbackFail, context);
 }
+
+export function addAttachment(botSchemeId, chatChannelId, messageId, attachment, callbackSuccess, callbackFail, context) {
+    const url = makeUrl(ApiPoints.ADD_ATTACHMENT, {
+        id: botSchemeId,
+        chatChannelId: chatChannelId,
+        messageId: messageId
+    });
+    handleRequest(axios.post(url, attachment), callbackSuccess, callbackFail, context);
+}
+
+export function getAttacmentsList(botSchemeId, chatChannelId, messageId, callbackSuccess, callbackFail, context) {
+    const url = makeUrl(ApiPoints.GET_ATTACHMENTS_LIST, {
+        id: botSchemeId,
+        chatChannelId: chatChannelId,
+        messageId: messageId
+    });
+    handleRequest(axios.get(url), callbackSuccess, callbackFail, context);
+}
+
+export function removeAttachment(botSchemeId, chatChannelId, messageId, attachmentId, callbackSuccess, callbackFail, context) {
+    const url = makeUrl(ApiPoints.REMOVE_ATTACHMENT, {
+        id: botSchemeId,
+        chatChannelId: chatChannelId,
+        messageId: messageId,
+        attachmentId: attachmentId
+    });
+    handleRequest(axios.post(url), callbackSuccess, callbackFail, context);
+
+}
