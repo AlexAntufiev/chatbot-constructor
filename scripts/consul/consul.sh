@@ -1,19 +1,19 @@
 #!/bin/bash
 
-path_to_config_file="./config.json"
-server_name="TEST-1"
-docker_image="wdijkerman/consul"
-container_name="consul"
+node_address="192.168.9.152"
+docker_image="consul"
+docker_app="consul agent"
 
 docker pull ${docker_image}
 
-docker image rm -f ${container_name}
+docker rm -f ${docker_image}
 
-docker run  -h \
-            -p 8400:8400 \
-            -p 8500:8500 \
-            -p 8600:53/udp \
-            -h ${server_name} \
-            -v ${path_to_config_file}:/consul/config/my_config.json:ro \
-            --name ${container_name} \
-            ${docker_image}
+docker run  -d \
+            --net=host \
+            --name ${docker_image} \
+            -e CONSUL_BIND_INTERFACE=eth0 \
+            ${docker_app} \
+            -server \
+            -ui \
+            -bootstrap-expect=1 \
+            -client ${node_address}
