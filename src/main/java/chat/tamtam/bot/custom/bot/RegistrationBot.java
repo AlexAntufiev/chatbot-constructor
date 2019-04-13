@@ -3,7 +3,6 @@ package chat.tamtam.bot.custom.bot;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -64,15 +63,12 @@ public class RegistrationBot extends AbstractCustomBot {
     private final @NonNull
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Getter
-    @Value("${tamtam.registration.bot.id}")
-    private String id;
-    // @todo #CC-91 dont create reg bot with nullable id and token
+    @Value("${tamtam.registration.bot.registrationBotId}")
+    private String registrationBotId;
+    // @todo #CC-91 dont create reg bot with nullable registrationBotId and token
     @Getter
     @Value("${tamtam.registration.bot.token}")
     private String token;
-    @Value("${tamtam.registration.bot.trustedUsers:{}}")
-    private Set<String> trustedUsers;
 
     @Value("${tamtam.host}")
     private String host;
@@ -88,7 +84,6 @@ public class RegistrationBot extends AbstractCustomBot {
 
     @PostConstruct
     public void init() {
-        System.out.println(ids.length());
         enabledIds = enabledIdsConverter.convert(ids);
         botAPI = TamTamBotAPI.create(token);
     }
@@ -103,7 +98,7 @@ public class RegistrationBot extends AbstractCustomBot {
                         .execute();
             }
         } catch (APIException | ClientException e) {
-            log.error(String.format("Bot with id = [%s] can't process message", id), e);
+            log.error(String.format("Bot with registrationBotId = [%s] can't process message", registrationBotId), e);
         }
     }
 
@@ -210,6 +205,11 @@ public class RegistrationBot extends AbstractCustomBot {
     }
 
     @Override
+    public String getId() {
+        return registrationBotId;
+    }
+
+    @Override
     public BotType getType() {
         return BotType.Registration;
     }
@@ -218,14 +218,22 @@ public class RegistrationBot extends AbstractCustomBot {
     @Bean
     public void subscribeRegBotOnAppReadyProduction() {
         try {
-            url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
+            url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + registrationBotId;
             SimpleQueryResult result = botAPI.subscribe(new SubscriptionRequestBody(url)).execute();
-            if (!result.isSuccess()) {
-                log.debug("Can't subscribe bot with id:" + id);
+            if (result.isSuccess()) {
+                log.info(String.format("Registration bot(registrationBotId:%d, token:%s) subscribed on %s",
+                        registrationBotId, token, url
+                ));
+            } else {
+                log.warn(String.format("Can't subscribe registration bot(registrationBotId:%d, token:%s) on %s",
+                        registrationBotId, token, url
+                ));
             }
             subscribed = true;
         } catch (ClientException | APIException e) {
-            log.error(String.format("Can't subscribe bot with id = [%s] via url = [%s]", id, url), e);
+            log.error(String.format("Can't subscribe bot with registrationBotId = [%s] via url = [%s]",
+                    registrationBotId, url
+            ), e);
         }
     }
 
@@ -237,11 +245,18 @@ public class RegistrationBot extends AbstractCustomBot {
         }
         try {
             SimpleQueryResult result = botAPI.unsubscribe(url).execute();
+            log.info(String.format("Registration bot(registrationBotId:%s, token:%s) unsubscribed from %s",
+                    registrationBotId, token, url
+            ));
             if (!result.isSuccess()) {
-                log.debug("Can't unsubscribe bot with id:" + id);
+                log.warn(String.format("Can't unsubscribe registration bot(registrationBotId:%s, token:%s) on %s",
+                        registrationBotId, token, url
+                ));
             }
         } catch (ClientException | APIException e) {
-            log.error(String.format("Can't unsubscribe bot with id = [%s] via url = [%s]", id, url), e);
+            log.error(String.format("Can't unsubscribe bot with registrationBotId = [%s] via url = [%s]",
+                    registrationBotId, url
+            ), e);
         }
     }
 }
