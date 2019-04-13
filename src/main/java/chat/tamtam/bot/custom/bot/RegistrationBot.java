@@ -18,6 +18,8 @@ import com.auth0.jwt.JWT;
 
 import chat.tamtam.bot.configuration.Profiles;
 import chat.tamtam.bot.controller.Endpoint;
+import chat.tamtam.bot.converter.EnabledIds;
+import chat.tamtam.bot.converter.EnabledIdsConverter;
 import chat.tamtam.bot.domain.session.SessionEntity;
 import chat.tamtam.bot.domain.user.UserEntity;
 import chat.tamtam.bot.repository.SessionRepository;
@@ -62,8 +64,6 @@ public class RegistrationBot extends AbstractCustomBot {
     private final @NonNull
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Value("${tamtam.registration.bot.onlyTrustedUsers:true}")
-    private boolean onlyTrustedUsers;
     @Getter
     @Value("${tamtam.registration.bot.id}")
     private String id;
@@ -71,10 +71,16 @@ public class RegistrationBot extends AbstractCustomBot {
     @Getter
     @Value("${tamtam.registration.bot.token}")
     private String token;
-    @Value("${tamtam.registration.bot.trustedUsers:{555537636725, 590435433004, 575868018573, 577949140156}}")
+    @Value("${tamtam.registration.bot.trustedUsers:{}}")
     private Set<String> trustedUsers;
+
     @Value("${tamtam.host}")
     private String host;
+
+    @Value("${tamtam.registration.bot.enabledIds:}")
+    private String ids;
+    private final EnabledIdsConverter enabledIdsConverter;
+    private EnabledIds enabledIds;
 
     private String url;
     private boolean subscribed = false;
@@ -82,6 +88,8 @@ public class RegistrationBot extends AbstractCustomBot {
 
     @PostConstruct
     public void init() {
+        System.out.println(ids.length());
+        enabledIds = enabledIdsConverter.convert(ids);
         botAPI = TamTamBotAPI.create(token);
     }
 
@@ -100,7 +108,7 @@ public class RegistrationBot extends AbstractCustomBot {
     }
 
     private boolean filter(final Message message) {
-        return !onlyTrustedUsers || trustedUsers.contains(message.getSender().getUserId().toString());
+        return enabledIds.isEnabled(message.getSender().getUserId());
     }
 
     private NewMessageBody resolve(final Message message) {
