@@ -95,11 +95,12 @@ public class RegistrationBot extends AbstractCustomBot {
     private boolean subscribed = false;
     private TamTamBotAPI botAPI;
 
-    private final RegistrationBotVisitor visitor = new RegistrationBotVisitor();
+    private RegistrationBotVisitor visitor;
 
     @PostConstruct
     public void init() {
         botAPI = TamTamBotAPI.create(token);
+        visitor = new RegistrationBotVisitor();
     }
 
     @Override
