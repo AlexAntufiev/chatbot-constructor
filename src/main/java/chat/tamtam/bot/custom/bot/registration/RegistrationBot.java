@@ -1,9 +1,9 @@
-package chat.tamtam.bot.custom.bot;
+package chat.tamtam.bot.custom.bot.registration;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -134,7 +134,7 @@ public class RegistrationBot extends AbstractCustomBot {
             log.error(
                     String.format(
                             "Bot(id=%s) can't response to event(type:%s, id:%s, sender:%d)",
-                            id,
+                            registrationBotId,
                             update.getType(),
                             update.getMessage().getBody().getMid(),
                             update.getMessage().getSender().getUserId()
@@ -155,7 +155,7 @@ public class RegistrationBot extends AbstractCustomBot {
             log.error(
                     String.format(
                             "Bot(id=%s) can't response to event(type:%s, sender:%d)",
-                            id,
+                            registrationBotId,
                             update.getType(),
                             update.getUserId()
                     ),
@@ -164,8 +164,8 @@ public class RegistrationBot extends AbstractCustomBot {
         }
     }
 
-    private boolean filter(final Message message) {
-        return enabledIds.isEnabled(message.getSender().getUserId());
+    private boolean filter(final Long userId) {
+        return enabledIds.isEnabled(userId);
     }
 
     private NewMessageBody resolve(final Message message) {
