@@ -30,7 +30,7 @@ public class WebHookCustomBotController {
     ) {
         try {
             webHookBotService.submit(id, message);
-        } catch (Exception e) {
+        } catch (UnsupportedOperationException e) {
             log.error(String.format(
                     "Webhook service can not submit message: [%s] to bot with id = [%s]",
                     message,

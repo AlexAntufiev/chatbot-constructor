@@ -12,10 +12,9 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @Component
-public class EnabledIdsConverter implements Converter<String, EnabledIds> {
+public class EnabledIdsConverter {
     public static final short PARTITIONS_AMOUNT = 256;
 
-    @Override
     public EnabledIds convert(final String source) {
         if (StringUtils.isEmpty(source)) {
             return new EnabledIdsImpl(Collections.emptySet(), PARTITIONS_AMOUNT, Collections.emptySet());
@@ -71,7 +70,7 @@ public class EnabledIdsConverter implements Converter<String, EnabledIds> {
             }
             return partitions;
         } catch (NumberFormatException e) {
-            log.warn("Can't convert partitions range", e);
+            log.debug("Can't convert partitions range", e);
             return Collections.emptySet();
         }
     }
