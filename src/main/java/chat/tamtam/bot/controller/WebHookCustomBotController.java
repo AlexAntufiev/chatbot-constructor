@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import chat.tamtam.bot.service.WebHookBotService;
-import chat.tamtam.botapi.model.Message;
+import chat.tamtam.botapi.model.Update;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -26,14 +26,14 @@ public class WebHookCustomBotController {
     @PostMapping(Endpoint.ID)
     public ResponseEntity<?> webHookMessage(
             @PathVariable final String id,
-            @RequestBody final Message message
+            @RequestBody final Update update
     ) {
         try {
-            webHookBotService.submit(id, message);
+            webHookBotService.submit(id, update);
         } catch (UnsupportedOperationException e) {
             log.error(String.format(
                     "Webhook service can not submit message: [%s] to bot with id = [%s]",
-                    message,
+                    update,
                     id
             ), e);
         } finally {

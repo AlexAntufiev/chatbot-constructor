@@ -1,9 +1,9 @@
 package chat.tamtam.bot.custom.bot;
 
-import chat.tamtam.botapi.model.Message;
+import chat.tamtam.botapi.model.Update;
 
 public abstract class AbstractCustomBot {
-    public void processMessage(Message message) {
+    public void process(Update update) {
         throw new UnsupportedOperationException("from " + getType());
     };
 
