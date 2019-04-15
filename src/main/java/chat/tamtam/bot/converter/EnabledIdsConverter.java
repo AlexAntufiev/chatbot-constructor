@@ -46,7 +46,7 @@ public class EnabledIdsConverter {
     }
 
     private static Set<Short> parsePartitionsRange(final String source) {
-        if (source == null) {
+        if (StringUtils.isEmpty(source)) {
             return Collections.emptySet();
         }
 
