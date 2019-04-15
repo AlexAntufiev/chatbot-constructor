@@ -1,6 +1,4 @@
 spring:
-  profiles:
-    active: development
   jpa:
     generate-ddl: true
     hibernate:

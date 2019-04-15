@@ -11,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class EnabledIdsConverterTest {
     @Autowired
     private EnabledIdsConverter converter;
+    private final List<Long> ids = List.of(155537636725L, 190435433004L, 175868018573L, 177949140156L);
+    private final String idsAsString = "155537636725, 190435433004, 175868018573, 177949140156";
 
     // CHECKSTYLE_OFF: ALMOST_ALL
     @Test
@@ -52,9 +54,7 @@ public class EnabledIdsConverterTest {
 
     @Test
     public void idsOnlyTest() {
-        List<Long> ids = List.of(555537636725L, 590435433004L, 575868018573L, 577949140156L);
-        String property = "555537636725, 590435433004, 575868018573, 577949140156";
-        EnabledIds enabledIds = converter.convert(property);
+        EnabledIds enabledIds = converter.convert(idsAsString);
         ids.forEach(id -> Assertions.assertTrue(
                 enabledIds.isEnabled(id),
                 String.format("Id=%d should be enabled", id)
@@ -68,7 +68,6 @@ public class EnabledIdsConverterTest {
 
     @Test
     public void emptyStringTest() {
-        List<Long> ids = List.of(555537636725L, 590435433004L, 575868018573L, 577949140156L);
         String nullString = null;
         EnabledIds enabledIdsWithNull = converter.convert(nullString);
         ids.forEach(id -> Assertions.assertFalse(
@@ -84,16 +83,17 @@ public class EnabledIdsConverterTest {
     }
 
     @Test
-    public void combinedTest() {
+    public void allPartitionsEnabledTest() {
         String parts = "0-255";
         EnabledIds enabledIds = converter.convert(parts);
-        List<Long> ids = List.of(555537636725L, 590435433004L, 575868018573L, 577949140156L);
         ids.forEach(id -> Assertions.assertTrue(
                 enabledIds.isEnabled(id),
                 String.format("Id=%d should be enabled", id)
         ));
+    }
 
-        // single partition enabled
+    @Test
+    public void singlePartitionEnabledTest() {
         ids.stream().findFirst().ifPresentOrElse(id -> {
             String partition = String.valueOf(id % converter.PARTITIONS_AMOUNT);
             EnabledIds enabledId = converter.convert(partition);
@@ -101,6 +101,6 @@ public class EnabledIdsConverterTest {
             Assertions.assertFalse(enabledId.isEnabled(id + 1), String.format("Id=%d should be disabled", id));
         }, IllegalStateException::new);
     }
-
     // CHECKSTYLE_ON: ALMOST_ALL
+
 }
