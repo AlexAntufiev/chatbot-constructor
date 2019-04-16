@@ -18,9 +18,3 @@ logging:
     chat:
       tamtam:
         bot: DEBUG
-
-tamtam:
-  registration:
-    bot:
-      id: 592946665497
-      token: JTY864IytlNJaW38XFn2WYC-Jikm0mv5PeewS_ugaYU

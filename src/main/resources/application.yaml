@@ -1,6 +1,4 @@
 spring:
-  profiles:
-    active: development
   jpa:
     generate-ddl: true
     hibernate:
@@ -49,8 +47,7 @@ tamtam:
     bot:
       id: 581483330212
       token: JUeixE5Dr7WoBY3ajjfwr72ya1CR_zw6D25VlR0sgNI
-      onlyTrustedUsers: true
-      trustedUsers: 555537636725, 590435433004, 575868018573, 577949140156
+      enabledIds: 555537636725, 590435433004, 575868018573, 577949140156
   broadcast:
     executor:
       corePoolSize: 2

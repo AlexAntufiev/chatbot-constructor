@@ -10,5 +10,4 @@ public class BroadcastMessageUpdate {
     private String text;
     private String firingTime;
     private String erasingTime;
-    // @todo #CC-63 Add payload field
 }
