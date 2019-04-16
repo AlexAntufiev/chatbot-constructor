@@ -41,6 +41,7 @@ public class EnabledIdsConverter {
             }
             return Set.of(id);
         } catch (NumberFormatException e) {
+            log.debug(String.format("Can't parse %s as id", source), e);
             return Collections.emptySet();
         }
     }
@@ -70,7 +71,7 @@ public class EnabledIdsConverter {
             }
             return partitions;
         } catch (NumberFormatException e) {
-            log.debug("Can't convert partitions range", e);
+            log.debug(String.format("Can't convert %s as partitions range", source), e);
             return Collections.emptySet();
         }
     }
@@ -83,6 +84,7 @@ public class EnabledIdsConverter {
             }
             return Set.of(partition);
         } catch (NumberFormatException e) {
+            log.debug(String.format("Can't parse %s as partition", source), e);
             return parsePartitionsRange(source);
         }
     }
