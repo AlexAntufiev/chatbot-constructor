@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 
 import chat.tamtam.bot.custom.bot.AbstractCustomBot;
 import chat.tamtam.bot.custom.bot.BotType;
-import chat.tamtam.bot.custom.bot.RegistrationBot;
 import chat.tamtam.bot.custom.bot.StubBot;
-import chat.tamtam.botapi.model.Message;
+import chat.tamtam.bot.custom.bot.registration.RegistrationBot;
+import chat.tamtam.botapi.model.Update;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -25,7 +25,7 @@ public class WebHookBotService {
 
     public void submit(
             final String botId,
-            final Message message
+            final Update update
     ) throws UnsupportedOperationException {
         botMap.getOrDefault(
                 typeMap.getOrDefault(
@@ -33,7 +33,7 @@ public class WebHookBotService {
                         BotType.Stub
                 ),
                 stubBot
-        ).processMessage(message);
+        ).process(update);
     }
 
     @PostConstruct

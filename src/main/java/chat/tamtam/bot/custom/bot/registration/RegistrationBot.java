@@ -1,9 +1,9 @@
-package chat.tamtam.bot.custom.bot;
+package chat.tamtam.bot.custom.bot.registration;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -19,6 +19,10 @@ import com.auth0.jwt.JWT;
 
 import chat.tamtam.bot.configuration.Profiles;
 import chat.tamtam.bot.controller.Endpoint;
+import chat.tamtam.bot.converter.EnabledIds;
+import chat.tamtam.bot.converter.EnabledIdsConverter;
+import chat.tamtam.bot.custom.bot.AbstractCustomBot;
+import chat.tamtam.bot.custom.bot.BotType;
 import chat.tamtam.bot.domain.session.SessionEntity;
 import chat.tamtam.bot.domain.user.UserEntity;
 import chat.tamtam.bot.repository.SessionRepository;
@@ -27,15 +31,26 @@ import chat.tamtam.bot.security.SecurityConstants;
 import chat.tamtam.botapi.TamTamBotAPI;
 import chat.tamtam.botapi.exceptions.APIException;
 import chat.tamtam.botapi.exceptions.ClientException;
+import chat.tamtam.botapi.model.BotAddedToChatUpdate;
+import chat.tamtam.botapi.model.BotRemovedFromChatUpdate;
+import chat.tamtam.botapi.model.BotStartedUpdate;
+import chat.tamtam.botapi.model.ChatTitleChangedUpdate;
 import chat.tamtam.botapi.model.InlineKeyboardAttachmentRequest;
 import chat.tamtam.botapi.model.InlineKeyboardAttachmentRequestPayload;
 import chat.tamtam.botapi.model.Intent;
 import chat.tamtam.botapi.model.LinkButton;
 import chat.tamtam.botapi.model.Message;
+import chat.tamtam.botapi.model.MessageCallbackUpdate;
+import chat.tamtam.botapi.model.MessageCreatedUpdate;
+import chat.tamtam.botapi.model.MessageEditedUpdate;
+import chat.tamtam.botapi.model.MessageRemovedUpdate;
+import chat.tamtam.botapi.model.MessageRestoredUpdate;
 import chat.tamtam.botapi.model.NewMessageBody;
 import chat.tamtam.botapi.model.SimpleQueryResult;
 import chat.tamtam.botapi.model.SubscriptionRequestBody;
-import lombok.Getter;
+import chat.tamtam.botapi.model.Update;
+import chat.tamtam.botapi.model.UserAddedToChatUpdate;
+import chat.tamtam.botapi.model.UserRemovedFromChatUpdate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -64,44 +79,103 @@ public class RegistrationBot extends AbstractCustomBot {
     private final @NonNull
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Value("${tamtam.registration.bot.onlyTrustedUsers:true}")
-    private boolean onlyTrustedUsers;
-    @Getter
     @Value("${tamtam.registration.bot.id}")
-    private String id;
-    // @todo #CC-91 dont create reg bot with nullable id and token
+    private String registrationBotId;
+    // @todo #CC-91 dont create reg bot with nullable registrationBotId and token
     @Value("${tamtam.registration.bot.token}")
     private String token;
-    @Value("${tamtam.registration.bot.trustedUsers:{555537636725, 590435433004, 575868018573, 577949140156}}")
-    private Set<String> trustedUsers;
+
     @Value("${tamtam.host}")
     private String host;
+
+    @Value("${tamtam.registration.bot.enabledIds}")
+    private String ids;
+    private final EnabledIdsConverter enabledIdsConverter;
+    private EnabledIds enabledIds;
 
     private String url;
     private boolean subscribed = false;
     private TamTamBotAPI botAPI;
 
+    private RegistrationBotVisitor visitor;
+
     @PostConstruct
     public void init() {
+        enabledIds = enabledIdsConverter.convert(ids);
         botAPI = TamTamBotAPI.create(token);
+        visitor = new RegistrationBotVisitor();
+        log.info(
+                String.format(
+                        "Registration bot(id:%s, token:%s) initialized",
+                        registrationBotId,
+                        token
+                )
+        );
     }
 
     @Override
-    public void processMessage(final Message message) {
+    public void process(final Update update) {
+        log.debug(String.format(
+                "Registration bot event(type=%s)",
+                update.getType()
+        ));
         try {
-            if (filter(message)) {
-                NewMessageBody messageBody = resolve(message);
-                botAPI.sendMessage(messageBody)
-                        .userId(message.getSender().getUserId())
-                        .execute();
-            }
-        } catch (APIException | ClientException e) {
-            log.error(String.format("Bot with id = [%s] can't process message", id), e);
+            update.visit(visitor);
+        } catch (RuntimeException e) {
+            log.error(
+                    String.format(
+                            "Update event{%s} produced exception",
+                            update
+                    ),
+                    e
+            );
         }
     }
 
-    private boolean filter(final Message message) {
-        return !onlyTrustedUsers || trustedUsers.contains(message.getSender().getUserId().toString());
+    private void response(final MessageCreatedUpdate update) {
+        try {
+            if (filter(update.getMessage().getSender().getUserId())) {
+                NewMessageBody messageBody = resolve(update.getMessage());
+                botAPI.sendMessage(messageBody)
+                        .userId(update.getMessage().getSender().getUserId())
+                        .execute();
+            }
+        } catch (APIException | ClientException e) {
+            log.error(
+                    String.format(
+                            "Bot(id=%s) can't response to event(type:%s, id:%s, sender:%d)",
+                            registrationBotId,
+                            update.getType(),
+                            update.getMessage().getBody().getMid(),
+                            update.getMessage().getSender().getUserId()
+                    ),
+                    e
+            );
+        }
+    }
+
+    private void response(final BotStartedUpdate update) {
+        try {
+            if (filter(update.getUserId())) {
+                botAPI.sendMessage(new NewMessageBody(HELP_MESSAGE, Collections.emptyList()))
+                        .userId(update.getUserId())
+                        .execute();
+            }
+        } catch (APIException | ClientException e) {
+            log.error(
+                    String.format(
+                            "Bot(id=%s) can't response to event(type:%s, sender:%d)",
+                            registrationBotId,
+                            update.getType(),
+                            update.getUserId()
+                    ),
+                    e
+            );
+        }
+    }
+
+    private boolean filter(final Long userId) {
+        return enabledIds.isEnabled(userId);
     }
 
     private NewMessageBody resolve(final Message message) {
@@ -203,6 +277,11 @@ public class RegistrationBot extends AbstractCustomBot {
     }
 
     @Override
+    public String getId() {
+        return registrationBotId;
+    }
+
+    @Override
     public BotType getType() {
         return BotType.Registration;
     }
@@ -211,14 +290,22 @@ public class RegistrationBot extends AbstractCustomBot {
     @Bean
     public void subscribeRegBotOnAppReadyProduction() {
         try {
-            url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
+            url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + registrationBotId;
             SimpleQueryResult result = botAPI.subscribe(new SubscriptionRequestBody(url)).execute();
-            if (!result.isSuccess()) {
-                log.debug("Can't subscribe bot with id:" + id);
+            if (result.isSuccess()) {
+                log.info(String.format("Registration bot(registrationBotId:%d, token:%s) subscribed on %s",
+                        registrationBotId, token, url
+                ));
+            } else {
+                log.warn(String.format("Can't subscribe registration bot(registrationBotId:%d, token:%s) on %s",
+                        registrationBotId, token, url
+                ));
             }
             subscribed = true;
         } catch (ClientException | APIException e) {
-            log.error(String.format("Can't subscribe bot with id = [%s] via url = [%s]", id, url), e);
+            log.error(String.format("Can't subscribe bot with registrationBotId = [%s] via url = [%s]",
+                    registrationBotId, url
+            ), e);
         }
     }
 
@@ -230,11 +317,81 @@ public class RegistrationBot extends AbstractCustomBot {
         }
         try {
             SimpleQueryResult result = botAPI.unsubscribe(url).execute();
+            log.info(String.format("Registration bot(registrationBotId:%s, token:%s) unsubscribed from %s",
+                    registrationBotId, token, url
+            ));
             if (!result.isSuccess()) {
-                log.debug("Can't unsubscribe bot with id:" + id);
+                log.warn(String.format("Can't unsubscribe registration bot(registrationBotId:%s, token:%s) on %s",
+                        registrationBotId, token, url
+                ));
             }
         } catch (ClientException | APIException e) {
-            log.error(String.format("Can't unsubscribe bot with id = [%s] via url = [%s]", id, url), e);
+            log.error(String.format("Can't unsubscribe bot with registrationBotId = [%s] via url = [%s]",
+                    registrationBotId, url
+            ), e);
+        }
+    }
+
+    private class RegistrationBotVisitor implements Update.Visitor {
+
+        @Override
+        public void visit(MessageCreatedUpdate model) {
+            response(model);
+        }
+
+        @Override
+        public void visit(MessageCallbackUpdate model) {
+
+        }
+
+        @Override
+        public void visit(MessageEditedUpdate model) {
+
+        }
+
+        @Override
+        public void visit(MessageRemovedUpdate model) {
+
+        }
+
+        @Override
+        public void visit(MessageRestoredUpdate model) {
+
+        }
+
+        @Override
+        public void visit(BotAddedToChatUpdate model) {
+
+        }
+
+        @Override
+        public void visit(BotRemovedFromChatUpdate model) {
+
+        }
+
+        @Override
+        public void visit(UserAddedToChatUpdate model) {
+
+        }
+
+        @Override
+        public void visit(UserRemovedFromChatUpdate model) {
+
+        }
+
+        @Override
+        public void visit(BotStartedUpdate model) {
+            response(model);
+        }
+
+        @Override
+        public void visit(ChatTitleChangedUpdate model) {
+
+        }
+
+        @Override
+        public void visitDefault(Update model) {
+
         }
     }
 }
