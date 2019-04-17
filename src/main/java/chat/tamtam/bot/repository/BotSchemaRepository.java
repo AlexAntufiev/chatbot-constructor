@@ -15,6 +15,8 @@ public interface BotSchemaRepository extends CrudRepository<BotSchemeEntity, Int
 
     BotSchemeEntity findByUserIdAndId(Long userId, int id);
 
+    BotSchemeEntity findByBotId(Long botId);
+
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
     void deleteByUserIdAndId(Long userId, Integer id);
 

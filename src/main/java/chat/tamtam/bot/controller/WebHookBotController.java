@@ -9,21 +9,31 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import chat.tamtam.botapi.model.Message;
+import chat.tamtam.bot.service.WebHookBotService;
+import chat.tamtam.botapi.model.Update;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @AllArgsConstructor
 @RestController
 @RequestMapping(path = Endpoint.TAM_BOT,
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.ALL_VALUE)
 public class WebHookBotController {
+    private final WebHookBotService webHookBotService;
+
     @PostMapping(Endpoint.ID)
     public ResponseEntity<?> webHookMessage(
-            @PathVariable final String id,
-            @RequestBody final Message message
+            @PathVariable final long botId,
+            @RequestBody final Update update
     ) {
-        //should always respond HttpStatus.OK
-        return new ResponseEntity<>(HttpStatus.OK);
+        try {
+            webHookBotService.submit(botId, update);
+        } catch (RuntimeException e) {
+            //log
+        } finally {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
     }
 }

@@ -33,5 +33,5 @@ public class BotSchemeEntity {
     private @NonNull String name;
 
     @Column(name = "schema")
-    private byte[] schema;
+    private Long schema;
 }
