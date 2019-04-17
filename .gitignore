@@ -16,6 +16,7 @@ hs_err_pid*
 *.lck
 *.script
 *.properties
+!/src/main/resources/config.properties
 build
 node_modules
 npm-debug.log
@@ -27,5 +28,5 @@ package-lock.json
 lombok.config
 .DS_Store
 chatbot-constructor.pid
-chatbot-constructor.jar
-!/src/main/resources/config.properties
+*.jar
+!/gradle/wrapper/gradle-wrapper.jar
