@@ -13,7 +13,7 @@ import chat.tamtam.bot.domain.exception.GenerateUploadLinkException;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
 import chat.tamtam.bot.domain.response.SuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
-import chat.tamtam.bot.repository.BotSchemaRepository;
+import chat.tamtam.bot.repository.BotSchemeRepository;
 import chat.tamtam.bot.repository.TamBotRepository;
 import chat.tamtam.botapi.TamTamBotAPI;
 import chat.tamtam.botapi.exceptions.APIException;
@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TamBotService {
     private final TamBotRepository tamBotRepository;
-    private final BotSchemaRepository botSchemaRepository;
+    private final BotSchemeRepository botSchemaRepository;
     private final UserService userService;
     private final BotSchemeService botSchemeService;
     private final TransactionalUtils transactionalUtils;

@@ -293,11 +293,13 @@ public class RegistrationBot extends AbstractCustomBot {
             url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + registrationBotId;
             SimpleQueryResult result = botAPI.subscribe(new SubscriptionRequestBody(url)).execute();
             if (result.isSuccess()) {
-                log.info(String.format("Registration bot(registrationBotId:%d, token:%s) subscribed on %s",
+                log.info(String.format(
+                        "Registration bot(registrationBotId:%s, token:%s) subscribed on %s",
                         registrationBotId, token, url
                 ));
             } else {
-                log.warn(String.format("Can't subscribe registration bot(registrationBotId:%d, token:%s) on %s",
+                log.warn(String.format(
+                        "Can't subscribe registration bot(registrationBotId:%s, token:%s) on %s",
                         registrationBotId, token, url
                 ));
             }

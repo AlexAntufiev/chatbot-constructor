@@ -84,6 +84,7 @@ export default {
     'errors.attachment.upload.service.error': 'Ошибка сервиса загрузки',
     'errors.attachment.does.not.exist': 'Приложение не существует',
     'errors.attachment.token.is.not.valid': 'Неверный идентификатор приложения',
+    'errors.bot.scheme.invalid.validator': 'Передан неверный валидатор',
 
     //Success messages
     'app.successmessage.successsumary': 'Успешно',

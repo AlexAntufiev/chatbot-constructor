@@ -25,7 +25,7 @@ public class WebHookBotController {
 
     @PostMapping(Endpoint.ID)
     public ResponseEntity<?> webHookMessage(
-            @PathVariable final long botId,
+            @PathVariable("id") final int botId,
             @RequestBody final Update update
     ) {
         try {

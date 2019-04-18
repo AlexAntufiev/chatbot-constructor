@@ -135,7 +135,7 @@ public class ChatChannelService {
                             + selectedChatChannel.getChatChannel()
                             + " cause"
                             + e.getLocalizedMessage(),
-                    Error.SERVICE_ERROR,
+                    Error.SERVICE_NO_ENTITY,
                     selectedChatChannel.getChatChannel()
             );
         }

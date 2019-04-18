@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 
 @Repository
-public interface BotSchemaRepository extends CrudRepository<BotSchemeEntity, Integer> {
+public interface BotSchemeRepository extends CrudRepository<BotSchemeEntity, Integer> {
     List<BotSchemeEntity> findAllByUserId(Long userId);
 
     BotSchemeEntity findByUserIdAndId(Long userId, int id);

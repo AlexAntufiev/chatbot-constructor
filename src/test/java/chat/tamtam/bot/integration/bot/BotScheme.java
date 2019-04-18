@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import chat.tamtam.bot.configuration.Profiles;
 import chat.tamtam.bot.controller.Endpoint;
-import chat.tamtam.bot.repository.BotSchemaRepository;
+import chat.tamtam.bot.repository.BotSchemeRepository;
 import chat.tamtam.bot.repository.SessionRepository;
 
 import static chat.tamtam.bot.TestContext.AUTH_TOKEN;
@@ -37,7 +37,7 @@ public class BotScheme {
     private MockMvc mockMvc;
 
     @Autowired
-    private BotSchemaRepository botSchemaRepository;
+    private BotSchemeRepository botSchemaRepository;
 
     @Autowired
     private SessionRepository sessionRepository;
