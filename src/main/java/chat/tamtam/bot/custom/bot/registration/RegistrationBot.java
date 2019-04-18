@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -50,7 +51,6 @@ import chat.tamtam.botapi.model.SubscriptionRequestBody;
 import chat.tamtam.botapi.model.Update;
 import chat.tamtam.botapi.model.UserAddedToChatUpdate;
 import chat.tamtam.botapi.model.UserRemovedFromChatUpdate;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -60,9 +60,10 @@ import static chat.tamtam.bot.security.SecurityConstants.SECRET;
 import static chat.tamtam.bot.security.SecurityConstants.TOKEN_PREFIX;
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
-@Component
-@RequiredArgsConstructor
 @Log4j2
+@Component
+@RefreshScope
+@RequiredArgsConstructor
 public class RegistrationBot extends AbstractCustomBot {
     private static final String HELP_MESSAGE =
             "Available commands:\n\n"
@@ -81,14 +82,13 @@ public class RegistrationBot extends AbstractCustomBot {
     @Value("${tamtam.registration.bot.id}")
     private String registrationBotId;
     // @todo #CC-91 dont create reg bot with nullable registrationBotId and token
-    @Getter
     @Value("${tamtam.registration.bot.token}")
     private String token;
 
     @Value("${tamtam.host}")
     private String host;
 
-    @Value("${tamtam.registration.bot.enabledIds:}")
+    @Value("${tamtam.registration.bot.enabledIds}")
     private String ids;
     private final EnabledIdsConverter enabledIdsConverter;
     private EnabledIds enabledIds;
@@ -181,7 +181,7 @@ public class RegistrationBot extends AbstractCustomBot {
     private NewMessageBody resolve(final Message message) {
         String[] cmd = Optional
                 .ofNullable(message.getBody().getText())
-                .orElseGet(() -> "")
+                .orElse("")
                 .split(" ");
         switch (cmd[0]) {
             case "/reg":
@@ -293,13 +293,11 @@ public class RegistrationBot extends AbstractCustomBot {
             url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + registrationBotId;
             SimpleQueryResult result = botAPI.subscribe(new SubscriptionRequestBody(url)).execute();
             if (result.isSuccess()) {
-                log.info(String.format(
-                        "Registration bot(registrationBotId:%s, token:%s) subscribed on %s",
+                log.info(String.format("Registration bot(registrationBotId:%s, token:%s) subscribed on %s",
                         registrationBotId, token, url
                 ));
             } else {
-                log.warn(String.format(
-                        "Can't subscribe registration bot(registrationBotId:%s, token:%s) on %s",
+                log.warn(String.format("Can't subscribe registration bot(registrationBotId:%s, token:%s) on %s",
                         registrationBotId, token, url
                 ));
             }

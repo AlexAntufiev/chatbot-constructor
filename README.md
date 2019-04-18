@@ -61,6 +61,10 @@ Make webhook subscription via [tamtam bot subscriptions] (`https://{ngrok_host}/
 
 Proceed to [reg bot]
 
+## Cloud configuration
+
+[consul]
+
 [java]: https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html
 [Node.js]: https://nodejs.org/en/download/
 [Download and install checkstyle plugin]: https://plugins.jetbrains.com/plugin/1065-checkstyle-idea
@@ -69,3 +73,4 @@ Proceed to [reg bot]
 [ngrok]: https://ngrok.com/download
 [tamtam bot subscriptions]: https://dev.tamtam.chat/#tag/subscriptions
 [reg bot]: https://tt.me/BuilderRegBot
+[consul]: http://localhost:8500/ui/dc1/services
