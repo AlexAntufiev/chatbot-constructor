@@ -51,7 +51,7 @@ public class BuilderService {
                     List<Update> updated = new ArrayList<>();
                     for (Update update
                             : updates) {
-
+                        // @todo #CC-141 Enable reserved component check
                         /*if(!componentRepository
                                 .existByIdAndSchemeId(
                                         update.getComponent().getId(),
