@@ -5,5 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public abstract class ValidatorWrapper {
-    private final Validator validator;
+    // CHECKSTYLE_OFF: ALMOST_ALL
+    protected final Validator validator;
+    // CHECKSTYLE_ON: ALMOST_ALL
 }
