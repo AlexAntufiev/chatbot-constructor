@@ -22,8 +22,6 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
-  application:
-    name: chatbot-constructor
 
 logging:
   level:

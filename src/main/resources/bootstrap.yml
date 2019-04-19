@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: chatbot-constructor
+  devtools:
+    add-properties: false
+  cloud:
+    consul:
+      enabled: false
+      host: 192.168.9.152
+      port: 8500
+      discovery:
+        healthCheckInterval: 300s
+      config:
+        watch:
+          enabled: false
+          delay: 1000 #ms
+        format: yaml
