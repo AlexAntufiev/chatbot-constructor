@@ -33,3 +33,19 @@ export function successOperation(obj, messId) {
         detail: successText
     });
 }
+
+export function customSuccess(obj, text) {
+    obj.growl.show({
+        severity: 'success',
+        summary: obj.props.intl.formatMessage({id: 'app.successmessage.successsumary'}),
+        detail: text
+    });
+}
+
+export function customError(obj, text) {
+    obj.growl.show({
+        severity: 'error',
+        summary: obj.props.intl.formatMessage({id: 'app.errormessage.errorsummary'}),
+        detail: text
+    });
+}

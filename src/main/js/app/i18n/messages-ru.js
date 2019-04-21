@@ -95,10 +95,15 @@ export default {
     'app.broadcastmessage.send.wait': 'Ждет отправки',
     'app.broadcastmessage.sent': 'Отправлено',
     'app.broadcastmessage.processing': 'Обработка',
+    'app.broadcastmessage.sent.erased': 'Отправлено и удалено',
     'app.broadcastmessage.postingtime': 'Время постинга',
     'app.broadcastmessage.erasingtime': 'Время удаления',
     'app.broadcastmessage.text': 'Текст сообщения',
     'app.broadcastmessage.saved': 'Сообщение сохранено',
+
+    'template.message.sent': 'Сообщение :name отправлено',
+    'template.message.erase': 'Сообщение :name удалено',
+    'template.message.error': 'Произошла ошибка в сообщении :name',
 
     //Common
     'app.common.sigin.message': 'Необходима авторизация'

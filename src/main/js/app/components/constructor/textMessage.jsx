@@ -8,7 +8,7 @@ import * as TamBotService from "app/service/tamBot";
 import {Growl} from "primereact/growl";
 import * as AxiosMessages from 'app/utils/axiosMessages';
 import * as Routes from 'app/constants/routes';
-import makeUrl from "app/utils/makeUrl";
+import makeTemplateStr from "app/utils/makeTemplateStr";
 import BroadcastMessageState from 'app/utils/broadcastMessageState';
 import shallowequal from "shallowequal";
 import getCalendar from "app/i18n/calendarLocale";
@@ -182,7 +182,7 @@ class TextMessage extends React.Component {
         BroadcastMessageService.updateBroadcastMessage(this.props.botSchemeId, this.props.chatChannelId,
             this.props.message.id,
             message,
-            () => {
+            (res) => {
                 this.state.attachments.forEach((attach, i) => {
                     if (!attach.id && !attach.removed) {
                         BroadcastMessageService.addAttachment(this.props.botSchemeId, this.props.chatChannelId,
@@ -201,7 +201,7 @@ class TextMessage extends React.Component {
                     }
 
                 });
-                this.props.refreshMessageList();
+                this.props.updateMessageList(res.data.payload);
                 AxiosMessages.successOperation(this, 'app.broadcastmessage.saved');
                 this.setState({
                     ajaxUpdateProcess: false,
@@ -219,12 +219,12 @@ class TextMessage extends React.Component {
             this.setState({ajaxRemoveProcess: true});
             BroadcastMessageService.removeBroadcastMessage(this.props.botSchemeId, this.props.chatChannelId, this.props.message.id,
                 () => {
-                    const url = makeUrl(Routes.botBroadcastingDetail(), {
+                    const url = makeTemplateStr(Routes.botBroadcastingDetail(), {
                         id: this.props.botId,
                         botSchemeId: this.props.botSchemeId,
                         chatChannelId: this.props.chatChannelId
                     });
-                    this.props.refreshMessageList();
+                    this.props.updateMessageList(this.props.message, true);
                     this.setState({ajaxRemoveProcess: false});
                     this.props.history.push(url);
                 }, () => this.setState({ajaxRemoveProcess: false}),

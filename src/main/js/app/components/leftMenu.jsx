@@ -3,17 +3,17 @@ import {Menu} from 'primereact/menu';
 import {connect} from "react-redux";
 import {injectIntl} from "react-intl";
 import * as routers from 'app/constants/routes';
-import makeUrl from 'app/utils/makeUrl';
+import makeTemplateStr from 'app/utils/makeTemplateStr';
 import {withRouter} from "react-router";
 
 class LeftMenu extends Component {
     constructor(props) {
         super(props);
         const {intl} = this.props;
-        const settingsUrl = makeUrl(routers.botSettings(), {id: this.props.id});
-        const constructorUrl = makeUrl(routers.botSetup(), {id: this.props.id});
-        const statisticUrl = makeUrl(routers.botStatistic(), {id: this.props.id});
-        const broadcastingUrl = makeUrl(routers.botBroadcasting(), {id: this.props.id});
+        const settingsUrl = makeTemplateStr(routers.botSettings(), {id: this.props.id});
+        const constructorUrl = makeTemplateStr(routers.botSetup(), {id: this.props.id});
+        const statisticUrl = makeTemplateStr(routers.botStatistic(), {id: this.props.id});
+        const broadcastingUrl = makeTemplateStr(routers.botBroadcasting(), {id: this.props.id});
         this.state = {
             items: [
                 {
