@@ -1,5 +1,6 @@
 package chat.tamtam.bot.domain.broadcast.message.action;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 
 import org.springframework.stereotype.Component;
@@ -42,36 +43,27 @@ public final class CreatedStateAction extends BroadcastMessageStateAction {
                 );
             }
 
-            ZonedDateTime firingTime = getDateTimeAtLocalZone(
-                    broadcastMessageUpdate.getFiringTime(),
-                    Error.BROADCAST_MESSAGE_FIRING_TIME_IS_MALFORMED
-            );
-
-            ZonedDateTime currentTime = ZonedDateTime.now(SERVER_LOCAL_ZONE_ID);
+            Instant currentTime = Instant.now();
 
             ZonedDateTime erasingTime;
 
             broadcastMessage.setFiringTime(
-                    futureTimestamp(
-                            firingTime,
+                    getInstant(
+                            broadcastMessageUpdate.getFiringTime(),
                             currentTime,
                             broadcastMessage.getId(),
+                            Error.BROADCAST_MESSAGE_FIRING_TIME_IS_MALFORMED,
                             Error.BROADCAST_MESSAGE_FIRING_TIME_IS_IN_PAST
                     )
             );
 
             if (broadcastMessageUpdate.getErasingTime() != null) {
-
-                erasingTime = getDateTimeAtLocalZone(
-                        broadcastMessageUpdate.getErasingTime(),
-                        Error.BROADCAST_MESSAGE_FIRING_TIME_IS_MALFORMED
-                );
-
                 broadcastMessage.setErasingTime(
-                        futureTimestamp(
-                                erasingTime,
-                                firingTime,
+                        getInstant(
+                                broadcastMessageUpdate.getErasingTime(),
+                                broadcastMessage.getFiringTime(),
                                 broadcastMessage.getId(),
+                                Error.BROADCAST_MESSAGE_FIRING_TIME_IS_MALFORMED,
                                 Error.BROADCAST_MESSAGE_ERASING_TIME_IS_BEFORE_THEN_FIRING_TIME
                         )
                 );

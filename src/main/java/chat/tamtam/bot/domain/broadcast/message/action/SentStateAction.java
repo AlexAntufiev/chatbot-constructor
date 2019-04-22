@@ -1,6 +1,6 @@
 package chat.tamtam.bot.domain.broadcast.message.action;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 
 import org.springframework.stereotype.Component;
 
@@ -34,18 +34,14 @@ public final class SentStateAction extends BroadcastMessageStateAction {
             return;
         }
 
-        ZonedDateTime currentTime = ZonedDateTime.now(SERVER_LOCAL_ZONE_ID);
-
-        ZonedDateTime erasingTime = getDateTimeAtLocalZone(
-                broadcastMessageUpdate.getErasingTime(),
-                Error.BROADCAST_MESSAGE_ERASING_TIME_IS_MALFORMED
-        );
+        Instant currentTime = Instant.now();
 
         broadcastMessage.setErasingTime(
-                futureTimestamp(
-                        erasingTime,
+                getInstant(
+                        broadcastMessageUpdate.getErasingTime(),
                         currentTime,
                         broadcastMessage.getId(),
+                        Error.BROADCAST_MESSAGE_ERASING_TIME_IS_MALFORMED,
                         Error.BROADCAST_MESSAGE_ERASING_TIME_IS_IN_THE_PAST
                 )
         );
