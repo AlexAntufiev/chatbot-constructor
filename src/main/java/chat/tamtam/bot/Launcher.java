@@ -1,5 +1,10 @@
 package chat.tamtam.bot;
 
+import java.time.ZoneOffset;
+import java.util.TimeZone;
+
+import javax.annotation.PostConstruct;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.ApplicationPidFileWriter;
@@ -20,5 +25,10 @@ public class Launcher {
         SpringApplication springApplication = new SpringApplication(Launcher.class);
         springApplication.addListeners(new ApplicationPidFileWriter("chatbot-constructor.pid"));
         springApplication.run(args);
+    }
+
+    @PostConstruct
+    public void setDefaultTimeZoneToUTC() {
+        TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC.normalized()));
     }
 }
