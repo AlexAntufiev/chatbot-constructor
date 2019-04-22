@@ -56,8 +56,6 @@ public abstract class BroadcastMessageStateAction {
                     timeSequenceError
             );
         }
-        System.out.println("GET");
-        System.out.println(futureInstant);
         return futureInstant;
     }
 
