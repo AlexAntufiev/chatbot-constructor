@@ -4,12 +4,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,6 +19,8 @@ import com.auth0.jwt.JWT;
 
 import chat.tamtam.bot.configuration.Profiles;
 import chat.tamtam.bot.controller.Endpoint;
+import chat.tamtam.bot.converter.EnabledIds;
+import chat.tamtam.bot.converter.EnabledIdsConverter;
 import chat.tamtam.bot.custom.bot.AbstractCustomBot;
 import chat.tamtam.bot.custom.bot.BotType;
 import chat.tamtam.bot.domain.session.SessionEntity;
@@ -49,7 +51,6 @@ import chat.tamtam.botapi.model.SubscriptionRequestBody;
 import chat.tamtam.botapi.model.Update;
 import chat.tamtam.botapi.model.UserAddedToChatUpdate;
 import chat.tamtam.botapi.model.UserRemovedFromChatUpdate;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -59,9 +60,10 @@ import static chat.tamtam.bot.security.SecurityConstants.SECRET;
 import static chat.tamtam.bot.security.SecurityConstants.TOKEN_PREFIX;
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
-@Component
-@RequiredArgsConstructor
 @Log4j2
+@Component
+@RefreshScope
+@RequiredArgsConstructor
 public class RegistrationBot extends AbstractCustomBot {
     private static final String HELP_MESSAGE =
             "Available commands:\n\n"
@@ -77,19 +79,19 @@ public class RegistrationBot extends AbstractCustomBot {
     private final @NonNull
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Value("${tamtam.registration.bot.onlyTrustedUsers:true}")
-    private boolean onlyTrustedUsers;
-    @Getter
     @Value("${tamtam.registration.bot.id}")
-    private String id;
-    // @todo #CC-91 dont create reg bot with nullable id and token
-    @Getter
+    private String registrationBotId;
+    // @todo #CC-91 dont create reg bot with nullable registrationBotId and token
     @Value("${tamtam.registration.bot.token}")
     private String token;
-    @Value("${tamtam.registration.bot.trustedUsers:{555537636725, 590435433004, 575868018573, 577949140156}}")
-    private Set<String> trustedUsers;
+
     @Value("${tamtam.host}")
     private String host;
+
+    @Value("${tamtam.registration.bot.enabledIds}")
+    private String ids;
+    private final EnabledIdsConverter enabledIdsConverter;
+    private EnabledIds enabledIds;
 
     private String url;
     private boolean subscribed = false;
@@ -99,8 +101,16 @@ public class RegistrationBot extends AbstractCustomBot {
 
     @PostConstruct
     public void init() {
+        enabledIds = enabledIdsConverter.convert(ids);
         botAPI = TamTamBotAPI.create(token);
         visitor = new RegistrationBotVisitor();
+        log.info(
+                String.format(
+                        "Registration bot(id:%s, token:%s) initialized",
+                        registrationBotId,
+                        token
+                )
+        );
     }
 
     @Override
@@ -109,7 +119,17 @@ public class RegistrationBot extends AbstractCustomBot {
                 "Registration bot event(type=%s)",
                 update.getType()
         ));
-        update.visit(visitor);
+        try {
+            update.visit(visitor);
+        } catch (RuntimeException e) {
+            log.error(
+                    String.format(
+                            "Update event{%s} produced exception",
+                            update
+                    ),
+                    e
+            );
+        }
     }
 
     private void response(final MessageCreatedUpdate update) {
@@ -124,7 +144,7 @@ public class RegistrationBot extends AbstractCustomBot {
             log.error(
                     String.format(
                             "Bot(id=%s) can't response to event(type:%s, id:%s, sender:%d)",
-                            id,
+                            registrationBotId,
                             update.getType(),
                             update.getMessage().getBody().getMid(),
                             update.getMessage().getSender().getUserId()
@@ -145,7 +165,7 @@ public class RegistrationBot extends AbstractCustomBot {
             log.error(
                     String.format(
                             "Bot(id=%s) can't response to event(type:%s, sender:%d)",
-                            id,
+                            registrationBotId,
                             update.getType(),
                             update.getUserId()
                     ),
@@ -155,13 +175,13 @@ public class RegistrationBot extends AbstractCustomBot {
     }
 
     private boolean filter(final Long userId) {
-        return !onlyTrustedUsers || trustedUsers.contains(userId.toString());
+        return enabledIds.isEnabled(userId);
     }
 
     private NewMessageBody resolve(final Message message) {
         String[] cmd = Optional
                 .ofNullable(message.getBody().getText())
-                .orElseGet(() -> "")
+                .orElse("")
                 .split(" ");
         switch (cmd[0]) {
             case "/reg":
@@ -257,6 +277,11 @@ public class RegistrationBot extends AbstractCustomBot {
     }
 
     @Override
+    public String getId() {
+        return registrationBotId;
+    }
+
+    @Override
     public BotType getType() {
         return BotType.Registration;
     }
@@ -265,14 +290,22 @@ public class RegistrationBot extends AbstractCustomBot {
     @Bean
     public void subscribeRegBotOnAppReadyProduction() {
         try {
-            url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
+            url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + registrationBotId;
             SimpleQueryResult result = botAPI.subscribe(new SubscriptionRequestBody(url)).execute();
-            if (!result.isSuccess()) {
-                log.debug("Can't subscribe bot with id:" + id);
+            if (result.isSuccess()) {
+                log.info(String.format("Registration bot(registrationBotId:%s, token:%s) subscribed on %s",
+                        registrationBotId, token, url
+                ));
+            } else {
+                log.warn(String.format("Can't subscribe registration bot(registrationBotId:%s, token:%s) on %s",
+                        registrationBotId, token, url
+                ));
             }
             subscribed = true;
         } catch (ClientException | APIException e) {
-            log.error(String.format("Can't subscribe bot with id = [%s] via url = [%s]", id, url), e);
+            log.error(String.format("Can't subscribe bot with registrationBotId = [%s] via url = [%s]",
+                    registrationBotId, url
+            ), e);
         }
     }
 
@@ -284,11 +317,18 @@ public class RegistrationBot extends AbstractCustomBot {
         }
         try {
             SimpleQueryResult result = botAPI.unsubscribe(url).execute();
+            log.info(String.format("Registration bot(registrationBotId:%s, token:%s) unsubscribed from %s",
+                    registrationBotId, token, url
+            ));
             if (!result.isSuccess()) {
-                log.debug("Can't unsubscribe bot with id:" + id);
+                log.warn(String.format("Can't unsubscribe registration bot(registrationBotId:%s, token:%s) on %s",
+                        registrationBotId, token, url
+                ));
             }
         } catch (ClientException | APIException e) {
-            log.error(String.format("Can't unsubscribe bot with id = [%s] via url = [%s]", id, url), e);
+            log.error(String.format("Can't unsubscribe bot with registrationBotId = [%s] via url = [%s]",
+                    registrationBotId, url
+            ), e);
         }
     }
 

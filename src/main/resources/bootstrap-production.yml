@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    consul:
+      enabled: true
+      discovery:
+        healthCheckInterval: 300s
+      config:
+        watch:
+          enabled: true
+          delay: 1000 #ms

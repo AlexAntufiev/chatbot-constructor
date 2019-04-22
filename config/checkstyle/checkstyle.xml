@@ -107,6 +107,12 @@
         <module name="TodoComment"/>
         <module name="UpperEll"/>
 
+        <!--Checkstyle suppression-->
+        <module name="SuppressionCommentFilter">
+            <property name="offCommentFormat" value="CHECKSTYLE_OFF: ALMOST_ALL"/>
+            <property name="onCommentFormat" value="CHECKSTYLE_ON: ALMOST_ALL"/>
+            <property name="checkFormat" value="^((?!(EqualsHashCode)).)*$"/>
+        </module>
     </module>
 
 </module>

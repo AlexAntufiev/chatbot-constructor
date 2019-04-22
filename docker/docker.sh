@@ -7,6 +7,7 @@ url="https://botapi.tamtam.chat/messages?access_token=${token}&chat_id=${chat_id
 server_name="TEST-1"
 host="89.208.84.173"
 port="8090"
+config_service_port="8500"
 body=""
 
 function set_message(){
@@ -34,9 +35,17 @@ function main() {
     docker build -t ${application_name} .
 
     send_message "${server_name} запускается"
-    docker run -d -p 8090:8090 -v ~/${application_name}/logs:/logs --name ${application_name} --log-opt max-size=50m --log-opt max-file=3 ${application_name}
-    sleep 10
-    send_message "${server_name} запущен: http://${host}:${port}/index.html"
+    docker run -d \
+               -p 8090:8090 \
+               -v ~/${application_name}/logs:/logs \
+               --name ${application_name} \
+               --log-opt max-size=50m \
+               --log-opt max-file=3 \
+               ${application_name}
+
+    sleep 40
+
+    send_message "${server_name} запущен: http://${host}:${port}/index.html \n managing config: http://${host}:${config_service_port}/ui/dc1/services"
 }
 
 main
