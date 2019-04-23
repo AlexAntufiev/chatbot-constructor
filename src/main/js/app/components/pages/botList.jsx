@@ -7,7 +7,7 @@ import {injectIntl} from 'react-intl';
 import {Redirect} from 'react-router-dom'
 import {Growl} from "primereact/growl";
 import * as AxiosMessages from 'app/utils/axiosMessages';
-import makeUrl from 'app/utils/makeUrl'
+import makeTemplateStr from 'app/utils/makeTemplateStr'
 import * as BotSchemeService from "app/service/botScheme"
 
 class BotList extends React.Component {
@@ -36,7 +36,7 @@ class BotList extends React.Component {
 
         BotSchemeService.addBot(defaultName, (res) => {
             if (Number.isInteger(res.data.payload.id)) {
-                const url = makeUrl(routers.botDetail(), {id: res.data.payload.id});
+                const url = makeTemplateStr(routers.botDetail(), {id: res.data.payload.id});
                 self.props.history.push(url);
             } else {
                 AxiosMessages.serverErrorResponse(self);

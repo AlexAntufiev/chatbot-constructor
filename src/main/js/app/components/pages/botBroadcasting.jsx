@@ -5,7 +5,7 @@ import {withRouter} from "react-router";
 import {connect} from "react-redux";
 import {injectIntl} from "react-intl";
 import * as routes from 'app/constants/routes';
-import makeUrl from 'app/utils/makeUrl';
+import makeTemplateStr from 'app/utils/makeTemplateStr';
 import * as ChatChannelService from 'app/service/chatChannel';
 import ChatChannelCard from "app/components/chatChannelCard";
 
@@ -39,7 +39,7 @@ class BotBroadcasting extends Component {
     }
 
     onChannelClick(chatChannelId) {
-        const url = makeUrl(routes.botBroadcastingDetail(), {
+        const url = makeTemplateStr(routes.botBroadcastingDetail(), {
             id: this.props.match.params.id,
             chatChannelId: chatChannelId
         });

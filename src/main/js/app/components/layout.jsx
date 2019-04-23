@@ -9,7 +9,13 @@ import {injectIntl} from 'react-intl';
 import {Cookies} from "react-cookie";
 import {AUTHORIZATION, USER_ID} from "app/constants/cookies";
 import setUserInfo from "app/actions/userInfo";
-
+import SockJsClient from 'react-stomp';
+import * as ElementId from 'app/constants/ElementId';
+import * as CustomEventType from 'app/constants/CustomEventType';
+import {Growl} from "primereact/growl";
+import BroadcastMessageState from "app/utils/broadcastMessageState";
+import makeTemplateStr from "app/utils/makeTemplateStr";
+import * as AxiosMessages from "app/utils/axiosMessages";
 
 class IndexLayout extends Component {
     constructor(props) {
@@ -20,6 +26,40 @@ class IndexLayout extends Component {
             userId: cookies.get(USER_ID),
             token: cookies.get(AUTHORIZATION)
         });
+    }
+
+    onMessage(msg) {
+        switch (msg.type) {
+            case CustomEventType.BROADCAST_MESSAGE_STATE_CHANGE_TYPE:
+                const event = new CustomEvent(CustomEventType.BROADCAST_MESSAGE_STATE_CHANGE, {
+                    detail: {
+                        message: msg
+                    }
+                });
+
+                const name = event.detail.message.payload.title;
+                const {intl} = this.props;
+                let mess;
+                switch (event.detail.message.payload.state) {
+                    case BroadcastMessageState.SENT:
+                        mess = makeTemplateStr(intl.formatMessage({id: 'template.message.sent'}), {name: name});
+                        AxiosMessages.customSuccess(this, mess);
+                        break;
+                    case BroadcastMessageState.ERASED_BY_SCHEDULE:
+                        mess = makeTemplateStr(intl.formatMessage({id: 'template.message.erase'}), {name: name});
+                        AxiosMessages.customSuccess(this, mess);
+                        break;
+                    case BroadcastMessageState.ERROR:
+                        mess = makeTemplateStr(intl.formatMessage({id: 'template.message.error'}), {name: name});
+                        AxiosMessages.customError(this, mess);
+                        break;
+                }
+                const botBroadcastingDetail = document.getElementById(ElementId.BOT_BROADCAST_DETAIL);
+                if (botBroadcastingDetail) {
+                    botBroadcastingDetail.dispatchEvent(event);
+                }
+                break;
+        }
     }
 
     render() {
@@ -39,16 +79,20 @@ class IndexLayout extends Component {
                 }
             });
         }
-
+        {/* @todo #CC-134 use single growl component*/}
         return (
             <div>
-                {/* @todo #CC-63 Implement notification service with SockJsClient*/}
-                {/*<SockJsClient
-                    url= 'http://localhost:8090/ws'
+                {this.props.isLogin && <SockJsClient
+                    url='http://localhost:8090/ws'
                     topics={['/user/queue/updates']}
-                    onConnect={ () => { console.log('connected'); }}
-                    onMessage={ (msg) => { console.log(msg); }}
-                    ref={ (client) => { this.clientRef = client }} />*/}
+                    onConnect={() => {
+                        console.log('connected');
+                    }}
+                    onMessage={(msg) => this.onMessage(msg)}
+                    ref={(client) => {
+                        this.clientRef = client
+                    }}/>}
+                <Growl ref={(el) => this.growl = el}/>
                 <div>
                     <Menubar model={menuItems}>
                         <div className="p-grid auth-locale-panel">
