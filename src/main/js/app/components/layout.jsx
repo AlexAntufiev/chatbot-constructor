@@ -13,9 +13,9 @@ import SockJsClient from 'react-stomp';
 import * as ElementId from 'app/constants/ElementId';
 import * as CustomEventType from 'app/constants/CustomEventType';
 import {Growl} from "primereact/growl";
-import BroadcastMessageState from "../utils/broadcastMessageState";
-import makeTemplateStr from "../utils/makeTemplateStr";
-import * as AxiosMessages from "../utils/axiosMessages";
+import BroadcastMessageState from "app/utils/broadcastMessageState";
+import makeTemplateStr from "app/utils/makeTemplateStr";
+import * as AxiosMessages from "app/utils/axiosMessages";
 
 class IndexLayout extends Component {
     constructor(props) {
