@@ -1,6 +1,7 @@
 const API_POINT = "/api/";
 const CHAT_CHANNEL =  API_POINT + "bot/:id/tam/chatchannel/";
 
+export const WEBSOCKET_URL =  window.location.origin + "/ws";
 export const LOGIN = API_POINT + "login";
 export const LOGOUT = API_POINT + "logout";
 export const REGISTRATION = API_POINT + "registration";
