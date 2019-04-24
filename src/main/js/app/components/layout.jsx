@@ -16,6 +16,7 @@ import {Growl} from "primereact/growl";
 import BroadcastMessageState from "app/utils/broadcastMessageState";
 import makeTemplateStr from "app/utils/makeTemplateStr";
 import * as AxiosMessages from "app/utils/axiosMessages";
+import * as ApiPoints from 'app/constants/apiPoints';
 
 class IndexLayout extends Component {
     constructor(props) {
@@ -83,11 +84,8 @@ class IndexLayout extends Component {
         return (
             <div>
                 {this.props.isLogin && <SockJsClient
-                    url='http://localhost:8090/ws'
+                    url={ApiPoints.WEBSOCKET_URL}
                     topics={['/user/queue/updates']}
-                    onConnect={() => {
-                        console.log('connected');
-                    }}
                     onMessage={(msg) => this.onMessage(msg)}
                     ref={(client) => {
                         this.clientRef = client
