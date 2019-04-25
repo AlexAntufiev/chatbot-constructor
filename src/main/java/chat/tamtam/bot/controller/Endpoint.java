@@ -37,4 +37,7 @@ public interface Endpoint {
 
     String TAM_CUSTOM_BOT_WEBHOOK = "/tam/custom/bot";
     String TAM_BOT = "/tam/bot";
+
+    String RESOURCES = "/resources";
+    String REGISTRATION_BOT_URL = "/registration/bot/url";
 }
