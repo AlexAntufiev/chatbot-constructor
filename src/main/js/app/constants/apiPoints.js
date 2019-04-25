@@ -30,3 +30,6 @@ export const BROADCAST_MESSAGE = CHAT_CHANNEL + ":chatChannelId/message/:message
 export const DELETE_BROADCAST_MESSAGE = CHAT_CHANNEL + ":chatChannelId/message/:messageId/delete";
 
 export const GET_UPLOAD_ATTACHMENT_LINK = API_POINT + "bot/:id/tam/upload/:attachmentType";
+
+const RESOURCES = '/resources/';
+export const GET_REGISTRATION_LINK = RESOURCES + "registration/bot/url";
