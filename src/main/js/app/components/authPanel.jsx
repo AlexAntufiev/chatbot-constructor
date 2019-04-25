@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {injectIntl} from 'react-intl';
-import RegisterDialog from 'app/components/registerDialog';
+import * as ResourcesService from 'app/service/resources';
 import LoginDialog from 'app/components/loginDialog';
 import {Button} from 'primereact/button';
 import setUserInfo from "app/actions/userInfo";
@@ -12,15 +12,19 @@ import * as UserService from "app/service/user"
 class AuthPanel extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            registrationLink: ''
+        };
         this.registrationDialog = React.createRef();
         this.loginDialog = React.createRef();
-        this.onShowRegistrationDialog = this.onShowRegistrationDialog.bind(this);
         this.onShowLoginDialog = this.onShowLoginDialog.bind(this);
         this.onLogout = this.onLogout.bind(this);
     }
 
-    onShowRegistrationDialog() {
-        this.registrationDialog.current.getWrappedInstance().onShow();
+    componentDidMount() {
+        ResourcesService.getRegistrationUrl((res) => {
+            this.setState({registrationLink: res.data.payload.url});
+        }, null, this);
     }
 
     onShowLoginDialog() {
@@ -54,8 +58,9 @@ class AuthPanel extends React.Component {
                 <span className="auth-panel">
                     <Button label={intl.formatMessage({id: 'app.menu.signin'})} onClick={this.onShowLoginDialog}/>
                     <Button label={intl.formatMessage({id: 'app.menu.signup'})}
-                            onClick={this.onShowRegistrationDialog}/>
-                    <RegisterDialog ref={this.registrationDialog}/>
+                            onClick={() => {
+                                window.location.href = this.state.registrationLink
+                            }}/>
                     <LoginDialog ref={this.loginDialog}/>
                 </span>
             );
