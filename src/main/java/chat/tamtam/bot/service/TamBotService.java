@@ -199,9 +199,9 @@ public class TamBotService {
                 transactionalUtils
                         .invokeRunnable(() -> {
                             tamBotRepository.deleteById(new TamBotEntity.Id(bot.getBotId(), bot.getUserId()));
+                            bot.setBotId(null);
                             botSchemaRepository.save(bot);
                         });
-                bot.setBotId(null);
                 log.info(
                         String.format(
                                 "Bot(id=%d, token=%s, botSchemeId=%d, url=%s) was unsubscribed",
