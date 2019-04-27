@@ -216,6 +216,9 @@ class TextMessage extends React.Component {
                         needProcessed++;
                     }
                 }
+                if (self.state.attachments.length === 0 ) {
+                    self.refreshIfAllDownloaded(0, 0, res.data.payload);
+                }
                 for (let i = 0; i < self.state.attachments.length; i++) {
                     const attach = self.state.attachments[i];
                     if (!attach.id && !attach.removed) {
