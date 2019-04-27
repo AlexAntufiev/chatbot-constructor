@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import chat.tamtam.bot.domain.builder.component.Update;
+import chat.tamtam.bot.domain.builder.component.ComponentUpdate;
 import chat.tamtam.bot.service.BuilderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -45,7 +45,7 @@ public class BuilderController {
     public ResponseEntity<?> saveBotScheme(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final int botSchemeId,
-            @RequestBody final List<Update> components
+            @RequestBody final List<ComponentUpdate> components
     ) {
         return new ResponseEntity<>(
                 builderService.saveBotScheme(

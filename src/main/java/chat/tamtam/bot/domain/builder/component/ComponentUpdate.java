@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Update {
+public class ComponentUpdate {
     private Component component;
     private List<Validator> validators = Collections.emptyList();
 }

@@ -9,7 +9,7 @@ import com.google.common.collect.Lists;
 
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.builder.component.Component;
-import chat.tamtam.bot.domain.builder.component.Update;
+import chat.tamtam.bot.domain.builder.component.ComponentUpdate;
 import chat.tamtam.bot.domain.builder.validator.Validator;
 import chat.tamtam.bot.domain.exception.ChatBotConstructorException;
 import chat.tamtam.bot.domain.response.SuccessResponse;
@@ -41,16 +41,16 @@ public class BuilderService {
     public SuccessResponse saveBotScheme(
             final String authToken,
             final int botSchemeId,
-            final List<Update> updates
+            final List<ComponentUpdate> componentUpdates
     ) {
         BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         // @todo #CC-141 Add component validation(check that current component id was reserved for this bot scheme)
 
         Object updatedComponents =
                 transactionalUtils.invokeCallable(() -> {
-                    List<Update> updated = new ArrayList<>();
-                    for (Update update
-                            : updates) {
+                    List<ComponentUpdate> updated = new ArrayList<>();
+                    for (ComponentUpdate update
+                            : componentUpdates) {
                         // @todo #CC-141 Enable reserved component check
                         /*if(!componentRepository
                                 .existByIdAndSchemeId(
@@ -60,12 +60,31 @@ public class BuilderService {
                         ) {
                             throw new NotFoundEntityException(
                                     String.format(
-                                            "Reserved component with id=%d and botSchemeId=%d not found",
+                                            "Reserved component(id=%d, botSchemeId=%d) was not found",
                                             update.getComponent().getId(),
                                             update.getComponent().getSchemeId()
                                     ),
                                     Error.SERVICE_NO_ENTITY
                             );
+                        }*/
+                        // @todo #CC-141 Enable check for next component existence
+                        /*if (update.getComponent().getNextComponent() != null) {
+                            if (!componentRepository.existsByIdAndAndSchemeId(
+                                    update.getComponent().getNextComponent(),
+                                    update.getComponent().getSchemeId()
+                            )) {
+                                throw new NotFoundEntityException(
+                                        String.format(
+                                                "Next component(id=%d, botSchemeId=%d) " +
+                                                        "for component(id=%d, botSchemeId=%d) was not found",
+                                                update.getComponent().getNextComponent(),
+                                                update.getComponent().getSchemeId(),
+                                                update.getComponent().getId(),
+                                                update.getComponent().getSchemeId()
+                                                ),
+                                        Error.SERVICE_NO_ENTITY
+                                );
+                            }
                         }*/
 
                         for (Validator validator
@@ -86,9 +105,9 @@ public class BuilderService {
                         Component component = componentRepository.save(update.getComponent());
                         List<Validator> validators =
                                 Lists.newArrayList(validatorRepository.saveAll(update.getValidators()));
-                        updated.add(new Update(component, validators));
+                        updated.add(new ComponentUpdate(component, validators));
                     }
-                    botScheme.setSchema(updates.stream().findFirst().orElseThrow().getComponent().getId());
+                    botScheme.setSchema(componentUpdates.stream().findFirst().orElseThrow().getComponent().getId());
                     botSchemaRepository.save(botScheme);
                     return updated;
                 });
