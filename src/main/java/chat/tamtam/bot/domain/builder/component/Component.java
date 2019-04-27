@@ -26,4 +26,6 @@ public class Component {
     private String text;
     @Column(name = "nextComponent")
     private Long nextComponent;
+    @Column(name = "groupId")
+    private Long groupId;
 }

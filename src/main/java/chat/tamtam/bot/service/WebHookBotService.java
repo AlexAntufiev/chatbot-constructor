@@ -125,8 +125,7 @@ public class WebHookBotService {
                 switch (ValidatorType.getById(validator.getType())) {
                     case EQUAL_TEXT:
                         EqualTextValidatorWrapper validatorWrapper = new EqualTextValidatorWrapper(validator);
-                        if (!validatorWrapper.validate(update)) {
-                            context.setState(validator.getFailState());
+                        if (!validatorWrapper.validate(update, context)) {
                             return;
                         }
                         break;
