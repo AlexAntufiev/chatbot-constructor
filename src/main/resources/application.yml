@@ -43,6 +43,7 @@ tamtam:
     chatsFetchAmount: 20
   registration:
     bot:
+      url: https://tt.me/BuilderRegBot
       id: 581483330212
       token: JUeixE5Dr7WoBY3ajjfwr72ya1CR_zw6D25VlR0sgNI
       enabledIds: 555537636725, 590435433004, 575868018573, 577949140156

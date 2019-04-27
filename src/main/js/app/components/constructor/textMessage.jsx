@@ -8,7 +8,7 @@ import * as TamBotService from "app/service/tamBot";
 import {Growl} from "primereact/growl";
 import * as AxiosMessages from 'app/utils/axiosMessages';
 import * as Routes from 'app/constants/routes';
-import makeUrl from "app/utils/makeUrl";
+import makeTemplateStr from "app/utils/makeTemplateStr";
 import BroadcastMessageState from 'app/utils/broadcastMessageState';
 import shallowequal from "shallowequal";
 import getCalendar from "app/i18n/calendarLocale";
@@ -44,6 +44,7 @@ class TextMessage extends React.Component {
         this.getUpdatedFields = this.getUpdatedFields.bind(this);
         this.uploadFilesToTam = this.uploadFilesToTam.bind(this);
         this.createAttachElementsList = this.createAttachElementsList.bind(this);
+        this.refreshIfAllDownloaded = this.refreshIfAllDownloaded.bind(this);
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -102,7 +103,7 @@ class TextMessage extends React.Component {
                         || this.props.message.state === BroadcastMessageState.ERASED_BY_SCHEDULE}
                         icon={"pi pi-times"}
                         onClick={() => {
-                            const attachments = [...this.state.attachments];
+                            const attachments = this.state.attachments.slice();
                             attachments[i].removed = true;
                             this.setState({
                                 attachments: attachments,
@@ -136,13 +137,13 @@ class TextMessage extends React.Component {
                         if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                             const uploadedObj = JSON.parse(xhr.responseText);
                             const firstKey = Object.keys(uploadedObj["photos"])[0];
-                            self.setState({
-                                attachments: [...self.state.attachments, {
-                                    title: files[i].name,
-                                    img: URL.createObjectURL(files[i]),
-                                    token: uploadedObj["photos"][firstKey].token
-                                }]
+                            let attachments = self.state.attachments.slice();
+                            attachments.push({
+                                title: files[i].name,
+                                img: URL.createObjectURL(files[i]),
+                                token: uploadedObj["photos"][firstKey].token
                             });
+                            self.setState({attachments: attachments});
                         }
                         uploaded++;
                         if (uploaded === files.length) {
@@ -156,6 +157,29 @@ class TextMessage extends React.Component {
                         self.setState({ajaxUploadAttachProcess: false});
                     }
                 }, this);
+        }
+    }
+
+    refreshIfAllDownloaded(processed, need, message) {
+        if (processed === need) {
+            this.props.updateMessageList(message);
+            AxiosMessages.successOperation(this, 'app.broadcastmessage.saved');
+            this.setState({
+                ajaxUpdateProcess: false,
+                initialMessage: Object.assign({}, this.state.message),
+                attachmentsWasChanged: false
+            });
+            BroadcastMessageService.getAttacmentsList(this.props.botSchemeId, this.props.chatChannelId, this.props.message.id, (res) => {
+                let attachments = [];
+                res.data.payload.forEach((attach) => {
+                    attachments.push({
+                        title: attach.title,
+                        id: attach.id,
+                        token: attach.attachmentIdentifier
+                    });
+                });
+                this.setState({attachments: attachments});
+            });
         }
     }
 
@@ -179,37 +203,44 @@ class TextMessage extends React.Component {
         if (this.state.message.erasingTime) {
             message.erasingTime = new Date(this.state.message.erasingTime).toUTCString();
         }
+        const self = this;
         BroadcastMessageService.updateBroadcastMessage(this.props.botSchemeId, this.props.chatChannelId,
             this.props.message.id,
             message,
-            () => {
-                this.state.attachments.forEach((attach, i) => {
+            (res) => {
+                let proccessedCount = 0;
+                let needProcessed = 0;
+                for (let i = 0; i < self.state.attachments.length; i++) {
+                    const attach = self.state.attachments[i];
+                    if ((!attach.id && !attach.removed) || (attach.removed && attach.id)) {
+                        needProcessed++;
+                    }
+                }
+                if (self.state.attachments.length === 0 ) {
+                    self.refreshIfAllDownloaded(0, 0, res.data.payload);
+                }
+                for (let i = 0; i < self.state.attachments.length; i++) {
+                    const attach = self.state.attachments[i];
                     if (!attach.id && !attach.removed) {
-                        BroadcastMessageService.addAttachment(this.props.botSchemeId, this.props.chatChannelId,
-                            this.props.message.id, {
+                        BroadcastMessageService.addAttachment(self.props.botSchemeId, self.props.chatChannelId,
+                            self.props.message.id, {
                                 title: attach.title,
                                 token: attach.token,
                                 type: "photo"
-                            }, (res) => {
-                                this.state.attachments[i].id = res.data.payload.id;
-                            }, null, this);
+                            }, () => {
+                                proccessedCount++;
+                                self.refreshIfAllDownloaded(proccessedCount, needProcessed, res.data.payload);
+                            }, null, self);
                     } else if (attach.removed && attach.id) {
-                        BroadcastMessageService.removeAttachment(this.props.botSchemeId, this.props.chatChannelId,
-                            this.props.message.id, attach.id, (res) => {
-                                this.state.attachments.splice(i, 1);
-                            }, null, this);
+                        BroadcastMessageService.removeAttachment(self.props.botSchemeId, self.props.chatChannelId,
+                            self.props.message.id, attach.id, () => {
+                                proccessedCount++;
+                                self.refreshIfAllDownloaded(proccessedCount, needProcessed, res.data.payload);
+                            }, null, self);
                     }
-
-                });
-                this.props.refreshMessageList();
-                AxiosMessages.successOperation(this, 'app.broadcastmessage.saved');
-                this.setState({
-                    ajaxUpdateProcess: false,
-                    initialMessage: Object.assign({}, this.state.message),
-                    attachmentsWasChanged: false
-                });
+                }
             },
-            () => this.setState({ajaxUpdateProcess: false}),
+            () => self.setState({ajaxUpdateProcess: false}),
             this);
     }
 
@@ -219,12 +250,12 @@ class TextMessage extends React.Component {
             this.setState({ajaxRemoveProcess: true});
             BroadcastMessageService.removeBroadcastMessage(this.props.botSchemeId, this.props.chatChannelId, this.props.message.id,
                 () => {
-                    const url = makeUrl(Routes.botBroadcastingDetail(), {
+                    const url = makeTemplateStr(Routes.botBroadcastingDetail(), {
                         id: this.props.botId,
                         botSchemeId: this.props.botSchemeId,
                         chatChannelId: this.props.chatChannelId
                     });
-                    this.props.refreshMessageList();
+                    this.props.updateMessageList(this.props.message, true);
                     this.setState({ajaxRemoveProcess: false});
                     this.props.history.push(url);
                 }, () => this.setState({ajaxRemoveProcess: false}),

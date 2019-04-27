@@ -50,6 +50,8 @@ public class RestSecurity extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers(HttpMethod.GET, WebSocketEndpoint.WEB_SOCKET + "/**")
                 .permitAll()
+                .antMatchers(HttpMethod.GET, Endpoint.RESOURCES + Endpoint.REGISTRATION_BOT_URL)
+                .permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

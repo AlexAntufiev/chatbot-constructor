@@ -20,7 +20,4 @@ logging:
         bot: DEBUG
 
 tamtam:
-  registration:
-    bot:
-      id: 592946665497
-      token: JTY864IytlNJaW38XFn2WYC-Jikm0mv5PeewS_ugaYU
+  host: http://89.208.84.173:8090

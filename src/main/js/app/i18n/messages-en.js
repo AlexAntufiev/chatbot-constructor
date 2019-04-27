@@ -96,11 +96,16 @@ export default {
 
     'app.broadcastmessage.send.wait': 'Waiting to be sent',
     'app.broadcastmessage.sent': 'Sent',
+    'app.broadcastmessage.sent.erased': 'Sent and erased',
     'app.broadcastmessage.processing': 'Processing',
     'app.broadcastmessage.postingtime': 'Posting time',
     'app.broadcastmessage.erasingtime': 'Erasing time',
     'app.broadcastmessage.text': 'Message text',
     'app.broadcastmessage.saved': 'Message saved',
+
+    'template.message.sent': 'Message :name sent',
+    'template.message.erase': 'Message :name erased',
+    'template.message.error': 'Error when process message :name',
 
     //Common
     'app.common.sigin.message': 'Please, sign in'

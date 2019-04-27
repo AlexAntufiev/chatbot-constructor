@@ -1,7 +1,7 @@
 package chat.tamtam.bot.configuration.scheduler;
 
 import java.nio.ByteBuffer;
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -60,10 +60,10 @@ public class BroadcastMessageScheduler {
 
     @Scheduled(fixedRate = DEFAULT_SENDING_RATE)
     public void fireScheduledMessages() {
-        Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+        Instant currentInstant = Instant.now();
         List<BroadcastMessageEntity> scheduledMessages =
                 broadcastMessageRepository.findAllByFiringTimeBeforeAndState(
-                        currentTimestamp,
+                        currentInstant,
                         BroadcastMessageState.SCHEDULED.getValue()
                 );
         scheduledMessages.forEach(message -> {
@@ -132,10 +132,10 @@ public class BroadcastMessageScheduler {
 
     @Scheduled(fixedRate = DEFAULT_ERASING_RATE)
     public void eraseScheduledMessages() {
-        Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+        Instant currentInstant = Instant.now();
         List<BroadcastMessageEntity> scheduledMessages =
                 broadcastMessageRepository.findAllByErasingTimeBeforeAndState(
-                        currentTimestamp,
+                        currentInstant,
                         BroadcastMessageState.SENT.getValue()
                 );
         scheduledMessages.forEach(message -> {

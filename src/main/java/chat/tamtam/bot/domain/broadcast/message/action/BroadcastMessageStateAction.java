@@ -1,9 +1,7 @@
 package chat.tamtam.bot.domain.broadcast.message.action;
 
-import java.sql.Timestamp;
 import java.time.DateTimeException;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -14,9 +12,6 @@ import chat.tamtam.bot.domain.exception.UpdateBroadcastMessageException;
 import chat.tamtam.bot.service.Error;
 
 public abstract class BroadcastMessageStateAction {
-
-    protected static final ZoneOffset SERVER_LOCAL_ZONE_OFFSET = ZoneOffset.of("+03:00"); // [EUROPE/MOSCOW]
-    protected static final ZoneId SERVER_LOCAL_ZONE_ID = SERVER_LOCAL_ZONE_OFFSET.normalized();
 
     public abstract void doAction(
             BroadcastMessageEntity broadcastMessage,
@@ -40,36 +35,28 @@ public abstract class BroadcastMessageStateAction {
         }
     }
 
-    protected ZonedDateTime getDateTimeAtLocalZone(
+    protected Instant getInstant(
             final String gmtDateTime,
-            final Error malformedDateTimeError
+            final Instant pastTime,
+            final long broadcastMessageId,
+            final Error malformedDateTimeError,
+            final Error timeSequenceError
     ) {
-        ZonedDateTime zonedDateTime = parseZonedDateTime(
-                gmtDateTime,
-                malformedDateTimeError
-        );
-        int zoneDif = SERVER_LOCAL_ZONE_OFFSET.getTotalSeconds() - zonedDateTime.getOffset().getTotalSeconds();
-        return zonedDateTime.plusSeconds(zoneDif).toLocalDateTime().atZone(SERVER_LOCAL_ZONE_OFFSET);
-    }
-
-    protected Timestamp futureTimestamp(
-            final ZonedDateTime futureTime,
-            final ZonedDateTime pastTime,
-            long broadcastMessageId,
-            final Error error
-    ) {
-        if (futureTime.isBefore(pastTime)) {
+        Instant futureInstant =
+                parseZonedDateTime(gmtDateTime, malformedDateTimeError)
+                        .toInstant();
+        if (futureInstant.isBefore(pastTime)) {
             throw new UpdateBroadcastMessageException(
                     String.format(
                             "Future time=%s is in the past, past time=%s, message id=%d",
-                            futureTime,
+                            futureInstant,
                             pastTime,
                             broadcastMessageId
                     ),
-                    error
+                    timeSequenceError
             );
         }
-        return Timestamp.valueOf(futureTime.toLocalDateTime());
+        return futureInstant;
     }
 
     protected void updateText(

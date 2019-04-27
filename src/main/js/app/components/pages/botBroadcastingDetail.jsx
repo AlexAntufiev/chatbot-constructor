@@ -3,32 +3,35 @@ import {Button} from "primereact/button";
 import TextMessage from "app/components/constructor/textMessage";
 import * as BroadcastMessageService from "app/service/broadcastMessage";
 import * as routers from 'app/constants/routes';
-import makeUrl from "app/utils/makeUrl";
+import makeTemplateStr from "app/utils/makeTemplateStr";
 import BroadcastMessageState from 'app/utils/broadcastMessageState'
 import dateFormat from 'dateformat';
 import {withRouter} from "react-router";
 import {connect} from "react-redux";
 import {injectIntl} from "react-intl";
 import {Growl} from "primereact/growl";
+import * as ElementId from 'app/constants/ElementId';
+import * as CustomEventType from 'app/constants/CustomEventType';
 
 class BotBroadcastingDetail extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            messageList: [],
+            messageList: {},
             ajaxRefreshProcess: false
         };
         this.onAddMessage = this.onAddMessage.bind(this);
         this.createMessagesList = this.createMessagesList.bind(this);
         this.refreshMessageList = this.refreshMessageList.bind(this);
+        this.updateMessageList = this.updateMessageList.bind(this);
     }
 
     onAddMessage() {
         const defaultName = 'Broadcast message';
         BroadcastMessageService.addBroadcastMessage(this.props.match.params.id, this.props.match.params.chatChannelId,
             {title: defaultName}, (res) => {
-                const newMessUrl = makeUrl(routers.botBroadcastingDetailMessage(), {
+                const newMessUrl = makeTemplateStr(routers.botBroadcastingDetailMessage(), {
                     id: this.props.match.params.id,
                     chatChannelId: this.props.match.params.chatChannelId,
                     messageId: res.data.payload.id,
@@ -38,6 +41,16 @@ class BotBroadcastingDetail extends Component {
                 this.setState({messageList: messageList});
                 this.props.history.push(newMessUrl);
             });
+    }
+
+    updateMessageList(message, remove = false) {
+        let messageList = Object.assign({}, this.state.messageList);
+        if (!remove) {
+            messageList[message.id] = message;
+        } else {
+           delete messageList[message.id];
+        }
+        this.setState({messageList: messageList});
     }
 
     refreshMessageList() {
@@ -59,6 +72,13 @@ class BotBroadcastingDetail extends Component {
 
     componentDidMount() {
         this.refreshMessageList();
+        document
+            .getElementById(ElementId.BOT_BROADCAST_DETAIL)
+            .addEventListener(CustomEventType.BROADCAST_MESSAGE_STATE_CHANGE, (event) => {
+                let messages = Object.assign({}, this.state.messageList);
+                messages[event.detail.message.payload.id] = event.detail.message.payload;
+                this.setState({messageList: messages});
+            });
     }
 
     getLabelByState(message) {
@@ -72,8 +92,11 @@ class BotBroadcastingDetail extends Component {
                     + ' ' + dateFormat(new Date(message.firingTime), dateTimeFormat);
                 labelClass = 'pi pi-clock sheduled';
                 break;
-            case BroadcastMessageState.SENT:
             case BroadcastMessageState.ERASED_BY_SCHEDULE:
+                labelText = intl.formatMessage({id: 'app.broadcastmessage.sent.erased'});
+                labelClass = 'pi pi-check sent';
+                break;
+            case BroadcastMessageState.SENT:
                 labelText = intl.formatMessage({id: 'app.broadcastmessage.sent'});
                 labelClass = 'pi pi-check sent';
                 break;
@@ -99,7 +122,7 @@ class BotBroadcastingDetail extends Component {
         let renderMessageList = [];
         for (let messageId in this.state.messageList) {
             const message = this.state.messageList[messageId];
-            const messUrl = makeUrl(routers.botBroadcastingDetailMessage(), {
+            const messUrl = makeTemplateStr(routers.botBroadcastingDetailMessage(), {
                 id: this.props.match.params.id,
                 chatChannelId: this.props.match.params.chatChannelId,
                 messageId: messageId
@@ -112,7 +135,6 @@ class BotBroadcastingDetail extends Component {
                     <Button label={message.title} icon='pi pi-envelope'
                             onClick={() => {
                                 this.props.history.push(messUrl);
-                                this.refreshMessageList()
                             }}/>
                 </div>
             );
@@ -126,7 +148,7 @@ class BotBroadcastingDetail extends Component {
         const message = Number(this.props.match.params.messageId)
             ? this.state.messageList[Number(this.props.match.params.messageId)]
             : null;
-        return (<div className="p-grid p-align-start bot-broadcasting">
+        return (<div className="p-grid p-align-start bot-broadcasting" id={ElementId.BOT_BROADCAST_DETAIL}>
             <Growl ref={(el) => this.growl = el}/>
             <div className="p-col bot-broadcasting_elements-container">
                 <div className="bot-broadcasting_elements-container_element">
@@ -145,7 +167,7 @@ class BotBroadcastingDetail extends Component {
                 <TextMessage botSchemeId={this.props.match.params.id}
                              botId={this.props.match.params.id}
                              chatChannelId={this.props.match.params.chatChannelId}
-                             refreshMessageList={this.refreshMessageList}
+                             updateMessageList={this.updateMessageList}
                              message={message}/>
             </div>
         </div>);

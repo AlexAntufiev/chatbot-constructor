@@ -41,4 +41,7 @@ public interface Endpoint {
     String BUILDER = "/builder";
     String SCHEME = "/scheme";
     String COMPONENT = "/component";
+
+    String RESOURCES = "/resources";
+    String REGISTRATION_BOT_URL = "/registration/bot/url";
 }

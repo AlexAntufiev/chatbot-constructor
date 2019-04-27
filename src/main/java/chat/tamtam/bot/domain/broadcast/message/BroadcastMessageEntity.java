@@ -1,6 +1,6 @@
 package chat.tamtam.bot.domain.broadcast.message;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -37,9 +37,9 @@ public class BroadcastMessageEntity {
     @Column(name = "title", nullable = false)
     private String title;
     @Column(name = "firingTime")
-    private Timestamp firingTime;
+    private Instant firingTime;
     @Column(name = "erasingTime")
-    private Timestamp erasingTime;
+    private Instant erasingTime;
     @Column(name = "mid")
     private String messageId;
     @Column(name = "text")
