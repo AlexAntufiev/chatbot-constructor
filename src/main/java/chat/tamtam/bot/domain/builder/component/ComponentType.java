@@ -9,7 +9,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ComponentType {
     INPUT((byte) 0),
-    INFO((byte) 1);
+    INFO((byte) 1),
+    ;
 
     @Getter
     private final byte type;
