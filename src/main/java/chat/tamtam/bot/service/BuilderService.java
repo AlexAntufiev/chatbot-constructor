@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import com.google.common.collect.Lists;
 
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
+import chat.tamtam.bot.domain.builder.callback.CallbackButton;
+import chat.tamtam.bot.domain.builder.callback.CallbackButtonsGroup;
 import chat.tamtam.bot.domain.builder.component.Component;
 import chat.tamtam.bot.domain.builder.component.ComponentUpdate;
 import chat.tamtam.bot.domain.builder.validator.Validator;
@@ -101,11 +103,25 @@ public class BuilderService {
                             }
                         }
 
+                        /*for (List<CallbackButton> callbacks
+                                : update.getCallbacks()) {
+
+                        }*/
+
+                        CallbackButtonsGroup group = new CallbackButtonsGroup(
+                                update.getComponent().getId(),
+                                update.getCallbacks()
+                        );
+
                         update.getComponent().setSchemeId(botScheme.getId());
                         Component component = componentRepository.save(update.getComponent());
+
                         List<Validator> validators =
                                 Lists.newArrayList(validatorRepository.saveAll(update.getValidators()));
-                        updated.add(new ComponentUpdate(component, validators));
+
+                        List<List<CallbackButton>> callbacks = group.getCallbackButtons();
+
+                        updated.add(new ComponentUpdate(component, validators, callbacks));
                     }
                     botScheme.setSchema(componentUpdates.stream().findFirst().orElseThrow().getComponent().getId());
                     botSchemaRepository.save(botScheme);

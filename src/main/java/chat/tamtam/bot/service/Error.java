@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 public enum Error {
+    SERVICE_ERROR("errors.service.error"),
     SERVICE_NO_ENTITY("errors.service.no.entity"),
     TAM_SERVICE_ERROR("errors.tam.service"),
     TAM_BOT_TOKEN_INCORRECT("errors.tam.bot.token.incorrect"),
