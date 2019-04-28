@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 public enum Error {
-    SERVICE_ERROR("errors.service.no.entity"),
+    SERVICE_NO_ENTITY("errors.service.no.entity"),
     TAM_SERVICE_ERROR("errors.tam.service"),
     TAM_BOT_TOKEN_INCORRECT("errors.tam.bot.token.incorrect"),
     TAM_BOT_TOKEN_EMPTY("errors.tam.bot.token.empty"),
@@ -44,6 +44,8 @@ public enum Error {
     ATTACHMENT_UPLOAD_SERVICE_ERROR("errors.attachment.upload.service.error"),
     ATTACHMENT_DOES_NOT_EXIST("errors.attachment.does.not.exist"),
     ATTACHMENT_IDENTIFIER_IS_NOT_VALID("errors.attachment.token.is.not.valid"),
+
+    BOT_SCHEME_INVALID_VALIDATOR("errors.bot.scheme.invalid.validator"),
     ;
 
     @Getter

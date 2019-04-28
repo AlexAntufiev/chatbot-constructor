@@ -13,7 +13,7 @@ import chat.tamtam.bot.domain.exception.GenerateUploadLinkException;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
 import chat.tamtam.bot.domain.response.SuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
-import chat.tamtam.bot.repository.BotSchemaRepository;
+import chat.tamtam.bot.repository.BotSchemeRepository;
 import chat.tamtam.bot.repository.TamBotRepository;
 import chat.tamtam.botapi.TamTamBotAPI;
 import chat.tamtam.botapi.exceptions.APIException;
@@ -24,12 +24,14 @@ import chat.tamtam.botapi.model.UploadEndpoint;
 import chat.tamtam.botapi.model.UploadType;
 import chat.tamtam.botapi.model.UserWithPhoto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class TamBotService {
     private final TamBotRepository tamBotRepository;
-    private final BotSchemaRepository botSchemaRepository;
+    private final BotSchemeRepository botSchemaRepository;
     private final UserService userService;
     private final BotSchemeService botSchemeService;
     private final TransactionalUtils transactionalUtils;
@@ -126,10 +128,10 @@ public class TamBotService {
                         Error.TAM_BOT_CONNECTED_TO_OTHER_BOT_SCHEME
                 );
             }
+            final String url = host + Endpoint.TAM_BOT + "/" + bot.getId();
             SimpleQueryResult result = tamTamBotAPI
-                    .subscribe(
-                            new SubscriptionRequestBody(host + Endpoint.TAM_BOT + "/" + bot.getId())
-                    ).execute();
+                    .subscribe(new SubscriptionRequestBody(url))
+                    .execute();
             if (result.isSuccess()) {
                 bot.setBotId(tamBot.getId().getBotId());
                 transactionalUtils
@@ -137,6 +139,12 @@ public class TamBotService {
                             tamBotRepository.save(tamBot);
                             botSchemaRepository.save(bot);
                         });
+                log.info(
+                        String.format(
+                                "Bot(id=%d, token=%s, botSchemeId=%d, url=%s) was subscribed",
+                                tamBot.getId().getBotId(), tamBot.getToken(), bot.getId(), url
+                        )
+                );
                 return new SuccessResponseWrapper<>(tamBot);
             } else {
                 throw new ChatBotConstructorException(
@@ -183,16 +191,23 @@ public class TamBotService {
                 .findById(new TamBotEntity.Id(bot.getBotId(), bot.getUserId()));
         TamTamBotAPI tamTamBotAPI = TamTamBotAPI.create(tamBot.getToken());
         try {
+            final String url = host + Endpoint.TAM_BOT + "/" + bot.getId();
             SimpleQueryResult result = tamTamBotAPI
-                    .unsubscribe(host + Endpoint.TAM_BOT + "/" + bot.getId())
+                    .unsubscribe(url)
                     .execute();
             if (result.isSuccess()) {
                 transactionalUtils
                         .invokeRunnable(() -> {
                             tamBotRepository.deleteById(new TamBotEntity.Id(bot.getBotId(), bot.getUserId()));
+                            bot.setBotId(null);
                             botSchemaRepository.save(bot);
                         });
-                bot.setBotId(null);
+                log.info(
+                        String.format(
+                                "Bot(id=%d, token=%s, botSchemeId=%d, url=%s) was unsubscribed",
+                                tamBot.getId().getBotId(), tamBot.getToken(), bot.getId(), url
+                        )
+                );
                 return new SuccessResponseWrapper<>(tamBot);
             } else {
                 throw new ChatBotConstructorException(

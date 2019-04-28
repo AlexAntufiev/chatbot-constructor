@@ -17,7 +17,7 @@ import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.domain.notification.NotificationMessage;
 import chat.tamtam.bot.domain.notification.NotificationType;
-import chat.tamtam.bot.repository.BotSchemaRepository;
+import chat.tamtam.bot.repository.BotSchemeRepository;
 import chat.tamtam.bot.repository.BroadcastMessageAttachmentRepository;
 import chat.tamtam.bot.repository.BroadcastMessageRepository;
 import chat.tamtam.bot.repository.TamBotRepository;
@@ -49,7 +49,7 @@ public class BroadcastMessageScheduler {
     private static final long DEFAULT_ERASING_RATE = 10_000L;
 
     private final BroadcastMessageRepository broadcastMessageRepository;
-    private final BotSchemaRepository botSchemaRepository;
+    private final BotSchemeRepository botSchemaRepository;
     private final TamBotRepository tamBotRepository;
     private final BroadcastMessageAttachmentRepository broadcastMessageAttachmentRepository;
     private final NotificationService notificationService;

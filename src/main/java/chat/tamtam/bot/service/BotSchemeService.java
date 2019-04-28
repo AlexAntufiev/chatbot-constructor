@@ -11,7 +11,7 @@ import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
 import chat.tamtam.bot.domain.response.SuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
-import chat.tamtam.bot.repository.BotSchemaRepository;
+import chat.tamtam.bot.repository.BotSchemeRepository;
 import chat.tamtam.bot.repository.TamBotRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class BotSchemeService {
-    private final @NonNull BotSchemaRepository botSchemaRepository;
+    private final @NonNull BotSchemeRepository botSchemaRepository;
     private final @NonNull TamBotRepository tamBotRepository;
 
     private final @NonNull UserService userService;

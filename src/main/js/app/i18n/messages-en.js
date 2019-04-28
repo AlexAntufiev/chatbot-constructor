@@ -84,8 +84,10 @@ export default {
     'errors.attachment.upload.service.error': 'Upload service error',
     'errors.attachment.does.not.exist': 'Attachment does not exist',
     'errors.attachment.token.is.not.valid': 'Attachment identifier is not valid',
+    'errors.bot.scheme.invalid.validator': 'Invalid validator presented',
 
-    //Success messages
+
+//Success messages
     'app.successmessage.successsumary': 'Success',
     'app.successmessage.successoperaton': 'Success operation',
     'success.tam.bot.name.changed': 'Name changed',
