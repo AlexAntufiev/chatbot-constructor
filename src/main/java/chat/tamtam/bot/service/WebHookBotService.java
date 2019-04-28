@@ -95,7 +95,7 @@ public class WebHookBotService {
                 }
 
                 if (context.getState() == null) {
-                    BotContext botContext = initContext(context.getId().getUserId());
+                    initContext(context.getId().getUserId());
                     break;
                 }
 
