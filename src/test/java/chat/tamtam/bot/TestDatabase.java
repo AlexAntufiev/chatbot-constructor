@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 
 import chat.tamtam.bot.domain.session.SessionEntity;
 import chat.tamtam.bot.domain.user.UserAuthEntity;
-import chat.tamtam.bot.repository.BotSchemaRepository;
+import chat.tamtam.bot.repository.BotSchemeRepository;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.service.UserService;
 import lombok.AllArgsConstructor;
@@ -18,7 +18,7 @@ import lombok.AllArgsConstructor;
 public class TestDatabase extends TestContext {
 
     private static final int AMOUNT_TO_ADD = 3;
-    private final BotSchemaRepository botSchemaRepository;
+    private final BotSchemeRepository botSchemaRepository;
     private final SessionRepository sessionRepository;
     private final UserService userService;
 
