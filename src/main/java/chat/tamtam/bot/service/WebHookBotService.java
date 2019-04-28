@@ -81,7 +81,6 @@ public class WebHookBotService {
                             break;
                         }
                         processInputComponent(component, context, ((MessageCreatedUpdate) update));
-                        System.out.println(context);
                         botContextRepository.save(context);
                         break;
 
@@ -119,7 +118,7 @@ public class WebHookBotService {
                 final BotContext context,
                 final MessageCreatedUpdate update
         ) {
-            Iterable<Validator> validators = validatorRepository.findAllByComponentId(component.getId());
+            Iterable<Validator> validators = validatorRepository.findAllByComponentIdOrderById(component.getId());
             for (Validator validator
                     : validators) {
                 switch (ValidatorType.getById(validator.getType())) {
