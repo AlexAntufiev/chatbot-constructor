@@ -59,7 +59,7 @@ public class WebHookBotService {
 
     @RequiredArgsConstructor
     private class WebHookBotVisitor implements Update.Visitor {
-        // @todo @CC-141 Implement kind of lock that depends on userId and botId
+        // @todo #CC-141 Implement kind of lock that depends on userId and botId
         private final int botSchemeId;
 
         private void execute(final BotContext context, final Update update) {
