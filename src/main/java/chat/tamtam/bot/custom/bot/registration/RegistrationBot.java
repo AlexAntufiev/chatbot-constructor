@@ -79,16 +79,16 @@ public class RegistrationBot extends AbstractCustomBot {
     private final @NonNull
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Value("${tamtam.registration.bot.id}")
+    @Value("${tamtam.bot.registration.id}")
     private String registrationBotId;
     // @todo #CC-91 dont create reg bot with nullable registrationBotId and token
-    @Value("${tamtam.registration.bot.token}")
+    @Value("${tamtam.bot.registration.token}")
     private String token;
 
     @Value("${tamtam.host}")
     private String host;
 
-    @Value("${tamtam.registration.bot.enabledIds}")
+    @Value("${tamtam.bot.registration.enabledIds}")
     private String ids;
     private final EnabledIdsConverter enabledIdsConverter;
     private EnabledIds enabledIds;
