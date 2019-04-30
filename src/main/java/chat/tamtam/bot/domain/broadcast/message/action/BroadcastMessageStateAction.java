@@ -48,7 +48,7 @@ public abstract class BroadcastMessageStateAction {
         if (futureInstant.isBefore(pastTime)) {
             throw new UpdateBroadcastMessageException(
                     String.format(
-                            "Future time=%s is in the past, past time=%s, message id=%d",
+                            "Future time=%s is in the past, past time=%s, messageOf id=%d",
                             futureInstant,
                             pastTime,
                             broadcastMessageId
@@ -80,7 +80,7 @@ public abstract class BroadcastMessageStateAction {
     ) {
         throw new UpdateBroadcastMessageException(
                 String.format(
-                        "Can't update broadcast message text, because message with id=%d is in state=%s",
+                        "Can't update broadcast messageOf text, because messageOf with id=%d is in state=%s",
                         broadcastMessage.getId(),
                         BroadcastMessageState.getById(broadcastMessage.getState()).name()
                 ),

@@ -14,50 +14,42 @@ import chat.tamtam.bot.domain.bot.hockey.Results;
 @Service
 public class Hockey2019Service {
 
-    @Value("${tamtam.bot.hockey2019.url}")
-    private String url;
+    @Value("${tamtam.bot.hockey2019.external_url.news}")
+    private String newsPath;
+
+    @Value("${tamtam.bot.hockey2019.external_url.news_team}")
+    private String newsTeamPath;
+
+    @Value("${tamtam.bot.hockey2019.external_url.calendar}")
+    private String calendarPath;
+
+    @Value("${tamtam.bot.hockey2019.external_url.results}")
+    private String resultsPath;
+
+    @Value("${tamtam.bot.hockey2019.external_url.match}")
+    private String matchPath;
 
     @Autowired
     private RestTemplate restTemplate;
 
     public News getNews() {
-        return getBodyFromRequest(getNewsPath(), News.class);
+        return getBodyFromRequest(newsPath, News.class);
     }
 
     public News getNewsOfTeam(int teamId) {
-        return getBodyFromRequest(getNewsOfTeamPath(), News.class, teamId);
+        return getBodyFromRequest(newsTeamPath, News.class, teamId);
     }
 
     public Results getResults() {
-        return getBodyFromRequest(getResultsPath(), Results.class);
+        return getBodyFromRequest(resultsPath, Results.class);
     }
 
     public Calendar getCalendar() {
-        return getBodyFromRequest(getCalendarPath(), Calendar.class);
+        return getBodyFromRequest(calendarPath, Calendar.class);
     }
 
     public Match getMatch(int matchId) {
-        return getBodyFromRequest(getMatchPath(), Match.class, matchId);
-    }
-
-    private String getNewsPath() {
-        return url + "/news";
-    }
-
-    private String getNewsOfTeamPath() {
-        return getNewsPath() + "/%s";
-    }
-
-    private String getResultsPath() {
-        return url + "/results";
-    }
-
-    private String getCalendarPath() {
-        return url + "/calendar";
-    }
-
-    private String getMatchPath() {
-        return url + "/match/%s";
+        return getBodyFromRequest(matchPath, Match.class, matchId);
     }
 
     @Loggable
