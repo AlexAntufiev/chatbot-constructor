@@ -1,6 +1,5 @@
 package chat.tamtam.bot.custom.bot.registration;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -157,7 +156,7 @@ public class RegistrationBot extends AbstractCustomBot {
     private void response(final BotStartedUpdate update) {
         try {
             if (filter(update.getUserId())) {
-                botAPI.sendMessage(new NewMessageBody(HELP_MESSAGE, Collections.emptyList()))
+                botAPI.sendMessage(messageOf(HELP_MESSAGE))
                         .userId(update.getUserId())
                         .execute();
             }
@@ -190,24 +189,23 @@ public class RegistrationBot extends AbstractCustomBot {
                 return delete(message.getSender().getUserId().toString());
             case "/upd":
                 if (cmd.length < 2) {
-                    return new NewMessageBody("Please provide new password", null);
+                    return messageOf("Please provide new password");
                 } else {
                     return updatePassword(message.getSender().getUserId().toString(), cmd[1]);
                 }
             case "/login":
                 return login(message.getSender().getUserId().toString());
             default:
-                return new NewMessageBody(HELP_MESSAGE, null);
+                return messageOf(HELP_MESSAGE);
         }
     }
 
     private NewMessageBody login(final String userId) {
         UserEntity user = userRepository.findByLogin(userId);
         if (user != null) {
-            return new NewMessageBody("Press to sign in", List.of(getAutoLoginButton(userId)));
+            return messageOf("Press to sign in", List.of(getAutoLoginButton(userId)));
         } else {
-            String response = "Login: " + userId + " not found\nTry '/reg' to create user";
-            return new NewMessageBody(response, null);
+            return messageOf("Login: " + userId + " not found\nTry '/reg' to create user");
         }
     }
 
@@ -222,10 +220,10 @@ public class RegistrationBot extends AbstractCustomBot {
             );
             userRepository.save(user);
             String response = "Login: " + userId + "\nPassword: " + password;
-            return new NewMessageBody(response, List.of(getAutoLoginButton(userId)));
+            return messageOf(response, List.of(getAutoLoginButton(userId)));
         }
         String response = "Login: " + userId + "\nTry '/upd' to change password";
-        return new NewMessageBody(response, List.of(getAutoLoginButton(userId)));
+        return messageOf(response, List.of(getAutoLoginButton(userId)));
     }
 
     private NewMessageBody delete(final String userId) {
@@ -233,27 +231,24 @@ public class RegistrationBot extends AbstractCustomBot {
         if (user != null) {
             userRepository.removeByLogin(userId);
             sessionRepository.removeAllByLogin(userId);
-            String response = "User with login: " + userId + " deleted";
-            return new NewMessageBody(response, null);
+            return messageOf("User with login: " + userId + " deleted");
         }
-        String response = "User with login: " + userId + " not found\nTry '/reg' to create user";
-        return new NewMessageBody(response, null);
+        return messageOf("User with login: " + userId + " not found\nTry '/reg' to create user");
     }
 
     private NewMessageBody updatePassword(final String userId, final String newPassword) {
         UserEntity user = userRepository.findByLogin(userId);
         if (user != null) {
             if (newPassword.isEmpty()) {
-                return new NewMessageBody("Try another password", null);
+                return messageOf("Try another password");
             }
             user.setPasswordHash(bCryptPasswordEncoder.encode(newPassword));
             userRepository.save(user);
             String response = "Login: " + userId + "\nPassword: " + newPassword;
             sessionRepository.removeAllByLogin(userId);
-            return new NewMessageBody(response, List.of(getAutoLoginButton(userId)));
+            return messageOf(response, List.of(getAutoLoginButton(userId)));
         }
-        String response = "Login: " + userId + " not found\nTry '/reg' to create user";
-        return new NewMessageBody(response, null);
+        return messageOf("Login: " + userId + " not found\nTry '/reg' to create user");
     }
 
     private InlineKeyboardAttachmentRequest getAutoLoginButton(final String userId) {

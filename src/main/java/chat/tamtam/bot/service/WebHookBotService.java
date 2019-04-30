@@ -53,7 +53,7 @@ public class WebHookBotService {
             log.info(String.format("Update {%s} submitted to bot scheme with id=%d", update, botSchemeId));
             update.visit(new WebHookBotVisitor(botSchemeId));
         } catch (RuntimeException e) {
-            log.error("Submitting message produced exception", e);
+            log.error("Submitting messageOf produced exception", e);
         }
     }
 
