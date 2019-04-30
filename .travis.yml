@@ -1,5 +1,6 @@
 addons:
   ssh_known_hosts: 89.208.84.173
+  ssh_known_hosts: 89.208.84.33
 
 language: java
 
