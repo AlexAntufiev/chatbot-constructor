@@ -36,17 +36,24 @@ server:
   address: 0.0.0.0
   port: 8090
 
+rest:
+  timeout:
+    connect: 1000
+    request: 4000
+
 tamtam:
   host: http://localhost:8090
   chat:
     listSizeThreshold: 20
     chatsFetchAmount: 20
-  registration:
-    bot:
+  bot:
+    registration:
       url: https://tt.me/BuilderRegBot
       id: 581483330212
       token: JUeixE5Dr7WoBY3ajjfwr72ya1CR_zw6D25VlR0sgNI
       enabledIds: 555537636725, 590435433004, 575868018573, 577949140156
+    hockey2019:
+      url: https://sport.mail.ru/inf/json_vk_bot_competition/hockey2019
   broadcast:
     executor:
       corePoolSize: 2
