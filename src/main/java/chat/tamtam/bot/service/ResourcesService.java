@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RefreshScope
 @RequiredArgsConstructor
 public class ResourcesService {
-    @Value("${tamtam.bot.registration.url}")
+    @Value("${tamtam.registration.bot.url}")
     private String registrationBotUrl;
 
     public SuccessResponse getRegistrationBotUrl() {
