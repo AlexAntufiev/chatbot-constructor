@@ -20,7 +20,7 @@ public class Validator {
     private Long id;
     @Column(name = "type", nullable = false)
     private byte type;
-    @Column(name = "callbacks", nullable = false)
+    @Column(name = "bytes", nullable = false)
     private byte[] bytes;
     @Column(name = "componentId", nullable = false)
     private Long componentId;

@@ -1,5 +1,6 @@
 package chat.tamtam.bot.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.HttpHeaders;
@@ -46,7 +47,7 @@ public class BuilderController {
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final int botSchemeId,
             @RequestBody final List<ComponentUpdate> components
-    ) {
+    ) throws IOException {
         return new ResponseEntity<>(
                 builderService.saveBotScheme(
                         authToken,
