@@ -5,7 +5,7 @@ token="QeFH2Jalc16THlx9YcNBDhtdx_u3uHOeDp8y8P20pT4"
 chat_id="-70460825709429"
 url="https://botapi.tamtam.chat/messages?access_token=${token}&chat_id=${chat_id}"
 server_name="TEST-1"
-host="ec2-18-188-3-124.us-east-2.compute.amazonaws.com"
+host="89.208.84.173"
 port="80"
 config_service_port="8500"
 body=""
@@ -36,7 +36,7 @@ function main() {
 
     send_message "${server_name} запускается"
     docker run -d \
-               -p 8090:8090 \
+               -p 80:8090 \
                -v ~/${application_name}/logs:/logs \
                --name ${application_name} \
                --log-opt max-size=50m \

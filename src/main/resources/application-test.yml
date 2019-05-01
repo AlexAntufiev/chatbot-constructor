@@ -20,4 +20,4 @@ logging:
         bot: DEBUG
 
 tamtam:
-  host: http://ec2-18-188-3-124.us-east-2.compute.amazonaws.com
+  host: http://89.208.84.173
