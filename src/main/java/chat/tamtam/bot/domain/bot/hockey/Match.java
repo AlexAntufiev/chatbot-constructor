@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import chat.tamtam.botapi.model.NewMessageBody;
 import lombok.Data;
 
 @Data
@@ -24,6 +25,10 @@ public class Match {
     private URL url;
 
     private List<Event> events;
+
+    public List<NewMessageBody> getMessages() {
+        return null;
+    }
 
     private static class Event {
 

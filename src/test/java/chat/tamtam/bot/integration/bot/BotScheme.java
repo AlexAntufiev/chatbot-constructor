@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import chat.tamtam.bot.configuration.Profiles;
+import chat.tamtam.bot.configuration.AppProfiles;
 import chat.tamtam.bot.controller.Endpoint;
 import chat.tamtam.bot.repository.BotSchemeRepository;
 import chat.tamtam.bot.repository.SessionRepository;
@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Disabled
-@ActiveProfiles(Profiles.TEST)
+@ActiveProfiles(AppProfiles.TEST)
 @SpringBootTest
 @AutoConfigureMockMvc(secure = false)
 public class BotScheme {
