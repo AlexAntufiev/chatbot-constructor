@@ -1,5 +1,6 @@
 addons:
-  ssh_known_hosts: 89.208.84.173
+  ssh_known_hosts: TEST_IP
+  ssh_known_hosts: PROD_IP
 
 language: java
 
@@ -33,7 +34,12 @@ before_deploy:
 
 deploy:
   provider: script
-  script: ./scripts/deploy.sh
+  script: ./scripts/deploy.sh TEST_IP
   skip_cleanup: true
   on:
-    branch: master
+    branch: develop
+  provider: script
+  script: ./scripts/deploy.sh PROD_IP
+  skip_cleanup: true
+  on:
+    branch: travis

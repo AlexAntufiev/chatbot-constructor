@@ -5,7 +5,7 @@ token="QeFH2Jalc16THlx9YcNBDhtdx_u3uHOeDp8y8P20pT4"
 chat_id="-70460825709429"
 url="https://botapi.tamtam.chat/messages?access_token=${token}&chat_id=${chat_id}"
 server_name="TEST-1"
-host="89.208.84.173"
+host=$1
 port="80"
 config_service_port="8500"
 body=""
