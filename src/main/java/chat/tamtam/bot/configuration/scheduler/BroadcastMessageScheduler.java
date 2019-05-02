@@ -89,7 +89,7 @@ public class BroadcastMessageScheduler {
                                                 ));
                                     } catch (IllegalStateException iSE) {
                                         log.error(String.format(
-                                                "Can't change messageOf state with id=%d",
+                                                "Can't change message state with id=%d",
                                                 message.getId()
                                         ), iSE);
                                     }
@@ -101,7 +101,7 @@ public class BroadcastMessageScheduler {
                             },
                             () -> log.error(
                                     String.format(
-                                            "Can't send messageOf with id=%d because botScheme is not presented",
+                                            "Can't send message with id=%d because botScheme is not presented",
                                             message.getBotSchemeId()
                                     )
                             )
@@ -124,7 +124,7 @@ public class BroadcastMessageScheduler {
             notifyUser(userId, broadcastMessage);
         } else {
             throw new IllegalStateException(
-                    "Can't set PROCESSING state because messageOf is not in "
+                    "Can't set PROCESSING state because message is not in "
                             + requiredState.name()
                             + " state");
         }
@@ -161,7 +161,7 @@ public class BroadcastMessageScheduler {
                                                 ));
                                     } catch (IllegalStateException iSE) {
                                         log.error(String.format(
-                                                "Can't change messageOf state with id=%d",
+                                                "Can't change message state with id=%d",
                                                 message.getId()
                                         ), iSE);
                                     }
@@ -173,7 +173,7 @@ public class BroadcastMessageScheduler {
                             },
                             () -> log.error(
                                     String.format(
-                                            "Can't erase messageOf with id=%d because botScheme is not presented",
+                                            "Can't erase message with id=%d because botScheme is not presented",
                                             message.getBotSchemeId()
                                     )
                             )
@@ -253,7 +253,7 @@ public class BroadcastMessageScheduler {
             broadcastMessage.setMessageId(sendMessageResult.getMessage().getBody().getMid());
             broadcastMessage.setState(BroadcastMessageState.SENT);
         } catch (APIException | ClientException | IllegalStateException ex) {
-            log.error(String.format("Can't send scheduled messageOf with id=%d", broadcastMessage.getId()), ex);
+            log.error(String.format("Can't send scheduled message with id=%d", broadcastMessage.getId()), ex);
             broadcastMessage.setState(BroadcastMessageState.ERROR);
             broadcastMessage.setError(Error.BROADCAST_MESSAGE_SEND_ERROR.getErrorKey());
         }
@@ -273,7 +273,7 @@ public class BroadcastMessageScheduler {
                     .execute();
             broadcastMessage.setState(BroadcastMessageState.ERASED_BY_SCHEDULE);
         } catch (APIException | ClientException ex) {
-            log.error(String.format("Can't erase scheduled messageOf with id=%d", broadcastMessage.getId()), ex);
+            log.error(String.format("Can't erase scheduled message with id=%d", broadcastMessage.getId()), ex);
             broadcastMessage.setState(BroadcastMessageState.ERROR);
             broadcastMessage.setError(Error.BROADCAST_MESSAGE_ERASE_ERROR.getErrorKey());
         }
@@ -287,7 +287,7 @@ public class BroadcastMessageScheduler {
         if (tamBot == null) {
             log.error(
                     String.format(
-                            "Can't process scheduled messageOf with id=%d because related tamBot not found",
+                            "Can't process scheduled message with id=%d because related tamBot not found",
                             e.getId()
                     ),
                     e

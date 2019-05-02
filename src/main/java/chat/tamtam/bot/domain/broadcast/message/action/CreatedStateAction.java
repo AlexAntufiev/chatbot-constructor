@@ -36,7 +36,7 @@ public final class CreatedStateAction extends BroadcastMessageStateAction {
             if (StringUtils.isEmpty(broadcastMessage.getText())) {
                 throw new UpdateBroadcastMessageException(
                         String.format(
-                                "Can't schedule messageOf with id=%d, because text is empty",
+                                "Can't schedule message with id=%d, because text is empty",
                                 broadcastMessage.getId()
                         ),
                         Error.BROADCAST_MESSAGE_TEXT_IS_EMPTY

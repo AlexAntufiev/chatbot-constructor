@@ -24,7 +24,7 @@ public interface Endpoint {
     String ADMIN = "/admin";
     String TAM_MARKER = "/{marker}";
 
-    String MESSAGE = "/messageOf";
+    String MESSAGE = "/message";
     String MESSAGE_ID = "/{message_id}";
 
     String ATTACHMENT = "/attachment";

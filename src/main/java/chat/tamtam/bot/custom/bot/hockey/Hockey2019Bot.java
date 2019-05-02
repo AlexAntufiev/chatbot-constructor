@@ -333,7 +333,7 @@ public class Hockey2019Bot extends AbstractCustomBot {
         } catch (ClientException | APIException e) {
             log.error(
                     String.format(
-                        "Bot(id=%s) can't send messageOf to event(id:%s, sender:%d)",
+                        "Bot(id=%s) can't send message to event(id:%s, sender:%d)",
                         id,
                         message.getBody().getMid(),
                         userId

@@ -47,7 +47,7 @@ public class BroadcastMessageService {
 
     private final TransactionalUtils transactionalUtils;
 
-    // Broadcast messageOf actions
+    // Broadcast message actions
     private final CreatedStateAction createdStateAction;
     private final DiscardedEraseByUserStateAction discardedEraseByUserStateAction;
     private final ScheduledStateAction scheduledStateAction;
@@ -162,7 +162,7 @@ public class BroadcastMessageService {
         } else {
             throw new UpdateBroadcastMessageException(
                     String.format(
-                            "Can't remove broadcast messageOf with id=%d because it is in illegal state=%s",
+                            "Can't remove broadcast message with id=%d because it is in illegal state=%s",
                             broadcastMessage.getId(),
                             BroadcastMessageState.getById(broadcastMessage.getState()).name()
                     ),
@@ -205,7 +205,7 @@ public class BroadcastMessageService {
                         .orElseThrow(
                                 () -> new NotFoundEntityException(
                                         String.format(
-                                                "Broadcast messageOf with id=%d does not exist",
+                                                "Broadcast message with id=%d does not exist",
                                                 messageId
                                         ),
                                         Error.BROADCAST_MESSAGE_DOES_NOT_EXIST
@@ -218,7 +218,7 @@ public class BroadcastMessageService {
             } else {
                 throw new UpdateBroadcastMessageException(
                         String.format(
-                                "Can't update title because it is empty, messageOf id=%d",
+                                "Can't update title because it is empty, message id=%d",
                                 messageId
                         ),
                         Error.BROADCAST_MESSAGE_TITLE_IS_EMPTY
@@ -245,7 +245,7 @@ public class BroadcastMessageService {
 
             default:
                 throw new BroadcastMessageIllegalStateException(
-                        "Can't update broadcast messageOf because it is in illegal state",
+                        "Can't update broadcast message because it is in illegal state",
                         Error.BROADCAST_MESSAGE_ILLEGAL_STATE
                 );
         }
@@ -263,7 +263,7 @@ public class BroadcastMessageService {
     ) {
         if (StringUtils.isEmpty(broadcastMessageUpdate.getTitle())) {
             throw new CreateBroadcastMessageException(
-                    "Can't create broadcast messageOf because title is empty",
+                    "Can't create broadcast message because title is empty",
                     Error.BROADCAST_MESSAGE_TITLE_IS_EMPTY
             );
         }
@@ -296,7 +296,7 @@ public class BroadcastMessageService {
             if (!BroadcastMessageState.isAttachmentUpdatable(state)) {
                 throw new UpdateBroadcastMessageException(
                         String.format(
-                                "Can't update broadcast messageOf(id=%d) attachments because it is in state=%s",
+                                "Can't update broadcast message(id=%d) attachments because it is in state=%s",
                                 broadcastMessageId,
                                 state.name()
                         ),
@@ -316,8 +316,8 @@ public class BroadcastMessageService {
             if (BroadcastMessageWeight.isWeightExceedsMax(currentWeight)) {
                 throw new UpdateBroadcastMessageException(
                         String.format(
-                                "Can't add attachment with type=%s to broadcast messageOf with id=%d "
-                                        + "because it has enough attachments already(messageOf weight=%d)",
+                                "Can't add attachment with type=%s to broadcast message with id=%d "
+                                        + "because it has enough attachments already(message weight=%d)",
                                 attachment.getUploadType(),
                                 broadcastMessage.getId(),
                                 broadcastMessage.getWeight()
@@ -354,7 +354,7 @@ public class BroadcastMessageService {
                 throw new UpdateBroadcastMessageException(
                         String.format(
                                 "Can't remove attachment with id=%d "
-                                        + "because broadcast messageOf with id=%d is in state=%s",
+                                        + "because broadcast message with id=%d is in state=%s",
                                 attachmentId,
                                 broadcastMessageId,
                                 state.name()
@@ -390,7 +390,7 @@ public class BroadcastMessageService {
                 })
                 .orElseThrow(() -> new NotFoundEntityException(
                         String.format(
-                                "Can't find broadcast messageOf attachment with id=%d and messageId=%d",
+                                "Can't find broadcast message attachment with id=%d and messageId=%d",
                                 attachmentId,
                                 messageId
                         ),
