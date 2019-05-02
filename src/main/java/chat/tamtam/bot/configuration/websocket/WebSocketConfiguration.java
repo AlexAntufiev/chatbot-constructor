@@ -54,6 +54,9 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
         ) {
             ServletServerHttpRequest servletServerHttpRequest = (ServletServerHttpRequest) request;
             HttpServletRequest httpServletRequest = servletServerHttpRequest.getServletRequest();
+            if (httpServletRequest.getCookies() == null) {
+                return null;
+            }
             Optional<Cookie> authCookie =
                     List.of(httpServletRequest.getCookies())
                             .stream()
