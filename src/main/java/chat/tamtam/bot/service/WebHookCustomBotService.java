@@ -34,6 +34,7 @@ public class WebHookCustomBotService {
 
     @PostConstruct
     public void insertBots() {
+        // @todo #CC-173 autowire all bots here
         typeMap.put(registrationBot.getId(), registrationBot.getType());
         typeMap.put(hockey2019Bot.getId(), hockey2019Bot.getType());
 

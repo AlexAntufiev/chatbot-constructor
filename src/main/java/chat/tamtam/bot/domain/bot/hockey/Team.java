@@ -27,6 +27,8 @@ public enum Team {
     GREAT_BRITAIN(1533, "Великобритания"),
     ;
 
+    // @todo add hashmap realization
+
     private final int id;
     private final String name;
 
