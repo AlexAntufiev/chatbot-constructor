@@ -54,7 +54,7 @@ public class BuilderService {
             final String authToken,
             final int botSchemeId,
             final List<ComponentUpdate> componentUpdates
-    ) throws IOException {
+    ) {
         // @todo #CC-163 Split logic by component type(e.g. if type is INPUT then ignore buttonsGroup)
         BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
 
