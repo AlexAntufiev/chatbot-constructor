@@ -7,7 +7,7 @@ public interface AppProfiles {
     String TEST = "test";
     String PRODUCTION = "production";
 
-    static Profiles noDevelopmentProfiles(){
+    static Profiles noDevelopmentProfiles() {
         return Profiles.of(TEST, PRODUCTION);
     }
 }

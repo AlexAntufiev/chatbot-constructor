@@ -98,7 +98,7 @@ public class Hockey2019Bot extends AbstractCustomBot {
         hockey2019BotVisitor = new Hockey2019BotVisitor();
         url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
         log.info(String.format("Hockey 2019 bot(id:%s, token:%s) initialized", id, token));
-        if(environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())){
+        if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
             botAPI = TamTamBotAPI.create(token);
             hockey2019BotVisitor = new Hockey2019BotVisitor();
             url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
@@ -120,7 +120,7 @@ public class Hockey2019Bot extends AbstractCustomBot {
 
     @PreDestroy
     public void unsubscribe() {
-        if(environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
+        if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
             try {
                 SimpleQueryResult result = botAPI.unsubscribe(url).execute();
                 log.info(String.format("Hockey 2019 bot(id:%s, token:%s) unsubscribed from %s", id, token, url));

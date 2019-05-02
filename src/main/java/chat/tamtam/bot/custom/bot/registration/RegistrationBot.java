@@ -135,7 +135,7 @@ public class RegistrationBot extends AbstractCustomBot {
 
     @PreDestroy
     public void unsubscribe() {
-        if(environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
+        if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
             try {
                 SimpleQueryResult result = botAPI.unsubscribe(url).execute();
                 log.info(String.format("Registration bot(registrationBotId:%s, token:%s) unsubscribed from %s",
