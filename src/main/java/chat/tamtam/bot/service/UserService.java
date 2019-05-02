@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import chat.tamtam.bot.configuration.Profiles;
+import chat.tamtam.bot.configuration.AppProfiles;
 import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.domain.user.UserAuthEntity;
 import chat.tamtam.bot.domain.user.UserEntity;
@@ -43,13 +43,13 @@ public class UserService {
     }
 
     @Bean
-    @Profile(Profiles.DEVELOPMENT)
+    @Profile(AppProfiles.DEVELOPMENT)
     InitializingBean populateDevelopmentDatabase() {
         return () -> addUser(new UserAuthEntity("admin", "admin"));
     }
 
     @Bean
-    @Profile(Profiles.TEST)
+    @Profile(AppProfiles.TEST)
     InitializingBean populateTestDatabase() {
         return () -> {
             addUser(new UserAuthEntity("test1", "B&]LhfC2bP^Joh.{b,g\\b\"a,%)'DW;x\""));

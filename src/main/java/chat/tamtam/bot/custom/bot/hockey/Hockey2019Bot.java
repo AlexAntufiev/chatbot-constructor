@@ -10,11 +10,10 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import chat.tamtam.bot.configuration.Profiles;
+import chat.tamtam.bot.configuration.AppProfiles;
 import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.controller.Endpoint;
 import chat.tamtam.bot.custom.bot.AbstractCustomBot;
@@ -75,6 +74,7 @@ public class Hockey2019Bot extends AbstractCustomBot {
     );
 
     private final @NonNull Hockey2019Service hockey2019Service;
+    private final @NonNull Environment environment;
 
     @Getter
     @Value("${tamtam.bot.hockey2019.id}")
@@ -93,11 +93,44 @@ public class Hockey2019Bot extends AbstractCustomBot {
     private Hockey2019BotVisitor hockey2019BotVisitor;
 
     @PostConstruct
-    public void init() {
+    public void subscribe() {
         botAPI = TamTamBotAPI.create(token);
         hockey2019BotVisitor = new Hockey2019BotVisitor();
         url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
         log.info(String.format("Hockey 2019 bot(id:%s, token:%s) initialized", id, token));
+        if(environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())){
+            botAPI = TamTamBotAPI.create(token);
+            hockey2019BotVisitor = new Hockey2019BotVisitor();
+            url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
+            log.info(String.format("Hockey 2019 bot(id:%s, token:%s) initialized", id, token));
+            try {
+                SimpleQueryResult result = botAPI.subscribe(new SubscriptionRequestBody(url)).execute();
+                if (result.isSuccess()) {
+                    log.info(String.format("Hockey 2019 bot(id:%s, token:%s) subscribed on %s", id, token, url
+                    ));
+                } else {
+                    log.warn(String.format("Can't subscribe Hockey 2019 bot(id:%s, token:%s) on %s", id, token, url
+                    ));
+                }
+            } catch (ClientException | APIException e) {
+                log.error(String.format("Can't subscribe bot with id = [%s] via url = [%s]", id, url), e);
+            }
+        }
+    }
+
+    @PreDestroy
+    public void unsubscribe() {
+        if(environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
+            try {
+                SimpleQueryResult result = botAPI.unsubscribe(url).execute();
+                log.info(String.format("Hockey 2019 bot(id:%s, token:%s) unsubscribed from %s", id, token, url));
+                if (!result.isSuccess()) {
+                    log.warn(String.format("Can't unsubscribe Hockey 2019 bot(id:%s, token:%s) on %s", id, token, url));
+                }
+            } catch (ClientException | APIException e) {
+                log.error(String.format("Can't unsubscribe bot with id = [%s] via url = [%s]", id, url), e);
+            }
+        }
     }
 
     @Loggable
@@ -202,43 +235,6 @@ public class Hockey2019Bot extends AbstractCustomBot {
                 .getNewsOfTeam(Team.getIdByName(teamName))
                 .getMessages()
                 .map(AbstractCustomBot::messageOf);
-    }
-
-    @Profile({Profiles.PRODUCTION, Profiles.TEST, Profiles.DEVELOPMENT})
-    @Bean
-    public void subscribeRegBotOnAppReadyProduction() {
-        try {
-            SimpleQueryResult result = botAPI.subscribe(new SubscriptionRequestBody(url)).execute();
-            if (result.isSuccess()) {
-                log.info(String.format("Hockey 2019 bot(id:%s, token:%s) subscribed on %s", id, token, url
-                ));
-            } else {
-                log.warn(String.format("Can't subscribe Hockey 2019 bot(id:%s, token:%s) on %s", id, token, url
-                ));
-            }
-            //FIXME delete flag
-            subscribed = true;
-        } catch (ClientException | APIException e) {
-            log.error(String.format("Can't subscribe bot with id = [%s] via url = [%s]", id, url), e);
-        }
-    }
-
-    @Profile({Profiles.PRODUCTION, Profiles.TEST, Profiles.DEVELOPMENT})
-    @PreDestroy //FIXME вызывается в любом случае
-    public void unsubscribeRegBotOnAppShutdown() {
-        if (!subscribed) {
-            return;
-        }
-        try {
-            SimpleQueryResult result = botAPI.unsubscribe(url).execute();
-            log.info(String.format("Hockey 2019 bot(id:%s, token:%s) unsubscribed from %s", id, token, url));
-            if (!result.isSuccess()) {
-                log.warn(String.format("Can't unsubscribe Hockey 2019 bot(id:%s, token:%s) on %s", id, token, url
-                ));
-            }
-        } catch (ClientException | APIException e) {
-            log.error(String.format("Can't unsubscribe bot with id = [%s] via url = [%s]", id, url), e);
-        }
     }
 
     private class Hockey2019BotVisitor implements Update.Visitor {
