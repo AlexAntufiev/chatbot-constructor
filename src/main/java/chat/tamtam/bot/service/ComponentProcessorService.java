@@ -133,8 +133,7 @@ public class ComponentProcessorService {
             final TamTamBotAPI api
     ) {
         try {
-            ButtonPayload payload = ButtonPayload
-                    .parseButtonPayload(update.getCallback().getPayload());
+            ButtonPayload payload = new ButtonPayload(update.getCallback().getPayload());
             componentRepository.findById(payload.getNextState())
                     .ifPresentOrElse(
                             foundComponent -> {
@@ -173,7 +172,7 @@ public class ComponentProcessorService {
                                 } else {
                                     // just notification
                                     final ButtonPayload buttonPayload
-                                            = ButtonPayload.parseButtonPayload(update.getCallback().getPayload());
+                                            = new ButtonPayload(update.getCallback().getPayload());
                                     final boolean success =
                                             answerOnCallback(
                                                     new CallbackAnswer()

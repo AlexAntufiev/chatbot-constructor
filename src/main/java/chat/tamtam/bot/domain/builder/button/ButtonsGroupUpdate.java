@@ -23,8 +23,7 @@ public class ButtonsGroupUpdate {
             List<Button> buttonList = new ArrayList<>();
             for (chat.tamtam.botapi.model.Button callbackButton
                     : list) {
-                ButtonPayload payload
-                        = ButtonPayload.parseButtonPayload(((CallbackButton) callbackButton).getPayload());
+                ButtonPayload payload = new ButtonPayload(((CallbackButton) callbackButton).getPayload());
                 Button button = new Button(
                         payload.getValue(),
                         callbackButton.getText(),
