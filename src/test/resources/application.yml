@@ -16,6 +16,14 @@ tamtam:
       enabledIds: 555537636725, 590435433004, 575868018573, 577949140156
     hockey2019:
       url: hockeyUrl
+      id: 1488
+      token: token
+      external_url:
+        news: /news
+        news_team: /news/{id}
+        calendar: /calendar
+        results: /results
+        match: /match/{id}
   broadcast:
     executor:
       corePoolSize: 2
