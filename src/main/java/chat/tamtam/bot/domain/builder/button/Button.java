@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Button {
-    private static final ObjectWriter objectWriter = new ObjectMapper().writerWithDefaultPrettyPrinter();
+    private static final ObjectWriter OBJECT_WRITER = new ObjectMapper().writerWithDefaultPrettyPrinter();
 
     private String value;
     private String text;
@@ -24,7 +24,7 @@ public class Button {
 
     @JsonIgnore
     public byte[] getBytes() throws JsonProcessingException {
-        final byte[] payload = objectWriter.writeValueAsString(new ButtonPayload(nextState, value)).getBytes();
+        final byte[] payload = OBJECT_WRITER.writeValueAsString(new ButtonPayload(nextState, value)).getBytes();
         final byte[] text = this.text.getBytes();
         int bytesLength =
                 Integer.BYTES
