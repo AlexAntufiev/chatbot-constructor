@@ -43,6 +43,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
         registry
                 .addEndpoint(WebSocketEndpoint.WEB_SOCKET)
                 .setHandshakeHandler(new WebSocketHandshakeHandler())
+                .setAllowedOrigins("*")
                 .withSockJS();
     }
 

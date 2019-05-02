@@ -20,4 +20,4 @@ logging:
         bot: DEBUG
 
 tamtam:
-  host: http://89.208.84.173:8090
+  host: http://89.208.84.173
