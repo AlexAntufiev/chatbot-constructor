@@ -14,6 +14,7 @@ import chat.tamtam.bot.domain.builder.button.Button;
 import chat.tamtam.bot.domain.builder.button.ButtonsGroup;
 import chat.tamtam.bot.domain.builder.button.ButtonsGroupUpdate;
 import chat.tamtam.bot.domain.builder.component.Component;
+import chat.tamtam.bot.domain.builder.component.ComponentType;
 import chat.tamtam.bot.domain.builder.component.ComponentUpdate;
 import chat.tamtam.bot.domain.builder.validator.Validator;
 import chat.tamtam.bot.domain.exception.ChatBotConstructorException;
@@ -79,16 +80,16 @@ public class BuilderService {
                             );
                         }*/
                         // @todo #CC-141 Enable check for next component existence
-                        /*if (update.getComponent().getNextComponent() != null) {
+                        /*if (update.getComponent().getNextState() != null) {
                             if (!componentRepository.existsByIdAndAndSchemeId(
-                                    update.getComponent().getNextComponent(),
+                                    update.getComponent().getNextState(),
                                     update.getComponent().getSchemeId()
                             )) {
                                 throw new NotFoundEntityException(
                                         String.format(
                                                 "Next component(id=%d, botSchemeId=%d) " +
                                                         "for component(id=%d, botSchemeId=%d) was not found",
-                                                update.getComponent().getNextComponent(),
+                                                update.getComponent().getNextState(),
                                                 update.getComponent().getSchemeId(),
                                                 update.getComponent().getId(),
                                                 update.getComponent().getSchemeId()
@@ -98,34 +99,21 @@ public class BuilderService {
                             }
                         }*/
 
-                        /*
-                         * Check if all validators belong to this component(validator.getComponentId == component.getId)
-                         * */
-                        for (Validator validator
-                                : update.getValidators()) {
-                            if (!update.getComponent().getId().equals(validator.getComponentId())) {
-                                throw new ChatBotConstructorException(
-                                        String.format(
-                                                "Invalid validator componentId=%d(should be %d)",
-                                                validator.getComponentId(),
-                                                update.getComponent().getId()
-                                        ),
-                                        Error.SCHEME_BUILDER_INVALID_VALIDATOR
-                                );
-                            }
+                        Component component = null;
+                        ButtonsGroupUpdate buttonsGroupUpdate = null;
+                        List<Validator> validators = null;
+
+                        switch (ComponentType.getById(update.getComponent().getType())) {
+                            case INFO:
+                                buttonsGroupUpdate = updateButtonsGroup(update, botSchemeId);
+                            case INPUT:
+                                validators = updateValidators(update);
+                            default:
+                                update.getComponent().setSchemeId(botScheme.getId());
+                                component = componentRepository.save(update.getComponent());
                         }
 
-                        ButtonsGroupUpdate buttonsGroupUpdate = storeButtonsGroup(update, botSchemeId);
-
-                        update.getComponent().setSchemeId(botScheme.getId());
-                        Component component = componentRepository.save(update.getComponent());
-
-                        List<Validator> validators =
-                                Lists.newArrayList(validatorRepository.saveAll(update.getValidators()));
-
-                        updated.add(
-                                new ComponentUpdate(component, validators, buttonsGroupUpdate)
-                        );
+                        updated.add(new ComponentUpdate(component, validators, buttonsGroupUpdate));
                     }
                     botScheme.setSchema(componentUpdates.stream().findFirst().orElseThrow().getComponent().getId());
                     botSchemaRepository.save(botScheme);
@@ -135,7 +123,28 @@ public class BuilderService {
         return new SuccessResponseWrapper<>(updatedComponents);
     }
 
-    private ButtonsGroupUpdate storeButtonsGroup(
+    private List<Validator> updateValidators(final ComponentUpdate update) {
+        /*
+         * Check if all validators belong to this component(validator.getComponentId == component.getId)
+         * */
+        for (Validator validator
+                : update.getValidators()) {
+            if (!update.getComponent().getId().equals(validator.getComponentId())) {
+                throw new ChatBotConstructorException(
+                        String.format(
+                                "Invalid validator componentId=%d(should be %d)",
+                                validator.getComponentId(),
+                                update.getComponent().getId()
+                        ),
+                        Error.SCHEME_BUILDER_INVALID_VALIDATOR
+                );
+            }
+        }
+
+        return Lists.newArrayList(validatorRepository.saveAll(update.getValidators()));
+    }
+
+    private ButtonsGroupUpdate updateButtonsGroup(
             final ComponentUpdate update,
             final int botSchemeId
     ) throws IOException {
@@ -235,6 +244,7 @@ public class BuilderService {
                 )
         );
 
+        update.getComponent().setHasCallbacks(true);
         return new ButtonsGroupUpdate(group);
     }
 }

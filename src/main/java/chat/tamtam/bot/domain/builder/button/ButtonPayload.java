@@ -15,7 +15,11 @@ public class ButtonPayload {
     private Long nextState;
     private String value;
 
-    public static ButtonPayload parseButtonPayload(final String payload) throws IOException {
-        return new ObjectMapper().readValue(payload, ButtonPayload.class);
+    public static ButtonPayload parseButtonPayload(final String payload) throws RuntimeException {
+        try {
+            return new ObjectMapper().readValue(payload, ButtonPayload.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

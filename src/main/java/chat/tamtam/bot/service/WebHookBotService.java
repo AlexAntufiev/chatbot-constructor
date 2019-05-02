@@ -2,7 +2,6 @@ package chat.tamtam.bot.service;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.concurrent.Executor;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -41,8 +40,6 @@ public class WebHookBotService {
     private final TamBotRepository tamBotRepository;
     private final ComponentRepository componentRepository;
 
-    private final Executor botComponentExecutor;
-
     private final ComponentProcessorService componentProcessorService;
 
     public void submit(final int botSchemeId, final Update update) {
@@ -69,25 +66,25 @@ public class WebHookBotService {
                                     )
                             );
 
-            TamTamBotAPI tamTamBotAPI = getTamTamBotAPI(component);
+            TamTamBotAPI api = getTamTamBotAPI(component);
 
             while (true) {
                 switch (ComponentType.getById(component.getType())) {
                     case INPUT:
                         if (update instanceof MessageCreatedUpdate) {
                             componentProcessorService
-                                    .process(((MessageCreatedUpdate) update), context, component, tamTamBotAPI);
+                                    .process(((MessageCreatedUpdate) update), context, component, api);
                         }
                         if (update instanceof MessageCallbackUpdate) {
                             componentProcessorService
-                                    .process(((MessageCallbackUpdate) update), context, component, tamTamBotAPI);
+                                    .process(((MessageCallbackUpdate) update), context, component, api);
                         }
                         botContextRepository.save(context);
                         break;
 
                     case INFO:
                         componentProcessorService
-                                .process(context, component, tamTamBotAPI);
+                                .process(context, component, api);
                         botContextRepository.save(context);
                         break;
 
@@ -96,6 +93,7 @@ public class WebHookBotService {
                 }
 
                 if (context.getState() == null) {
+                    componentProcessorService.updatePendingMessage(context, api);
                     initContext(context.getId().getUserId());
                     break;
                 }
@@ -124,7 +122,7 @@ public class WebHookBotService {
                                     )
                             );
             TamBotEntity tamBot =
-                    Optional.of(tamBotRepository.findById(
+                    Optional.ofNullable(tamBotRepository.findById(
                             new TamBotEntity.Id(botScheme.getBotId(), botScheme.getUserId()))
                     ).orElseThrow(
                             () -> new NoSuchElementException(
