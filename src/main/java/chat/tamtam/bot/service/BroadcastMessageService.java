@@ -30,6 +30,7 @@ import chat.tamtam.bot.domain.response.SuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
 import chat.tamtam.bot.repository.BroadcastMessageAttachmentRepository;
 import chat.tamtam.bot.repository.BroadcastMessageRepository;
+import chat.tamtam.bot.utils.TransactionalUtils;
 import lombok.RequiredArgsConstructor;
 
 @Service

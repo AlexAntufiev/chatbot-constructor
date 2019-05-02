@@ -24,6 +24,7 @@ import chat.tamtam.bot.repository.BotSchemeRepository;
 import chat.tamtam.bot.repository.ButtonsGroupRepository;
 import chat.tamtam.bot.repository.ComponentRepository;
 import chat.tamtam.bot.repository.ComponentValidatorRepository;
+import chat.tamtam.bot.utils.TransactionalUtils;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

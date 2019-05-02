@@ -15,6 +15,7 @@ import chat.tamtam.bot.domain.response.SuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
 import chat.tamtam.bot.repository.BotSchemeRepository;
 import chat.tamtam.bot.repository.TamBotRepository;
+import chat.tamtam.bot.utils.TransactionalUtils;
 import chat.tamtam.botapi.TamTamBotAPI;
 import chat.tamtam.botapi.exceptions.APIException;
 import chat.tamtam.botapi.exceptions.ClientException;
