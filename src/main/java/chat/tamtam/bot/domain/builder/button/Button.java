@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
+import chat.tamtam.botapi.model.Intent;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,15 +23,33 @@ public class Button {
     private String intent;
     private Long nextState;
 
+    /*
+     *  Integer.BYTES - length of payload in bytes
+     *  payload length - serialized payload of button button
+     *  Integer.BYTES - length of text in bytes
+     *  text length - serialized text of button button
+     *  Integer.BYTES - length of intent
+     *  intent length - intent bytes
+     * */
     @JsonIgnore
     public byte[] getBytes() throws JsonProcessingException {
         final byte[] payload = OBJECT_WRITER.writeValueAsString(new ButtonPayload(nextState, value)).getBytes();
         final byte[] text = this.text.getBytes();
+
+        if (intent == null) {
+            intent = Intent.DEFAULT.getValue();
+        }
+
+        final byte[] intentBytes = intent.getBytes();
+
         int bytesLength =
                 Integer.BYTES
                         + payload.length
                         + Integer.BYTES
-                        + text.length;
+                        + text.length
+                        + Integer.BYTES
+                        + intentBytes.length;
+
         byte[] bytes = new byte[bytesLength];
         return ByteBuffer
                 .wrap(bytes)
@@ -38,6 +57,8 @@ public class Button {
                 .put(payload)
                 .putInt(text.length)
                 .put(text)
+                .putInt(intentBytes.length)
+                .put(intentBytes)
                 .array();
     }
 }

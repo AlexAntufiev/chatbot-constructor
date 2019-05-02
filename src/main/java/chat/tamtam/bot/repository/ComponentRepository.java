@@ -7,5 +7,7 @@ import chat.tamtam.bot.domain.builder.component.Component;
 
 @Repository
 public interface ComponentRepository extends CrudRepository<Component, Long> {
-    boolean existsByIdAndAndSchemeId(Long id, Integer schemeId);
+    boolean existsByIdAndSchemeId(Long id, Integer schemeId);
+
+    Iterable<Component> findAllBySchemeId(Integer schemeId);
 }

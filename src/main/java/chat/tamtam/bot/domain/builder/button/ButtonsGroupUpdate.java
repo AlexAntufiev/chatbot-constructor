@@ -1,6 +1,5 @@
 package chat.tamtam.bot.domain.builder.button;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +13,7 @@ public class ButtonsGroupUpdate {
     private Long id;
     private List<List<Button>> buttons;
 
-    public ButtonsGroupUpdate(final ButtonsGroup group) throws IOException {
+    public ButtonsGroupUpdate(final ButtonsGroup group) {
         id = group.getId();
         buttons = new ArrayList<>();
 
