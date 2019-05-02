@@ -1,9 +1,8 @@
 package chat.tamtam.bot.configuration.websocket;
 
 import java.security.Principal;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -54,18 +53,14 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
         ) {
             ServletServerHttpRequest servletServerHttpRequest = (ServletServerHttpRequest) request;
             HttpServletRequest httpServletRequest = servletServerHttpRequest.getServletRequest();
-            if (httpServletRequest.getCookies() == null) {
-                return null;
-            }
-            Optional<Cookie> authCookie =
-                    List.of(httpServletRequest.getCookies())
-                            .stream()
-                            .filter(e -> e.getName().equals(SecurityConstants.COOKIE_AUTH))
-                            .findFirst();
-            if (authCookie.isEmpty()) {
-                return null;
-            }
-            return getPrincipal(authCookie.get());
+
+            return Stream
+                    .ofNullable(httpServletRequest.getCookies())
+                    .flatMap(Stream::of)
+                    .filter(e -> e.getName().equals(SecurityConstants.COOKIE_AUTH))
+                    .findFirst()
+                    .map(this::getPrincipal)
+                    .orElse(null);
         }
 
         private Principal getPrincipal(final Cookie authCookie) {
