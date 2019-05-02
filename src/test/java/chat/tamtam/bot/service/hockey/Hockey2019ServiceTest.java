@@ -56,29 +56,28 @@ class Hockey2019ServiceTest extends RunnableTestContext {
     @BeforeEach
     void setUp() throws IOException {
 
-        String url = String.valueOf(getField(hockey2019Service, "url"));
-        String newsPath = url + "/news";
+        String newsPath = String.valueOf(getField(hockey2019Service, "newsPath"));
         News news = objectMapper.readValue(newsFile.getFile(), News.class);
         assertNotNull(news);
         when(restTemplate.getForEntity(eq(newsPath), eq(News.class))).thenReturn(ResponseEntity.ok(news));
 
-        String newsOfTeamPath = newsPath + "/%s";
+        String newsOfTeamPath = String.valueOf(getField(hockey2019Service, "newsTeamPath"));
         News newsOfTeam = objectMapper.readValue(newsOfTeamFile.getFile(), News.class);
         assertNotNull(newsOfTeam);
         when(restTemplate.getForEntity(eq(newsOfTeamPath), eq(News.class), eq(TEAM_ID))).thenReturn(ResponseEntity.ok(
                 newsOfTeam));
 
-        String resultsPath = url + "/results";
+        String resultsPath = String.valueOf(getField(hockey2019Service, "resultsPath"));
         Results results = objectMapper.readValue(resultsFile.getFile(), Results.class);
         assertNotNull(results);
         when(restTemplate.getForEntity(eq(resultsPath), eq(Results.class))).thenReturn(ResponseEntity.ok(results));
 
-        String calendarPath = url + "/calendar";
+        String calendarPath = String.valueOf(getField(hockey2019Service, "calendarPath"));
         Calendar calendar = objectMapper.readValue(calendarFile.getFile(), Calendar.class);
         assertNotNull(calendar);
         when(restTemplate.getForEntity(eq(calendarPath), eq(Calendar.class))).thenReturn(ResponseEntity.ok(calendar));
 
-        String matchPath = url + "/match/%s";
+        String matchPath = String.valueOf(getField(hockey2019Service, "matchPath"));
         Match match = objectMapper.readValue(matchFile.getFile(), Match.class);
         assertNotNull(match);
         when(restTemplate.getForEntity(eq(matchPath),
