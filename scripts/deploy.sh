@@ -1,8 +1,7 @@
 #!/bin/bash
 
 app_name="chatbot-constructor"
-pem_key_file="keys/TEST-1.pem"
-ssh_deploy_file_test="/tmp/deploy_rsa"
+ssh_deploy_file_test="/tmp/test_ssh"
 ssh_deploy_file_prod="/tmp/prod_ssh"
 user="centos"
 server_type=$1
