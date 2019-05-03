@@ -10,7 +10,7 @@ spring:
     open-in-view: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:hsqldb:mem:testdb;sql.syntax_pgs=true;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:hsqldb:mem:testdb;sql.syntax_pgs=true;hsqldb.lock_file=true;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.hsqldb.jdbc.JDBCDriver
     username: sa
     password:

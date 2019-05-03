@@ -5,7 +5,7 @@ spring:
         show-sql: true
         format_sql: true
   datasource:
-    url: jdbc:hsqldb:file:testdb;sql.syntax_pgs=true
+    url: jdbc:hsqldb:file:testdb;sql.syntax_pgs=true;hsqldb.lock_file=true
     username: sa
     password:
 

@@ -1,6 +1,6 @@
 import makeTemplateStr from "app/utils/makeTemplateStr";
 import * as ApiPoints from "app/constants/apiPoints";
-import handleRequest from 'app/service/handleRequest'
+import {handleRequest} from 'app/service/handleRequest'
 import axios from 'axios';
 
 export function getTamBot(botId, callbackSuccess, callbackFail, context) {
