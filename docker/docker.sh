@@ -32,7 +32,7 @@ function main() {
     send_message "${server_type} остановлен"
 
     echo "Set profile to ${server_type}"
-    docker build --build-arg profile=${server_type} \
+    docker build --build-arg custom_profile=${server_type} \
                  -t ${application_name} \
                  .
 
