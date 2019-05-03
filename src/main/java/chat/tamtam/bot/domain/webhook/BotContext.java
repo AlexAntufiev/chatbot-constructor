@@ -23,6 +23,8 @@ public class BotContext {
     private Long state;
     @Column(name = "variables")
     private String variables;
+    @Column(name = "pendingMessage")
+    private byte[] pendingMessage;
 
     @Data
     @NoArgsConstructor

@@ -82,7 +82,7 @@ public class TamBotService {
             throw new ChatBotConstructorException(
                     "Tam bot for bot scheme with id="
                             + botScheme.getId()
-                            + "was not subscribed",
+                            + " was not subscribed",
                     Error.TAM_BOT_NOT_SUBSCRIBED
             );
         }

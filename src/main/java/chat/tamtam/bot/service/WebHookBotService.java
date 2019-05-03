@@ -10,19 +10,12 @@ import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.builder.component.Component;
 import chat.tamtam.bot.domain.builder.component.ComponentType;
-import chat.tamtam.bot.domain.builder.component.wrapper.InfoComponentWrapper;
-import chat.tamtam.bot.domain.builder.validator.Validator;
-import chat.tamtam.bot.domain.builder.validator.ValidatorType;
-import chat.tamtam.bot.domain.builder.validator.wrapper.EqualTextValidatorWrapper;
 import chat.tamtam.bot.domain.webhook.BotContext;
 import chat.tamtam.bot.repository.BotContextRepository;
 import chat.tamtam.bot.repository.BotSchemeRepository;
 import chat.tamtam.bot.repository.ComponentRepository;
-import chat.tamtam.bot.repository.ComponentValidatorRepository;
 import chat.tamtam.bot.repository.TamBotRepository;
 import chat.tamtam.botapi.TamTamBotAPI;
-import chat.tamtam.botapi.exceptions.APIException;
-import chat.tamtam.botapi.exceptions.ClientException;
 import chat.tamtam.botapi.model.BotAddedToChatUpdate;
 import chat.tamtam.botapi.model.BotRemovedFromChatUpdate;
 import chat.tamtam.botapi.model.BotStartedUpdate;
@@ -46,7 +39,8 @@ public class WebHookBotService {
     private final BotSchemeRepository botSchemaRepository;
     private final TamBotRepository tamBotRepository;
     private final ComponentRepository componentRepository;
-    private final ComponentValidatorRepository validatorRepository;
+
+    private final ComponentProcessorService componentProcessorService;
 
     public void submit(final int botSchemeId, final Update update) {
         try {
@@ -59,7 +53,7 @@ public class WebHookBotService {
 
     @RequiredArgsConstructor
     private class WebHookBotVisitor implements Update.Visitor {
-        // @todo #CC-141 Implement kind of lock that depends on userId and botId
+        // @todo @CC-141 Implement kind of lock that depends on userId and botId
         private final int botSchemeId;
 
         private void execute(final BotContext context, final Update update) {
@@ -72,21 +66,25 @@ public class WebHookBotService {
                                     )
                             );
 
-            TamTamBotAPI tamTamBotAPI = getTamTamBotAPI(component);
+            TamTamBotAPI api = getTamTamBotAPI(component);
 
             while (true) {
                 switch (ComponentType.getById(component.getType())) {
                     case INPUT:
-                        if (!(update instanceof MessageCreatedUpdate)) {
-                            break;
+                        if (update instanceof MessageCreatedUpdate) {
+                            componentProcessorService
+                                    .process(((MessageCreatedUpdate) update), context, component, api);
                         }
-                        processInputComponent(component, context, ((MessageCreatedUpdate) update));
+                        if (update instanceof MessageCallbackUpdate) {
+                            componentProcessorService
+                                    .process(((MessageCallbackUpdate) update), context, component, api);
+                        }
                         botContextRepository.save(context);
                         break;
 
                     case INFO:
-                        sendMessage(tamTamBotAPI, new InfoComponentWrapper(component), context.getId().getUserId());
-                        context.setState(component.getNextComponent());
+                        componentProcessorService
+                                .process(context, component, api);
                         botContextRepository.save(context);
                         break;
 
@@ -95,6 +93,7 @@ public class WebHookBotService {
                 }
 
                 if (context.getState() == null) {
+                    componentProcessorService.updatePendingMessage(context, api);
                     initContext(context.getId().getUserId());
                     break;
                 }
@@ -113,45 +112,6 @@ public class WebHookBotService {
             }
         }
 
-        private void processInputComponent(
-                final Component component,
-                final BotContext context,
-                final MessageCreatedUpdate update
-        ) {
-            Iterable<Validator> validators = validatorRepository.findAllByComponentIdOrderById(component.getId());
-            for (Validator validator
-                    : validators) {
-                switch (ValidatorType.getById(validator.getType())) {
-                    case EQUAL_TEXT:
-                        EqualTextValidatorWrapper validatorWrapper = new EqualTextValidatorWrapper(validator);
-                        if (!validatorWrapper.validate(update, context)) {
-                            return;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-            context.setState(component.getNextComponent());
-
-            // @todo #CC-141 Invocation of predicates etc.
-        }
-
-        private void sendMessage(
-                final TamTamBotAPI tamTamBotAPI,
-                final InfoComponentWrapper componentWrapper,
-                final long recipient
-        ) {
-            try {
-                tamTamBotAPI
-                        .sendMessage(componentWrapper.getMessageBody())
-                        .userId(recipient)
-                        .execute();
-            } catch (APIException | ClientException e) {
-                log.error("Message sending produced exception", e);
-            }
-        }
-
         private @NotNull TamTamBotAPI getTamTamBotAPI(Component component) {
             BotSchemeEntity botScheme =
                     botSchemaRepository
@@ -162,7 +122,7 @@ public class WebHookBotService {
                                     )
                             );
             TamBotEntity tamBot =
-                    Optional.of(tamBotRepository.findById(
+                    Optional.ofNullable(tamBotRepository.findById(
                             new TamBotEntity.Id(botScheme.getBotId(), botScheme.getUserId()))
                     ).orElseThrow(
                             () -> new NoSuchElementException(
@@ -176,9 +136,7 @@ public class WebHookBotService {
             return TamTamBotAPI.create(tamBot.getToken());
         }
 
-        @Override
-        public void visit(final MessageCreatedUpdate model) {
-            long userId = model.getMessage().getSender().getUserId();
+        private BotContext getContext(final long userId) {
             BotContext context = botContextRepository
                     .findByIdUserIdAndIdBotSchemeId(userId, botSchemeId)
                     .orElseGet(() -> initContext(userId));
@@ -187,12 +145,17 @@ public class WebHookBotService {
                         String.format("Context state is null(userId=%d, botSchemeId=%d)", userId, botSchemeId)
                 );
             }
-            execute(context, model);
+            return context;
+        }
+
+        @Override
+        public void visit(final MessageCreatedUpdate model) {
+            execute(getContext(model.getMessage().getSender().getUserId()), model);
         }
 
         @Override
         public void visit(MessageCallbackUpdate model) {
-
+            execute(getContext(model.getCallback().getUser().getUserId()), model);
         }
 
         @Override
