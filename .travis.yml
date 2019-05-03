@@ -1,5 +1,7 @@
 addons:
-  ssh_known_hosts: 89.208.84.173
+  ssh_known_hosts:
+    - ${TEST_IP}
+    - ${PROD_IP}
 
 language: java
 
@@ -7,7 +9,7 @@ jdk:
   - oraclejdk11
 
 before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 
 cache:
@@ -28,12 +30,19 @@ script:
 
 before_deploy:
   - echo "${SSH_KEY}" | base64 --decode >/tmp/deploy_rsa
+  - echo "${PROD_SSH}" | base64 --decode >/tmp/prod_ssh
   - chmod 600 /tmp/deploy_rsa
+  - chmod 600 /tmp/prod_ssh
   - chmod +x scripts/deploy.sh
 
 deploy:
   provider: script
-  script: ./scripts/deploy.sh
+  script: ./scripts/deploy.sh test ${TEST_IP}
   skip_cleanup: true
   on:
-    branch: master
+    branch: develop
+  provider: script
+  script: ./scripts/deploy.sh prod ${PROD_IP}
+  skip_cleanup: true
+  on:
+    branch: travis

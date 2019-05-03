@@ -15,13 +15,10 @@ debug_port="5005"
 help_requested=false
 help_arguments=""
 
-JAVA_MIN_MEM="128M"
-JAVA_MAX_MEM="512M"
-
 trap "error 'Interrupted!'; stopApplication" SIGINT
 trap "error 'Critical error!'" ERR
 
-jvm_arguments="-Xms${JAVA_MIN_MEM} -Xmx${JAVA_MAX_MEM}"
+jvm_arguments=""
 
 function error {
     echo "ERROR: ${1}" >&2
