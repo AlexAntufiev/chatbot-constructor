@@ -18,7 +18,7 @@ public class EnabledIdsConverterTest {
     @Test
     public void partitionsOnlyTest() {
         String parts = "0-12, 15-100";
-        EnabledIds enabledIds = converter.convert(parts);
+        EnabledIds enabledIds = converter.convert(parts, getClass());
         for (long i = 0; i <= 12; i++) {
             Assertions.assertTrue(
                     enabledIds.isEnabled(i),
@@ -43,7 +43,7 @@ public class EnabledIdsConverterTest {
         );
 
         String allParts = "0-255";
-        enabledIds = converter.convert(allParts);
+        enabledIds = converter.convert(allParts, getClass());
         for (long i = 0; i <= 1000; i++) {
             Assertions.assertTrue(
                     enabledIds.isEnabled(i),
@@ -54,7 +54,7 @@ public class EnabledIdsConverterTest {
 
     @Test
     public void idsOnlyTest() {
-        EnabledIds enabledIds = converter.convert(idsAsString);
+        EnabledIds enabledIds = converter.convert(idsAsString, getClass());
         ids.forEach(id -> Assertions.assertTrue(
                 enabledIds.isEnabled(id),
                 String.format("Id=%d should be enabled", id)
@@ -69,13 +69,13 @@ public class EnabledIdsConverterTest {
     @Test
     public void emptyStringTest() {
         String nullString = null;
-        EnabledIds enabledIdsWithNull = converter.convert(nullString);
+        EnabledIds enabledIdsWithNull = converter.convert(nullString, getClass());
         ids.forEach(id -> Assertions.assertFalse(
                 enabledIdsWithNull.isEnabled(id),
                 String.format("Id=%d should be disabled", id)
         ));
         String emptyString = "";
-        EnabledIds enabledIdsWithEmpty = converter.convert(emptyString);
+        EnabledIds enabledIdsWithEmpty = converter.convert(emptyString, getClass());
         ids.forEach(id -> Assertions.assertFalse(
                 enabledIdsWithNull.isEnabled(id),
                 String.format("Id=%d should be disabled", id)
@@ -85,7 +85,7 @@ public class EnabledIdsConverterTest {
     @Test
     public void allPartitionsEnabledTest() {
         String parts = "0-255";
-        EnabledIds enabledIds = converter.convert(parts);
+        EnabledIds enabledIds = converter.convert(parts, getClass());
         ids.forEach(id -> Assertions.assertTrue(
                 enabledIds.isEnabled(id),
                 String.format("Id=%d should be enabled", id)
@@ -96,7 +96,7 @@ public class EnabledIdsConverterTest {
     public void singlePartitionEnabledTest() {
         ids.stream().findFirst().ifPresentOrElse(id -> {
             String partition = String.valueOf(id % converter.PARTITIONS_AMOUNT);
-            EnabledIds enabledId = converter.convert(partition);
+            EnabledIds enabledId = converter.convert(partition, getClass());
             Assertions.assertTrue(enabledId.isEnabled(id), String.format("Id=%d should be enabled", id));
             Assertions.assertFalse(enabledId.isEnabled(id + 1), String.format("Id=%d should be disabled", id));
         }, IllegalStateException::new);

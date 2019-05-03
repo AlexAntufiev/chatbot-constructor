@@ -13,6 +13,7 @@ import chat.tamtam.bot.domain.response.SuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
 import chat.tamtam.bot.repository.BotSchemeRepository;
 import chat.tamtam.bot.repository.TamBotRepository;
+import chat.tamtam.bot.utils.TransactionalUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 

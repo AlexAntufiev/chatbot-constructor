@@ -1,6 +1,5 @@
 package chat.tamtam.bot.custom.bot.registration;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -10,14 +9,13 @@ import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
 
-import chat.tamtam.bot.configuration.Profiles;
+import chat.tamtam.bot.configuration.AppProfiles;
 import chat.tamtam.bot.controller.Endpoint;
 import chat.tamtam.bot.converter.EnabledIds;
 import chat.tamtam.bot.converter.EnabledIdsConverter;
@@ -72,12 +70,10 @@ public class RegistrationBot extends AbstractCustomBot {
                     + "/upd {new password} - change password on specified one\n"
                     + "/login - receive auto-login button";
 
-    private final @NonNull
-    UserRepository userRepository;
-    private final @NonNull
-    SessionRepository sessionRepository;
-    private final @NonNull
-    BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final @NonNull UserRepository userRepository;
+    private final @NonNull SessionRepository sessionRepository;
+    private final @NonNull BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final @NonNull Environment environment;
 
     @Value("${tamtam.bot.registration.id}")
     private String registrationBotId;
@@ -100,8 +96,8 @@ public class RegistrationBot extends AbstractCustomBot {
     private RegistrationBotVisitor visitor;
 
     @PostConstruct
-    public void init() {
-        enabledIds = enabledIdsConverter.convert(ids);
+    public void subscribe() {
+        enabledIds = enabledIdsConverter.convert(ids, getClass());
         botAPI = TamTamBotAPI.create(token);
         visitor = new RegistrationBotVisitor();
         log.info(
@@ -111,6 +107,56 @@ public class RegistrationBot extends AbstractCustomBot {
                         token
                 )
         );
+        if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
+            try {
+                url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + registrationBotId;
+                SimpleQueryResult result = botAPI.subscribe(new SubscriptionRequestBody(url)).execute();
+                if (result.isSuccess()) {
+                    log.info(String.format("Registration bot(registrationBotId:%s, token:%s) subscribed on %s",
+                            registrationBotId,
+                            token,
+                            url
+                    ));
+                } else {
+                    log.warn(String.format("Can't subscribe registration bot(registrationBotId:%s, token:%s) on %s",
+                            registrationBotId,
+                            token,
+                            url
+                    ));
+                }
+            } catch (ClientException | APIException e) {
+                log.error(String.format("Can't subscribe bot with registrationBotId = [%s] via url = [%s]",
+                        registrationBotId,
+                        url
+                ), e);
+            }
+        }
+    }
+
+    @PreDestroy
+    public void unsubscribe() {
+        if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
+            try {
+                SimpleQueryResult result = botAPI.unsubscribe(url).execute();
+                log.info(String.format("Registration bot(registrationBotId:%s, token:%s) unsubscribed from %s",
+                        registrationBotId,
+                        token,
+                        url
+                ));
+                if (!result.isSuccess()) {
+                    log.warn(String.format("Can't unsubscribe registration bot(registrationBotId:%s, token:%s) on %s",
+                            registrationBotId,
+                            token,
+                            url
+                    ));
+                }
+            } catch (ClientException | APIException e) {
+                log.error(String.format("Can't unsubscribe bot with registrationBotId = [%s] via url = [%s]",
+                        registrationBotId,
+                        url
+                ), e);
+            }
+        }
     }
 
     @Override
@@ -157,7 +203,7 @@ public class RegistrationBot extends AbstractCustomBot {
     private void response(final BotStartedUpdate update) {
         try {
             if (filter(update.getUserId())) {
-                botAPI.sendMessage(new NewMessageBody(HELP_MESSAGE, Collections.emptyList()))
+                botAPI.sendMessage(messageOf(HELP_MESSAGE))
                         .userId(update.getUserId())
                         .execute();
             }
@@ -190,24 +236,23 @@ public class RegistrationBot extends AbstractCustomBot {
                 return delete(message.getSender().getUserId().toString());
             case "/upd":
                 if (cmd.length < 2) {
-                    return new NewMessageBody("Please provide new password", null);
+                    return messageOf("Please provide new password");
                 } else {
                     return updatePassword(message.getSender().getUserId().toString(), cmd[1]);
                 }
             case "/login":
                 return login(message.getSender().getUserId().toString());
             default:
-                return new NewMessageBody(HELP_MESSAGE, null);
+                return messageOf(HELP_MESSAGE);
         }
     }
 
     private NewMessageBody login(final String userId) {
         UserEntity user = userRepository.findByLogin(userId);
         if (user != null) {
-            return new NewMessageBody("Press to sign in", List.of(getAutoLoginButton(userId)));
+            return messageOf("Press to sign in", List.of(getAutoLoginButton(userId)));
         } else {
-            String response = "Login: " + userId + " not found\nTry '/reg' to create user";
-            return new NewMessageBody(response, null);
+            return messageOf("Login: " + userId + " not found\nTry '/reg' to create user");
         }
     }
 
@@ -222,10 +267,10 @@ public class RegistrationBot extends AbstractCustomBot {
             );
             userRepository.save(user);
             String response = "Login: " + userId + "\nPassword: " + password;
-            return new NewMessageBody(response, List.of(getAutoLoginButton(userId)));
+            return messageOf(response, List.of(getAutoLoginButton(userId)));
         }
         String response = "Login: " + userId + "\nTry '/upd' to change password";
-        return new NewMessageBody(response, List.of(getAutoLoginButton(userId)));
+        return messageOf(response, List.of(getAutoLoginButton(userId)));
     }
 
     private NewMessageBody delete(final String userId) {
@@ -233,27 +278,24 @@ public class RegistrationBot extends AbstractCustomBot {
         if (user != null) {
             userRepository.removeByLogin(userId);
             sessionRepository.removeAllByLogin(userId);
-            String response = "User with login: " + userId + " deleted";
-            return new NewMessageBody(response, null);
+            return messageOf("User with login: " + userId + " deleted");
         }
-        String response = "User with login: " + userId + " not found\nTry '/reg' to create user";
-        return new NewMessageBody(response, null);
+        return messageOf("User with login: " + userId + " not found\nTry '/reg' to create user");
     }
 
     private NewMessageBody updatePassword(final String userId, final String newPassword) {
         UserEntity user = userRepository.findByLogin(userId);
         if (user != null) {
             if (newPassword.isEmpty()) {
-                return new NewMessageBody("Try another password", null);
+                return messageOf("Try another password");
             }
             user.setPasswordHash(bCryptPasswordEncoder.encode(newPassword));
             userRepository.save(user);
             String response = "Login: " + userId + "\nPassword: " + newPassword;
             sessionRepository.removeAllByLogin(userId);
-            return new NewMessageBody(response, List.of(getAutoLoginButton(userId)));
+            return messageOf(response, List.of(getAutoLoginButton(userId)));
         }
-        String response = "Login: " + userId + " not found\nTry '/reg' to create user";
-        return new NewMessageBody(response, null);
+        return messageOf("Login: " + userId + " not found\nTry '/reg' to create user");
     }
 
     private InlineKeyboardAttachmentRequest getAutoLoginButton(final String userId) {
@@ -284,52 +326,6 @@ public class RegistrationBot extends AbstractCustomBot {
     @Override
     public BotType getType() {
         return BotType.Registration;
-    }
-
-    @Profile({Profiles.PRODUCTION, Profiles.TEST})
-    @Bean
-    public void subscribeRegBotOnAppReadyProduction() {
-        try {
-            url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + registrationBotId;
-            SimpleQueryResult result = botAPI.subscribe(new SubscriptionRequestBody(url)).execute();
-            if (result.isSuccess()) {
-                log.info(String.format("Registration bot(registrationBotId:%s, token:%s) subscribed on %s",
-                        registrationBotId, token, url
-                ));
-            } else {
-                log.warn(String.format("Can't subscribe registration bot(registrationBotId:%s, token:%s) on %s",
-                        registrationBotId, token, url
-                ));
-            }
-            subscribed = true;
-        } catch (ClientException | APIException e) {
-            log.error(String.format("Can't subscribe bot with registrationBotId = [%s] via url = [%s]",
-                    registrationBotId, url
-            ), e);
-        }
-    }
-
-    @Profile({Profiles.PRODUCTION, Profiles.TEST})
-    @PreDestroy
-    public void unsubscribeRegBotOnAppShutdown() {
-        if (!subscribed) {
-            return;
-        }
-        try {
-            SimpleQueryResult result = botAPI.unsubscribe(url).execute();
-            log.info(String.format("Registration bot(registrationBotId:%s, token:%s) unsubscribed from %s",
-                    registrationBotId, token, url
-            ));
-            if (!result.isSuccess()) {
-                log.warn(String.format("Can't unsubscribe registration bot(registrationBotId:%s, token:%s) on %s",
-                        registrationBotId, token, url
-                ));
-            }
-        } catch (ClientException | APIException e) {
-            log.error(String.format("Can't unsubscribe bot with registrationBotId = [%s] via url = [%s]",
-                    registrationBotId, url
-            ), e);
-        }
     }
 
     private class RegistrationBotVisitor implements Update.Visitor {

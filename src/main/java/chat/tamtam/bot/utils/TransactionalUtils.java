@@ -1,4 +1,4 @@
-package chat.tamtam.bot.service;
+package chat.tamtam.bot.utils;
 
 import java.util.concurrent.Callable;
 
