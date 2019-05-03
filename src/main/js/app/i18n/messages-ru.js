@@ -89,6 +89,7 @@ export default {
     'errors.bot.scheme.builder.buttons.empty.fields': 'Кнопки не должны иметь пустые поля',
     'errors.bot.scheme.builder.buttons.id.not.exist': 'Id группы кнопок не подходит',
     'errors.bot.scheme.builder.buttons.group.is.empty': 'Группа кнопок не может быть пустой',
+    'errors.bot.scheme.builder.buttons.group.intent.malformed': 'Неверный цвет кнопки',
 
     //Success messages
     'app.successmessage.successsumary': 'Успешно',

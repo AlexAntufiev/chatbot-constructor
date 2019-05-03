@@ -3,6 +3,7 @@ package chat.tamtam.bot.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -25,6 +26,7 @@ import chat.tamtam.bot.repository.ButtonsGroupRepository;
 import chat.tamtam.bot.repository.ComponentRepository;
 import chat.tamtam.bot.repository.ComponentValidatorRepository;
 import chat.tamtam.bot.utils.TransactionalUtils;
+import chat.tamtam.botapi.model.Intent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -49,6 +51,31 @@ public class BuilderService {
             @Getter
             private final Long componentId = componentRepository.save(newComponent).getId();
         });
+    }
+
+    public SuccessResponse getBotScheme(final String authToken, final int botSchemeId) {
+        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        List<ComponentUpdate> components = new ArrayList<>();
+        componentRepository
+                .findAllBySchemeId(botScheme.getId())
+                .forEach(component -> {
+                    ComponentUpdate update = new ComponentUpdate();
+                    update.setComponent(component);
+
+                    switch (ComponentType.getById(component.getType())) {
+                        case INFO:
+                            buttonsGroupRepository
+                                    .findByComponentId(component.getId())
+                                    .ifPresent(group -> update.setButtonsGroup(new ButtonsGroupUpdate(group)));
+                            // @todo #CC-185 Fetch and add other attachments
+                        case INPUT:
+                            // @todo #CC-185 Fetch and add validators, actions etc.
+                        default:
+                            break;
+                    }
+                    components.add(update);
+                });
+        return new SuccessResponseWrapper<>(components);
     }
 
     public SuccessResponse saveBotScheme(
@@ -228,11 +255,27 @@ public class BuilderService {
                             String.format(
                                     "Button(%s) has empty text or payload"
                                             + "(botSchemeId=%d, componentId=%d)",
-                                    button,
-                                    botSchemeId,
-                                    update.getComponent().getId()
+                                    button, botSchemeId, update.getComponent().getId()
                             ),
                             Error.SCHEME_BUILDER_BUTTONS_EMPTY_FIELDS
+                    );
+                }
+
+                try {
+                    Optional
+                            .ofNullable(Intent.create(button.getIntent()))
+                            .ifPresentOrElse(
+                                    intent -> button.setIntent(intent.getValue()),
+                                    () -> button.setIntent(Intent.DEFAULT.getValue())
+                            );
+                } catch (IllegalArgumentException e) {
+                    throw new ChatBotConstructorException(
+                            String.format(
+                                    "Malformed intent(%s, botSchemeId=%d, componentId=%d)",
+                                    update, botSchemeId, update.getComponent().getId()
+                            ),
+                            Error.SCHEME_BUILDER_BUTTONS_GROUP_INTENT_MALFORMED,
+                            e
                     );
                 }
             }

@@ -89,6 +89,7 @@ export default {
     'errors.bot.scheme.builder.buttons.empty.fields': 'Buttons has empty fields',
     'errors.bot.scheme.builder.buttons.id.not.exist': 'Wrong buttons id',
     'errors.bot.scheme.builder.buttons.group.is.empty': 'Please, provide at least one button',
+    'errors.bot.scheme.builder.buttons.group.intent.malformed': 'Malformed button intent',
 
 
 //Success messages

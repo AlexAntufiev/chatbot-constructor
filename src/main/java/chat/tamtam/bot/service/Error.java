@@ -50,6 +50,7 @@ public enum Error {
     SCHEME_BUILDER_BUTTONS_EMPTY_FIELDS("errors.bot.scheme.builder.buttons.empty.fields"),
     SCHEME_BUILDER_BUTTONS_UPDATE_BY_ID("errors.bot.scheme.builder.buttons.id.not.exist"),
     SCHEME_BUILDER_BUTTONS_GROUP_IS_EMPTY("errors.bot.scheme.builder.buttons.group.is.empty"),
+    SCHEME_BUILDER_BUTTONS_GROUP_INTENT_MALFORMED("errors.bot.scheme.builder.buttons.group.intent.malformed"),
     ;
 
     @Getter

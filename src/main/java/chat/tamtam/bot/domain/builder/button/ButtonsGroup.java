@@ -18,6 +18,7 @@ import org.apache.commons.lang.ArrayUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import chat.tamtam.botapi.model.CallbackButton;
+import chat.tamtam.botapi.model.Intent;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -38,10 +39,7 @@ public class ButtonsGroup {
      * [
      *   Integer.BYTES - List size(amount of callbacks),
      *   [
-     *       Integer.BYTES - length of payload in bytes
-     *       payload.length - serialized payload of button button
-     *       Integer.BYTES - length of text in bytes
-     *       text.length - serialized text of button button
+     *       Button
      *   ]
      * ]
      * */
@@ -78,7 +76,10 @@ public class ButtonsGroup {
                 int textLength = byteBuffer.getInt();
                 final String text =
                         new String(getBytesFromByteBuffer(byteBuffer, textLength));
-                buttons.add(new CallbackButton(payload, text, null));
+                int intentLength = byteBuffer.getInt();
+                final String intent = new String(getBytesFromByteBuffer(byteBuffer, intentLength));
+
+                buttons.add(new CallbackButton(payload, text, Intent.create(intent)));
             }
             group.add(buttons);
         }
