@@ -6,7 +6,6 @@ application_command=""
 application_arguments=""
 application_port="8090"
 
-profile_requested=false
 profile_name="test"
 
 debug_requested=false
@@ -25,32 +24,7 @@ function error {
     exit ${2:-255}
 }
 
-function checkPidFileExists {
-    if ! [[ -f "${application_name}.pid" ]]; then
-        echo "PID file does not exists."
-        return 1
-    fi
-
-    process_id=$(<${application_name}.pid)
-
-    return 0
-}
-
-function checkApplicationStarted {
-    if ! [[ -e "/proc/${process_id}" ]]; then
-        echo "WARNING: PID file exists, but process does not. Consider removing PID file manually" >&2
-        return 1
-    fi
-
-    return 0
-}
-
 function start {
-
-    if checkPidFileExists > /dev/null && checkApplicationStarted; then
-        echo "Application already started [PID: ${process_id}]."
-        return
-    fi
 
     if ! [[ -f "${application_name}.jar" ]]; then
         error "Application executable [${application_name}.jar] not accessible or does not exists"

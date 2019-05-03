@@ -1,6 +1,8 @@
 FROM openjdk:11
 
-ARG profile=development
+ARG custom_profile=development
+
+ENV profile=$custom_profile
 
 COPY run.sh chatbot-constructor.jar /
 

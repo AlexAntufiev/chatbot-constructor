@@ -14,6 +14,7 @@ elif [ "$server_type" == "prod" ]; then
     ssh_path=${ssh_deploy_file_prod}
 else
     echo "Incorrect server type"
+    exit
 fi
 
 cp ./build/libs/chatbot-constructor.jar ./docker/chatbot-constructor.jar
