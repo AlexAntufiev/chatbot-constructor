@@ -29,6 +29,7 @@ script:
   - ./gradlew clean build
 
 before_deploy:
+  - echo "${SSH_KEY}"
   - echo "${SSH_KEY}" | base64 --decode >/tmp/deploy_rsa
   - echo "${PROD_SSH}" | base64 --decode >/tmp/prod_ssh
   - chmod 600 /tmp/deploy_rsa
