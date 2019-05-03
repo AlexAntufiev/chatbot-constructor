@@ -25,8 +25,8 @@ script:
 
 before_deploy:
   - echo $TEST_IP
-  - ssh-keyscan -t $TRAVIS_SSH_KEY_TYPES -H $TEST_IP 2>&1 | tee -a $HOME/.ssh/known_hosts
-  - ssh-keyscan -t $TRAVIS_SSH_KEY_TYPES -H $PROD_IP 2>&1 | tee -a $HOME/.ssh/known_hosts
+  - ssh-keyscan -t $TRAVIS_SSH_KEY_TYPES $TEST_IP 2>&1 | tee -a $HOME/.ssh/known_hosts
+  - ssh-keyscan -t $TRAVIS_SSH_KEY_TYPES $PROD_IP 2>&1 | tee -a $HOME/.ssh/known_hosts
   - echo "${SSH_KEY}" | base64 --decode >/tmp/deploy_rsa
   - echo "${PROD_SSH}" | base64 --decode >/tmp/prod_ssh
   - chmod 600 /tmp/deploy_rsa
