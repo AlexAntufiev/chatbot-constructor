@@ -143,7 +143,7 @@ public class RegistrationBot extends AbstractCustomBot {
         try {
             update.visit(visitor);
         } catch (RuntimeException e) {
-            log.error(String.format("Update event{%s} produced exception",update), e);
+            log.error(String.format("Update event{%s} produced exception", update), e);
         }
     }
 
