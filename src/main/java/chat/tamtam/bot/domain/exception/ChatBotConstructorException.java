@@ -13,4 +13,11 @@ public class ChatBotConstructorException extends RuntimeException {
             errorKey = error.getErrorKey();
         }
     }
+
+    public ChatBotConstructorException(final String message, final Error error, final Throwable throwable) {
+        super(message, throwable);
+        if (error != null) {
+            errorKey = error.getErrorKey();
+        }
+    }
 }

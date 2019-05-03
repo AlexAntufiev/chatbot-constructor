@@ -25,6 +25,7 @@ import chat.tamtam.bot.repository.BotSchemeRepository;
 import chat.tamtam.bot.repository.ButtonsGroupRepository;
 import chat.tamtam.bot.repository.ComponentRepository;
 import chat.tamtam.bot.repository.ComponentValidatorRepository;
+import chat.tamtam.bot.utils.TransactionalUtils;
 import chat.tamtam.botapi.model.Intent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -273,7 +274,8 @@ public class BuilderService {
                                     "Malformed intent(%s, botSchemeId=%d, componentId=%d)",
                                     update, botSchemeId, update.getComponent().getId()
                             ),
-                            Error.SCHEME_BUILDER_BUTTONS_GROUP_INTENT_MALFORMED
+                            Error.SCHEME_BUILDER_BUTTONS_GROUP_INTENT_MALFORMED,
+                            e
                     );
                 }
             }
