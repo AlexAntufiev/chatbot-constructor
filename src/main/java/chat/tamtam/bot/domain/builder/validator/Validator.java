@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "ComponentValidator")
 public class Validator {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(name = "type", nullable = false)
     private byte type;

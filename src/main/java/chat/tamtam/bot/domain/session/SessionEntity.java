@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class SessionEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private Integer id;
 
