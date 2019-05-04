@@ -34,12 +34,14 @@ class TextMessage extends React.Component {
             },
             ajaxUpdateProcess: false,
             ajaxRemoveProcess: false,
-            attachmentChanged: false
+            attachmentChanged: false,
+            attachmentUpload: false
         };
         this.onUpdateMessage = this.onUpdateMessage.bind(this);
         this.onRemoveMessage = this.onRemoveMessage.bind(this);
         this.getUpdatedFields = this.getUpdatedFields.bind(this);
         this.attachmentChanged = this.attachmentChanged.bind(this);
+        this.uploadProcess = this.uploadProcess.bind(this);
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -82,10 +84,6 @@ class TextMessage extends React.Component {
             return;
         }
 
-        if (this.props.message.state === BroadcastMessageState.CREATED && this.state.message.text.trim() && !this.state.message.firingTime) {
-            AxiosMessages.serverErrorResponse(this, 'error.broadcast.message.need.fill.text.and.posttime');
-            return;
-        }
         this.setState({ajaxUpdateProcess: true});
         let message = this.getUpdatedFields();
         //time fields send always
@@ -140,6 +138,10 @@ class TextMessage extends React.Component {
         this.setState({attachmentChanged: state});
     }
 
+    uploadProcess(state) {
+        this.setState({attachmentUpload: state});
+    }
+
     render() {
         if (!this.props.message) {
             return (<div/>);
@@ -150,7 +152,7 @@ class TextMessage extends React.Component {
             message[field] = value;
             this.setState({message: message});
         };
-        let disableSave = this.state.ajaxUpdateProcess || Object.keys(this.getUpdatedFields()).length === 0;
+        let disableSave = this.state.attachmentUpload || this.state.ajaxUpdateProcess || Object.keys(this.getUpdatedFields()).length === 0;
         if (this.state.attachmentChanged) {
             disableSave = false;
         }
@@ -206,7 +208,8 @@ class TextMessage extends React.Component {
                 </div>
                 <Attachments botSchemeId={this.props.botSchemeId} chatChannelId={this.props.chatChannelId}
                              message={this.props.message} ref={(obj) => this.attachments = obj}
-                             attachmentChanged={this.attachmentChanged}/>
+                             onAttachmentChanged={this.attachmentChanged}
+                             onUploadProcess={this.uploadProcess}/>
                 <div className="text-card_button-panel">
                     <Button
                         label={intl.formatMessage({id: 'app.dialog.save'})}

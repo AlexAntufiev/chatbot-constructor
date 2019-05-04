@@ -24,8 +24,14 @@ class Attachments extends React.Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (!prevState || prevState.attachmentChanged !== this.state.attachmentChanged) {
-            if (this.props.attachmentChanged) {
-                this.props.attachmentChanged(this.state.attachmentChanged)
+            if (this.props.onAttachmentChanged) {
+                this.props.onAttachmentChanged(this.state.attachmentChanged)
+            }
+        }
+
+        if (!prevState || prevState.ajaxUploadAttachProcess !== this.state.ajaxUploadAttachProcess) {
+            if (this.props.onUploadProcess) {
+                this.props.onUploadProcess(this.state.ajaxUploadAttachProcess)
             }
         }
     }
