@@ -76,6 +76,9 @@ public class ComponentProcessorService {
             );
             context.setState(null);
         }
+        try {
+            Thread.sleep(2000);
+        } catch (Exception e) {}
     }
 
     private List<AttachmentRequest> getAttachments(final Long componentId, final boolean withCallbacks) {

@@ -1,10 +1,17 @@
 package chat.tamtam.bot.service;
 
+import java.nio.ByteBuffer;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
 
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
@@ -42,6 +49,15 @@ public class WebHookBotService {
 
     private final ComponentProcessorService componentProcessorService;
 
+    private final HazelcastInstance hazelcastInstance;
+    private IMap<Byte[], Object> botContextLockMap;
+    private final String BOT_CONTEXT_LOCK_MAP = "bot-context-lock-map";
+
+    @PostConstruct
+    public void initLockMap() {
+        botContextLockMap = hazelcastInstance.getMap(BOT_CONTEXT_LOCK_MAP);
+    }
+
     public void submit(final int botSchemeId, final Update update) {
         try {
             log.info(String.format("Update {%s} submitted to bot scheme with id=%d", update, botSchemeId));
@@ -55,8 +71,10 @@ public class WebHookBotService {
     private class WebHookBotVisitor implements Update.Visitor {
         // @todo @CC-141 Implement kind of lock that depends on userId and botId
         private final int botSchemeId;
+        private Byte[] botContextLockKey;
 
         private void execute(final BotContext context, final Update update) {
+            System.out.println("EXECUTION " + Thread.currentThread());
             Component component =
                     componentRepository
                             .findById(context.getState())
@@ -150,12 +168,24 @@ public class WebHookBotService {
 
         @Override
         public void visit(final MessageCreatedUpdate model) {
-            execute(getContext(model.getMessage().getSender().getUserId()), model);
+            setBotContextLockKey(model.getMessage().getSender().getUserId());
+            lock();
+            try {
+                execute(getContext(model.getMessage().getSender().getUserId()), model);
+            } finally {
+                unlock();
+            }
         }
 
         @Override
         public void visit(MessageCallbackUpdate model) {
-            execute(getContext(model.getCallback().getUser().getUserId()), model);
+            setBotContextLockKey(model.getCallback().getUser().getUserId());
+            lock();
+            try {
+                execute(getContext(model.getCallback().getUser().getUserId()), model);
+            } finally {
+                unlock();
+            }
         }
 
         @Override
@@ -195,7 +225,13 @@ public class WebHookBotService {
 
         @Override
         public void visit(BotStartedUpdate model) {
-            execute(initContext(model.getUserId()), model);
+            setBotContextLockKey(model.getUserId());
+            lock();
+            try {
+                execute(initContext(model.getUserId()), model);
+            } finally {
+                unlock();
+            }
         }
 
         private BotContext initContext(final long userId) {
@@ -221,6 +257,25 @@ public class WebHookBotService {
         @Override
         public void visitDefault(Update model) {
 
+        }
+
+        private void lock() {
+            botContextLockMap.lock(botContextLockKey);
+        }
+
+        // must be called in finally section
+        private void unlock() {
+            botContextLockMap.unlock(botContextLockKey);
+        }
+
+        private void setBotContextLockKey(final long userId) {
+            byte[] bytes =
+                    ByteBuffer
+                            .allocate(Long.BYTES + Integer.BYTES)
+                            .putLong(userId)
+                            .putInt(botSchemeId)
+                            .array();
+            botContextLockKey = ArrayUtils.toObject(bytes);
         }
     }
 }
