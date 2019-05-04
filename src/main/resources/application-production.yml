@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:hsqldb:file:testdb;sql.syntax_pgs=true
-    username: sa
-    password:
+    url: jdbc:postgresql://localhost:5432/${spring.datasource.username}
+    username: prod_database
+    password: QUFNRXNlY3JldDA0MDUyMDE5MzA4Cg==
   servlet:
     multipart:
       max-file-size: 1000MB

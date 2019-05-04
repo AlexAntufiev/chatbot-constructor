@@ -5,17 +5,24 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL95Dialect
         show-sql: false
         format_sql: false
+        use_sql: false
+        temp:
+          use_jdbc_metadata_defaults: false
     open-in-view: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:hsqldb:mem:testdb;sql.syntax_pgs=true;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.hsqldb.jdbc.JDBCDriver
+    url: jdbc:postgresql:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.postgresql.Driver
     username: sa
     password:
     hikari:
-      idle-timeout: 10000
+      idle-timeout: 300000 #Default: 600000 (10 minutes)
+      connection-timeout: 10000 #Default: 30000 (30 seconds)
+      maximum-pool-size: 3 #((core_count * 2) + 1)
+      minimum-idle: 1
   servlet:
     multipart:
       max-file-size: 100MB
@@ -23,11 +30,18 @@ spring:
 
 logging:
   level:
+    com:
+      zaxxer:
+        hikari:
+          HikariConfig: INFO
     org:
       springframework: INFO
       hibernate:
         SQL: OFF
-        type: OFF
+        type:
+          descriptor:
+            sql:
+              BasicBinder: OFF
     chat:
       tamtam:
         bot: INFO
