@@ -55,13 +55,13 @@ tamtam:
     hockey2019:
       url: https://tt.me/Hockey2019
       id: 579249368771
+      token: _WJ5Jt0ksotmic5llAnm7DJNvXO8WAce8AIBpLGVW-o
       external_url:
         news: https://sport.mail.ru/inf/json_vk_bot_competition/hockey2019/news
         news_team: https://sport.mail.ru/inf/json_vk_bot_competition/hockey2019/news/{id}
         calendar: https://sport.mail.ru/inf/json_vk_bot_competition/hockey2019/calendar
         results: https://sport.mail.ru/inf/json_vk_bot_competition/hockey2019/results
         match: https://sport.mail.ru/inf/json_vk_bot_competition/hockey2019/match/{id}
-      token: _WJ5Jt0ksotmic5llAnm7DJNvXO8WAce8AIBpLGVW-o
   broadcast:
     executor:
       corePoolSize: 2

@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -53,6 +54,7 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @Component
+@RefreshScope
 @RequiredArgsConstructor
 public class Hockey2019Bot extends AbstractCustomBot {
 
@@ -99,18 +101,12 @@ public class Hockey2019Bot extends AbstractCustomBot {
         url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
         log.info(String.format("Hockey 2019 bot(id:%s, token:%s) initialized", id, token));
         if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
-            botAPI = TamTamBotAPI.create(token);
-            hockey2019BotVisitor = new Hockey2019BotVisitor();
-            url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
-            log.info(String.format("Hockey 2019 bot(id:%s, token:%s) initialized", id, token));
             try {
                 SimpleQueryResult result = botAPI.subscribe(new SubscriptionRequestBody(url)).execute();
                 if (result.isSuccess()) {
-                    log.info(String.format("Hockey 2019 bot(id:%s, token:%s) subscribed on %s", id, token, url
-                    ));
+                    log.info(String.format("Hockey 2019 bot(id:%s, token:%s) subscribed on %s", id, token, url));
                 } else {
-                    log.warn(String.format("Can't subscribe Hockey 2019 bot(id:%s, token:%s) on %s", id, token, url
-                    ));
+                    log.warn(String.format("Can't subscribe Hockey 2019 bot(id:%s, token:%s) on %s", id, token, url));
                 }
             } catch (ClientException | APIException e) {
                 log.error(String.format("Can't subscribe bot with id = [%s] via url = [%s]", id, url), e);
@@ -136,7 +132,12 @@ public class Hockey2019Bot extends AbstractCustomBot {
     @Loggable
     @Override
     public void process(final Update update) {
-        update.visit(hockey2019BotVisitor);
+        log.info("Visit hockey bot 2019");
+        try {
+            update.visit(hockey2019BotVisitor);
+        } catch (RuntimeException e) {
+            log.error(String.format("Update event{%s} produced exception", update), e);
+        }
     }
 
     private void createdUpdate(final MessageCreatedUpdate update) {
