@@ -15,11 +15,11 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Entity
-@Table(name = "Session")
+@Table
 @NoArgsConstructor
 @Data
 @RequiredArgsConstructor
-public class SessionEntity {
+public class Session {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

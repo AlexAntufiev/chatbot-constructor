@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @NoArgsConstructor
-@Table(name = "CallbackButtonsGroup")
+@Table
 public class ButtonsGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

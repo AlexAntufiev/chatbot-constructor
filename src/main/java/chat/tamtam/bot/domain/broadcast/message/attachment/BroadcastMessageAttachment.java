@@ -26,7 +26,7 @@ import lombok.Setter;
 @Data
 @Entity
 @NoArgsConstructor
-@Table(name = "BroadcastMessageAttachment")
+@Table
 public class BroadcastMessageAttachment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

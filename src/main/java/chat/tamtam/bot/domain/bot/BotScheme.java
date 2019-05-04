@@ -13,11 +13,11 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Entity
-@Table(name = "BotSchema")
+@Table
 @NoArgsConstructor
 @Data
 @RequiredArgsConstructor
-public class BotSchemeEntity {
+public class BotScheme {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -32,6 +32,6 @@ public class BotSchemeEntity {
     @Column(name = "name")
     private @NonNull String name;
 
-    @Column(name = "schema")
-    private Long schema;
+    @Column(name = "scheme")
+    private Long scheme;
 }

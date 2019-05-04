@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @NoArgsConstructor
-@Table(name = "ComponentValidator")
-public class Validator {
+@Table
+public class ComponentValidator {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
