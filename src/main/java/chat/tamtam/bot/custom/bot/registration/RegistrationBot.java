@@ -49,6 +49,7 @@ import chat.tamtam.botapi.model.SubscriptionRequestBody;
 import chat.tamtam.botapi.model.Update;
 import chat.tamtam.botapi.model.UserAddedToChatUpdate;
 import chat.tamtam.botapi.model.UserRemovedFromChatUpdate;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -75,9 +76,10 @@ public class RegistrationBot extends AbstractCustomBot {
     private final @NonNull BCryptPasswordEncoder bCryptPasswordEncoder;
     private final @NonNull Environment environment;
 
+    @Getter
     @Value("${tamtam.bot.registration.id}")
-    private String registrationBotId;
-    // @todo #CC-91 dont create reg bot with nullable registrationBotId and token
+    private String id;
+    // @todo #CC-91 dont create reg bot with nullable id and token
     @Value("${tamtam.bot.registration.token}")
     private String token;
 
@@ -90,7 +92,6 @@ public class RegistrationBot extends AbstractCustomBot {
     private EnabledIds enabledIds;
 
     private String url;
-    private boolean subscribed = false;
     private TamTamBotAPI botAPI;
 
     private RegistrationBotVisitor visitor;
@@ -100,35 +101,18 @@ public class RegistrationBot extends AbstractCustomBot {
         enabledIds = enabledIdsConverter.convert(ids, getClass());
         botAPI = TamTamBotAPI.create(token);
         visitor = new RegistrationBotVisitor();
-        log.info(
-                String.format(
-                        "Registration bot(id:%s, token:%s) initialized",
-                        registrationBotId,
-                        token
-                )
-        );
+        log.info(String.format("Registration bot(id:%s, token:%s) initialized", id, token));
         if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
             try {
-                url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + registrationBotId;
+                url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
                 SimpleQueryResult result = botAPI.subscribe(new SubscriptionRequestBody(url)).execute();
                 if (result.isSuccess()) {
-                    log.info(String.format("Registration bot(registrationBotId:%s, token:%s) subscribed on %s",
-                            registrationBotId,
-                            token,
-                            url
-                    ));
+                    log.info(String.format("Registration bot(id:%s, token:%s) subscribed on %s", id, token, url));
                 } else {
-                    log.warn(String.format("Can't subscribe registration bot(registrationBotId:%s, token:%s) on %s",
-                            registrationBotId,
-                            token,
-                            url
-                    ));
+                    log.warn(String.format("Can't subscribe registration bot(id:%s, token:%s) on %s", id, token, url));
                 }
             } catch (ClientException | APIException e) {
-                log.error(String.format("Can't subscribe bot with registrationBotId = [%s] via url = [%s]",
-                        registrationBotId,
-                        url
-                ), e);
+                log.error(String.format("Can't subscribe bot with id = [%s] via url = [%s]", id, url), e);
             }
         }
     }
@@ -138,43 +122,28 @@ public class RegistrationBot extends AbstractCustomBot {
         if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
             try {
                 SimpleQueryResult result = botAPI.unsubscribe(url).execute();
-                log.info(String.format("Registration bot(registrationBotId:%s, token:%s) unsubscribed from %s",
-                        registrationBotId,
-                        token,
-                        url
-                ));
+                log.info(String.format("Registration bot(id:%s, token:%s) unsubscribed from %s", id, token, url));
                 if (!result.isSuccess()) {
-                    log.warn(String.format("Can't unsubscribe registration bot(registrationBotId:%s, token:%s) on %s",
-                            registrationBotId,
+                    log.warn(String.format(
+                            "Can't unsubscribe registration bot(id:%s, token:%s) on %s",
+                            id,
                             token,
                             url
                     ));
                 }
             } catch (ClientException | APIException e) {
-                log.error(String.format("Can't unsubscribe bot with registrationBotId = [%s] via url = [%s]",
-                        registrationBotId,
-                        url
-                ), e);
+                log.error(String.format("Can't unsubscribe bot with id = [%s] via url = [%s]", id, url), e);
             }
         }
     }
 
     @Override
     public void process(final Update update) {
-        log.debug(String.format(
-                "Registration bot event(type=%s)",
-                update.getType()
-        ));
+        log.info("Visit registration bot");
         try {
             update.visit(visitor);
         } catch (RuntimeException e) {
-            log.error(
-                    String.format(
-                            "Update event{%s} produced exception",
-                            update
-                    ),
-                    e
-            );
+            log.error(String.format("Update event{%s} produced exception", update), e);
         }
     }
 
@@ -189,8 +158,7 @@ public class RegistrationBot extends AbstractCustomBot {
         } catch (APIException | ClientException e) {
             log.error(
                     String.format(
-                            "Bot(id=%s) can't response to event(type:%s, id:%s, sender:%d)",
-                            registrationBotId,
+                            "Bot(id=%s) can't response to event(type:%s, id:%s, sender:%d)", id,
                             update.getType(),
                             update.getMessage().getBody().getMid(),
                             update.getMessage().getSender().getUserId()
@@ -210,8 +178,7 @@ public class RegistrationBot extends AbstractCustomBot {
         } catch (APIException | ClientException e) {
             log.error(
                     String.format(
-                            "Bot(id=%s) can't response to event(type:%s, sender:%d)",
-                            registrationBotId,
+                            "Bot(id=%s) can't response to event(type:%s, sender:%d)", id,
                             update.getType(),
                             update.getUserId()
                     ),
@@ -316,11 +283,6 @@ public class RegistrationBot extends AbstractCustomBot {
         LinkButton button = new LinkButton(tempAccessUrl, "sign in", Intent.DEFAULT);
         return new InlineKeyboardAttachmentRequest(
                         new InlineKeyboardAttachmentRequestPayload(List.of(List.of(button))));
-    }
-
-    @Override
-    public String getId() {
-        return registrationBotId;
     }
 
     @Override
