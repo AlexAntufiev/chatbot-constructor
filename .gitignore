@@ -13,6 +13,7 @@ hs_err_pid*
 *.iml
 *.pem
 *.out
+*.db
 *.lck
 *.script
 *.properties
