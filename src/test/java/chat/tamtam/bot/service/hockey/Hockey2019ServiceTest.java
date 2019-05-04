@@ -4,16 +4,19 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import chat.tamtam.bot.RunnableTestContext;
+import chat.tamtam.bot.TestContext;
 import chat.tamtam.bot.domain.bot.hockey.Calendar;
 import chat.tamtam.bot.domain.bot.hockey.Match;
 import chat.tamtam.bot.domain.bot.hockey.News;
@@ -24,7 +27,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.util.ReflectionTestUtils.getField;
 
-class Hockey2019ServiceTest extends RunnableTestContext {
+@SpringBootTest
+@ExtendWith(SpringExtension.class)
+class Hockey2019ServiceTest extends TestContext {
 
     private static final int TEAM_ID = 1;
     private static final int MATCH_ID = 1;
