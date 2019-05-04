@@ -153,7 +153,7 @@ class TextMessage extends React.Component {
             this.setState({message: message});
         };
         let disableSave = this.state.attachmentUpload || this.state.ajaxUpdateProcess || Object.keys(this.getUpdatedFields()).length === 0;
-        if (this.state.attachmentChanged) {
+        if (!this.state.ajaxUpdateProcess && !this.state.attachmentUpload && this.state.attachmentChanged) {
             disableSave = false;
         }
 

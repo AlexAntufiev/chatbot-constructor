@@ -148,7 +148,9 @@ class Attachments extends React.Component {
                 <Button icon={"pi pi-paperclip"} className={'attach-button'} ref={(obj) => this.attachButton = obj}
                         label={intl.formatMessage({id: "app.dialog.attach"})}
                         onClick={() => this.uploadButton.click()}
-                        disabled={this.state.ajaxUploadAttachProcess}/>
+                        disabled={this.state.ajaxUploadAttachProcess
+                        || this.props.message.state === BroadcastMessageState.SENT
+                        || this.props.message.state === BroadcastMessageState.ERASED_BY_SCHEDULE}/>
                 {this.state.ajaxUploadAttachProcess &&
                 <ProgressBar mode="indeterminate" className={'attach-progressbar'}/>}
                 <input accept="image/*" className={"attach-input"} name={"data"}
