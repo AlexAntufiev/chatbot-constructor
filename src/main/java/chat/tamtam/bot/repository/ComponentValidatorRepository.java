@@ -7,5 +7,5 @@ import chat.tamtam.bot.domain.builder.validator.Validator;
 
 @Repository
 public interface ComponentValidatorRepository extends CrudRepository<Validator, Long> {
-    Iterable<Validator> findAllByComponentIdOrderById(Long componentId);
+    Iterable<Validator> findAllByComponentId(Long componentId);
 }

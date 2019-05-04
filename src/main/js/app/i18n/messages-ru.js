@@ -52,6 +52,7 @@ export default {
     'app.errormessage.fillname': 'Заполните имя',
     'app.errormessage.servernotresponse': 'Сервер недоступен',
     'app.errormessage.serverwrongresponse': 'Неверный ответ от сервера',
+    'errors.service.error': "Ошибка сервиса",
     'errors.tam.service': 'Ошибка сервиса ТамТам',
     'errors.tam.bot.token.incorrect': 'Неправильный токен',
     'errors.tam.bot.token.empty': 'Пустой токен',
@@ -85,6 +86,10 @@ export default {
     'errors.attachment.does.not.exist': 'Приложение не существует',
     'errors.attachment.token.is.not.valid': 'Неверный идентификатор приложения',
     'errors.bot.scheme.invalid.validator': 'Передан неверный валидатор',
+    'errors.bot.scheme.builder.buttons.empty.fields': 'Кнопки не должны иметь пустые поля',
+    'errors.bot.scheme.builder.buttons.id.not.exist': 'Id группы кнопок не подходит',
+    'errors.bot.scheme.builder.buttons.group.is.empty': 'Группа кнопок не может быть пустой',
+    'errors.bot.scheme.builder.buttons.group.intent.malformed': 'Неверный цвет кнопки',
 
     //Success messages
     'app.successmessage.successsumary': 'Успешно',

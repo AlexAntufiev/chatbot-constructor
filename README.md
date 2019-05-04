@@ -65,6 +65,20 @@ Proceed to [reg bot]
 
 [consul]
 
+## VPN 
+
+[docker-ipsec-vpn-server]
+
+#### ip 
+`89.208.84.173`
+#### user 
+`cc-vpn-user`
+#### password
+`cbYKaiLGt8Fz5zD5`
+#### PSK
+`Ia/obKExB1IgJ/uQP+A5AQBTFG6COymw`
+
+
 [java]: https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html
 [Node.js]: https://nodejs.org/en/download/
 [Download and install checkstyle plugin]: https://plugins.jetbrains.com/plugin/1065-checkstyle-idea
@@ -74,3 +88,4 @@ Proceed to [reg bot]
 [tamtam bot subscriptions]: https://dev.tamtam.chat/#tag/subscriptions
 [reg bot]: https://tt.me/BuilderRegBot
 [consul]: http://localhost:8500/ui/dc1/services
+[docker-ipsec-vpn-server]: https://github.com/hwdsl2/docker-ipsec-vpn-server

@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 public enum Error {
+    SERVICE_ERROR("errors.service.error"),
     SERVICE_NO_ENTITY("errors.service.no.entity"),
     TAM_SERVICE_ERROR("errors.tam.service"),
     TAM_BOT_TOKEN_INCORRECT("errors.tam.bot.token.incorrect"),
@@ -45,7 +46,11 @@ public enum Error {
     ATTACHMENT_DOES_NOT_EXIST("errors.attachment.does.not.exist"),
     ATTACHMENT_IDENTIFIER_IS_NOT_VALID("errors.attachment.token.is.not.valid"),
 
-    BOT_SCHEME_INVALID_VALIDATOR("errors.bot.scheme.invalid.validator"),
+    SCHEME_BUILDER_INVALID_VALIDATOR("errors.bot.scheme.invalid.validator"),
+    SCHEME_BUILDER_BUTTONS_EMPTY_FIELDS("errors.bot.scheme.builder.buttons.empty.fields"),
+    SCHEME_BUILDER_BUTTONS_UPDATE_BY_ID("errors.bot.scheme.builder.buttons.id.not.exist"),
+    SCHEME_BUILDER_BUTTONS_GROUP_IS_EMPTY("errors.bot.scheme.builder.buttons.group.is.empty"),
+    SCHEME_BUILDER_BUTTONS_GROUP_INTENT_MALFORMED("errors.bot.scheme.builder.buttons.group.intent.malformed"),
     ;
 
     @Getter

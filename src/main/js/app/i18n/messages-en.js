@@ -52,6 +52,7 @@ export default {
     'app.errormessage.fillname': 'Fill name',
     'app.errormessage.servernotresponse': 'Server not response',
     'app.errormessage.serverwrongresponse': 'Wrong server answer',
+    'errors.service.error': "Service error",
     'errors.tam.service': 'TamTam service error',
     'errors.tam.bot.token.incorrect': 'Incorrect bot token',
     'errors.tam.bot.token.empty': 'Empty bot token',
@@ -85,6 +86,10 @@ export default {
     'errors.attachment.does.not.exist': 'Attachment does not exist',
     'errors.attachment.token.is.not.valid': 'Attachment identifier is not valid',
     'errors.bot.scheme.invalid.validator': 'Invalid validator presented',
+    'errors.bot.scheme.builder.buttons.empty.fields': 'Buttons has empty fields',
+    'errors.bot.scheme.builder.buttons.id.not.exist': 'Wrong buttons id',
+    'errors.bot.scheme.builder.buttons.group.is.empty': 'Please, provide at least one button',
+    'errors.bot.scheme.builder.buttons.group.intent.malformed': 'Malformed button intent',
 
 
 //Success messages

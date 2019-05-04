@@ -98,7 +98,7 @@ public class RegistrationBot extends AbstractCustomBot {
 
     @PostConstruct
     public void subscribe() {
-        enabledIds = enabledIdsConverter.convert(ids);
+        enabledIds = enabledIdsConverter.convert(ids, getClass());
         botAPI = TamTamBotAPI.create(token);
         visitor = new RegistrationBotVisitor();
         log.info(String.format("Registration bot(id:%s, token:%s) initialized", id, token));

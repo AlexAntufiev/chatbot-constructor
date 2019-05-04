@@ -41,6 +41,17 @@ public class BuilderController {
         );
     }
 
+    @GetMapping(path = Endpoint.SCHEME, consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<?> getBotScheme(
+            @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
+            @PathVariable("id") final int botSchemeId
+    ) {
+        return new ResponseEntity<>(
+                builderService.getBotScheme(authToken, botSchemeId),
+                HttpStatus.OK
+        );
+    }
+
     @PostMapping(path = Endpoint.SCHEME)
     public ResponseEntity<?> saveBotScheme(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
