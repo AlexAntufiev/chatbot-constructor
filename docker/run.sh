@@ -6,7 +6,6 @@ application_command=""
 application_arguments=""
 application_port="8090"
 
-profile_requested=false
 profile_name="test"
 
 debug_requested=false
@@ -15,45 +14,17 @@ debug_port="5005"
 help_requested=false
 help_arguments=""
 
-JAVA_MIN_MEM="128M"
-JAVA_MAX_MEM="512M"
-
 trap "error 'Interrupted!'; stopApplication" SIGINT
 trap "error 'Critical error!'" ERR
 
-jvm_arguments="-Xms${JAVA_MIN_MEM} -Xmx${JAVA_MAX_MEM}"
+jvm_arguments=""
 
 function error {
     echo "ERROR: ${1}" >&2
     exit ${2:-255}
 }
 
-function checkPidFileExists {
-    if ! [[ -f "${application_name}.pid" ]]; then
-        echo "PID file does not exists."
-        return 1
-    fi
-
-    process_id=$(<${application_name}.pid)
-
-    return 0
-}
-
-function checkApplicationStarted {
-    if ! [[ -e "/proc/${process_id}" ]]; then
-        echo "WARNING: PID file exists, but process does not. Consider removing PID file manually" >&2
-        return 1
-    fi
-
-    return 0
-}
-
 function start {
-
-    if checkPidFileExists > /dev/null && checkApplicationStarted; then
-        echo "Application already started [PID: ${process_id}]."
-        return
-    fi
 
     if ! [[ -f "${application_name}.jar" ]]; then
         error "Application executable [${application_name}.jar] not accessible or does not exists"
