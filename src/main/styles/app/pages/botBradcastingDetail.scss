@@ -2,6 +2,15 @@
   flex-wrap: nowrap;
 }
 
+.bot-broadcasting .broadcasting-message {
+  transition: margin 400ms;
+
+  &.selected {
+    margin-left: 20px;
+  }
+}
+
+
 .bot-broadcasting .bot-broadcasting_elements-container .bot-broadcasting_elements-container_element {
   margin-bottom: 18px;
 }
