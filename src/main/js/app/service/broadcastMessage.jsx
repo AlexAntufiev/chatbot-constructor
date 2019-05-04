@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as ApiPoints from 'app/constants/apiPoints';
 import makeTemplateStr from 'app/utils/makeTemplateStr'
-import handleRequest from 'app/service/handleRequest'
+import {handleRequest, handleMultiplyRequests} from 'app/service/handleRequest'
 
 export function addBroadcastMessage(botSchemeId, chatChannelId, broadcastMessage, callbackSuccess, callbackFail, context) {
     const url = makeTemplateStr(ApiPoints.ADD_BROADCAST_MESSAGE, {id: botSchemeId, chatChannelId: chatChannelId});
@@ -66,5 +66,32 @@ export function removeAttachment(botSchemeId, chatChannelId, messageId, attachme
         attachmentId: attachmentId
     });
     handleRequest(axios.post(url), callbackSuccess, callbackFail, context);
+}
 
+export function addAndRemoveAttachments(botSchemeId, chatChannelId, messageId, attachments, callbackSuccess, callbackFail, context) {
+    const addUrl = makeTemplateStr(ApiPoints.ADD_ATTACHMENT, {
+        id: botSchemeId,
+        chatChannelId: chatChannelId,
+        messageId: messageId
+    });
+
+    let attachmentsReq = [];
+    attachments.forEach((attach) => {
+        if (!attach.id && !attach.removed) {
+            attachmentsReq.push(axios.post(addUrl, attach));
+        } else if (attach.id && attach.removed) {
+            const removeUrl = makeTemplateStr(ApiPoints.REMOVE_ATTACHMENT, {
+                id: botSchemeId,
+                chatChannelId: chatChannelId,
+                messageId: messageId,
+                attachmentId: attach.id
+            });
+            attachmentsReq.push(axios.post(removeUrl));
+        }
+    });
+    if (attachmentsReq.length > 0) {
+        handleMultiplyRequests(axios.all(attachmentsReq), callbackSuccess, callbackFail, context);
+    } else {
+        callbackSuccess && callbackSuccess();
+    }
 }

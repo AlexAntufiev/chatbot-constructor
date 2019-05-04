@@ -280,7 +280,7 @@ public class BroadcastMessageService {
         return new SuccessResponseWrapper<>(broadcastMessageRepository.save(broadcastMessage));
     }
 
-    public SuccessResponse addBroadcastMessageAttachment(
+   public SuccessResponse addBroadcastMessageAttachment(
             final String authToken,
             final int botSchemeId,
             final long chatChannelId,
