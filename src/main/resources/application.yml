@@ -63,6 +63,7 @@ tamtam:
         match: https://sport.mail.ru/inf/json_vk_bot_competition/hockey2019/match/{id}
       token: _WJ5Jt0ksotmic5llAnm7DJNvXO8WAce8AIBpLGVW-o
   broadcast:
+    enabled: true
     executor:
       corePoolSize: 2
       maxPoolSize: 4

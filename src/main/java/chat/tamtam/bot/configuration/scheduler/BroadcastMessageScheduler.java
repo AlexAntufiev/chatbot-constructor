@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 import org.jetbrains.annotations.Nullable;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -43,7 +45,13 @@ import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @Component
+@ConditionalOnProperty(
+        prefix = "tamtam.broadcast",
+        name = "enabled",
+        havingValue = "true"
+)
 @RequiredArgsConstructor
+@RefreshScope
 public class BroadcastMessageScheduler {
     private static final long DEFAULT_SENDING_RATE = 10_000L;
     private static final long DEFAULT_ERASING_RATE = 10_000L;
