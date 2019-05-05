@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import chat.tamtam.bot.TestContext;
-import chat.tamtam.bot.domain.bot.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.service.BotSchemeService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,7 +39,7 @@ class BotSchemeControllerTest extends TestContext {
 
         assertNotNull(responseEntity, "Controller must be return object");
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode(), "Status code must be return");
-        BotSchemeEntity body = (BotSchemeEntity) responseEntity.getBody();
+        BotScheme body = (BotScheme) responseEntity.getBody();
         assertNotNull(body, "Body must be null");
         assertEquals(USER_ID, body.getUserId(), "User id must be set");
         assertEquals(BOT_NAME, body.getName(), "BotScheme name must be set");

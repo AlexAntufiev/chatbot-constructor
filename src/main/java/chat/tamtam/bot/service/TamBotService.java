@@ -6,7 +6,7 @@ import org.springframework.util.StringUtils;
 
 import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.controller.Endpoint;
-import chat.tamtam.bot.domain.bot.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.exception.ChatBotConstructorException;
 import chat.tamtam.bot.domain.exception.GenerateUploadLinkException;
@@ -32,7 +32,7 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class TamBotService {
     private final TamBotRepository tamBotRepository;
-    private final BotSchemeRepository botSchemaRepository;
+    private final BotSchemeRepository botSchemeRepository;
     private final UserService userService;
     private final BotSchemeService botSchemeService;
     private final TransactionalUtils transactionalUtils;
@@ -72,12 +72,12 @@ public class TamBotService {
     @Loggable
     public TamBotEntity status(final String authToken, final int botSchemeId) {
         long userId = userService.getUserIdByToken(authToken);
-        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         return getTamBot(botScheme.getBotId(), userId);
     }
 
     @Loggable
-    public TamBotEntity getTamBot(final BotSchemeEntity botScheme) {
+    public TamBotEntity getTamBot(final BotScheme botScheme) {
         if (botScheme.getBotId() == null) {
             throw new ChatBotConstructorException(
                     "Tam bot for bot scheme with id="
@@ -108,7 +108,7 @@ public class TamBotService {
                     Error.TAM_BOT_TOKEN_EMPTY
             );
         }
-        BotSchemeEntity bot = botSchemeService.getBotScheme(authToken, id);
+        BotScheme bot = botSchemeService.getBotScheme(authToken, id);
         if (bot.getBotId() != null) {
             throw new ChatBotConstructorException(
                     "Can't subscribe bot with id="
@@ -138,7 +138,7 @@ public class TamBotService {
                 transactionalUtils
                         .invokeRunnable(() -> {
                             tamBotRepository.save(tamBot);
-                            botSchemaRepository.save(bot);
+                            botSchemeRepository.save(bot);
                         });
                 log.info(
                         String.format(
@@ -179,7 +179,7 @@ public class TamBotService {
 
     @Loggable
     public SuccessResponse disconnect(final String authToken, int id) {
-        BotSchemeEntity bot = botSchemeService.getBotScheme(authToken, id);
+        BotScheme bot = botSchemeService.getBotScheme(authToken, id);
         if (bot.getBotId() == null) {
             throw new ChatBotConstructorException(
                     "Can't unsubscribe bot with id="
@@ -201,7 +201,7 @@ public class TamBotService {
                         .invokeRunnable(() -> {
                             tamBotRepository.deleteById(new TamBotEntity.Id(bot.getBotId(), bot.getUserId()));
                             bot.setBotId(null);
-                            botSchemaRepository.save(bot);
+                            botSchemeRepository.save(bot);
                         });
                 log.info(
                         String.format(

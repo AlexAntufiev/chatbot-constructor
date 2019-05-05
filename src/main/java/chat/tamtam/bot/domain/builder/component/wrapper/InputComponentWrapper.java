@@ -1,10 +1,10 @@
 package chat.tamtam.bot.domain.builder.component.wrapper;
 
-import chat.tamtam.bot.domain.builder.component.Component;
+import chat.tamtam.bot.domain.builder.component.BuilderComponent;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class InputComponentWrapper {
-    private final Component component;
-    // @todo #CC-141 Implement validators and predicates invocation
+    private final BuilderComponent builderComponent;
+    // @todo #CC-141 Implement componentValidators and predicates invocation
 }
