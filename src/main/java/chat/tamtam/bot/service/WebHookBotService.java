@@ -13,11 +13,10 @@ import org.springframework.stereotype.Service;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
-import chat.tamtam.bot.domain.bot.BotSchemeEntity;
 import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
-import chat.tamtam.bot.domain.builder.component.BuilderComponent;
 import chat.tamtam.bot.domain.builder.component.ComponentType;
+import chat.tamtam.bot.domain.builder.component.SchemeComponent;
 import chat.tamtam.bot.domain.webhook.BotContext;
 import chat.tamtam.bot.repository.BotContextRepository;
 import chat.tamtam.bot.repository.BotSchemeRepository;
@@ -74,7 +73,7 @@ public class WebHookBotService {
         private Byte[] botContextLockKey;
 
         private void execute(final BotContext context, final Update update) {
-            BuilderComponent builderComponent =
+            SchemeComponent schemeComponent =
                     componentRepository
                             .findById(context.getState())
                             .orElseThrow(
@@ -83,25 +82,25 @@ public class WebHookBotService {
                                     )
                             );
 
-            TamTamBotAPI api = getTamTamBotAPI(builderComponent);
+            TamTamBotAPI api = getTamTamBotAPI(schemeComponent);
 
             while (true) {
-                switch (ComponentType.getById(builderComponent.getType())) {
+                switch (ComponentType.getById(schemeComponent.getType())) {
                     case INPUT:
                         if (update instanceof MessageCreatedUpdate) {
                             componentProcessorService
-                                    .process(((MessageCreatedUpdate) update), context, builderComponent, api);
+                                    .process(((MessageCreatedUpdate) update), context, schemeComponent, api);
                         }
                         if (update instanceof MessageCallbackUpdate) {
                             componentProcessorService
-                                    .process(((MessageCallbackUpdate) update), context, builderComponent, api);
+                                    .process(((MessageCallbackUpdate) update), context, schemeComponent, api);
                         }
                         botContextRepository.save(context);
                         break;
 
                     case INFO:
                         componentProcessorService
-                                .process(context, builderComponent, api);
+                                .process(context, schemeComponent, api);
                         botContextRepository.save(context);
                         break;
 
@@ -115,7 +114,7 @@ public class WebHookBotService {
                     break;
                 }
 
-                builderComponent =
+                schemeComponent =
                         componentRepository
                                 .findById(context.getState())
                                 .orElseThrow(
@@ -123,19 +122,19 @@ public class WebHookBotService {
                                                 "Can't find next builderComponent with id=" + context.getState()
                                         )
                                 );
-                if (ComponentType.getById(builderComponent.getType()) == ComponentType.INPUT) {
+                if (ComponentType.getById(schemeComponent.getType()) == ComponentType.INPUT) {
                     break;
                 }
             }
         }
 
-        private @NotNull TamTamBotAPI getTamTamBotAPI(BuilderComponent builderComponent) {
+        private @NotNull TamTamBotAPI getTamTamBotAPI(SchemeComponent schemeComponent) {
             BotScheme botScheme =
                     botSchemeRepository
-                            .findById(builderComponent.getSchemeId())
+                            .findById(schemeComponent.getSchemeId())
                             .orElseThrow(
                                     () -> new NoSuchElementException(
-                                            "Can't find botScheme with id=" + builderComponent.getSchemeId()
+                                            "Can't find botScheme with id=" + schemeComponent.getSchemeId()
                                     )
                             );
             TamBotEntity tamBot =
