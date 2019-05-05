@@ -81,7 +81,7 @@ public class BuilderService {
     public SuccessResponse saveBotScheme(
             final String authToken,
             final int botSchemeId,
-            final List<ComponentUpdate> componentUpdates
+            final List<ComponentUpdate> components
     ) {
         // @todo #CC-163 Split logic by builderComponent type(e.g. if type is INPUT then ignore buttonsGroup)
         BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
@@ -90,7 +90,7 @@ public class BuilderService {
                 transactionalUtils.invokeCallable(() -> {
                     List<ComponentUpdate> updated = new ArrayList<>();
                     for (ComponentUpdate update
-                            : componentUpdates) {
+                            : components) {
                         // @todo #CC-141 Enable reserved builderComponent check
                         /*if(!componentRepository
                                 .existByIdAndSchemeId(
@@ -143,7 +143,7 @@ public class BuilderService {
 
                         updated.add(new ComponentUpdate(builderComponent, componentValidators, buttonsGroupUpdate));
                     }
-                    botScheme.setScheme(componentUpdates.stream().findFirst().orElseThrow().getBuilderComponent().getId());
+                    botScheme.setScheme(components.stream().findFirst().orElseThrow().getBuilderComponent().getId());
                     botSchemeRepository.save(botScheme);
                     return updated;
                 });
@@ -153,7 +153,8 @@ public class BuilderService {
 
     private List<ComponentValidator> updateValidators(final ComponentUpdate update) {
         /*
-         * Check if all componentValidators belong to this builderComponent(componentValidator.getComponentId == builderComponent.getId)
+         * Check if all componentValidators belong to this
+         * builderComponent(componentValidator.getComponentId == builderComponent.getId)
          * */
         for (ComponentValidator componentValidator
                 : update.getComponentValidators()) {
