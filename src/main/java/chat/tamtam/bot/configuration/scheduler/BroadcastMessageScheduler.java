@@ -13,9 +13,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import chat.tamtam.bot.domain.bot.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
-import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
+import chat.tamtam.bot.domain.broadcast.message.BroadcastMessage;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.domain.notification.NotificationMessage;
 import chat.tamtam.bot.domain.notification.NotificationType;
@@ -57,7 +57,7 @@ public class BroadcastMessageScheduler {
     private static final long DEFAULT_ERASING_RATE = 10_000L;
 
     private final BroadcastMessageRepository broadcastMessageRepository;
-    private final BotSchemeRepository botSchemaRepository;
+    private final BotSchemeRepository botSchemeRepository;
     private final TamBotRepository tamBotRepository;
     private final BroadcastMessageAttachmentRepository broadcastMessageAttachmentRepository;
     private final NotificationService notificationService;
@@ -69,13 +69,13 @@ public class BroadcastMessageScheduler {
     @Scheduled(fixedRate = DEFAULT_SENDING_RATE)
     public void fireScheduledMessages() {
         Instant currentInstant = Instant.now();
-        List<BroadcastMessageEntity> scheduledMessages =
+        List<BroadcastMessage> scheduledMessages =
                 broadcastMessageRepository.findAllByFiringTimeBeforeAndState(
                         currentInstant,
                         BroadcastMessageState.SCHEDULED.getValue()
                 );
         scheduledMessages.forEach(message -> {
-            botSchemaRepository
+            botSchemeRepository
                     .findById(message.getBotSchemeId())
                     .ifPresentOrElse(
                             botScheme -> {
@@ -119,7 +119,7 @@ public class BroadcastMessageScheduler {
     }
 
     protected void setProcessingStateAttempt(
-            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessage broadcastMessage,
             final BroadcastMessageState requiredState,
             final long userId
     ) throws IllegalStateException {
@@ -141,13 +141,13 @@ public class BroadcastMessageScheduler {
     @Scheduled(fixedRate = DEFAULT_ERASING_RATE)
     public void eraseScheduledMessages() {
         Instant currentInstant = Instant.now();
-        List<BroadcastMessageEntity> scheduledMessages =
+        List<BroadcastMessage> scheduledMessages =
                 broadcastMessageRepository.findAllByErasingTimeBeforeAndState(
                         currentInstant,
                         BroadcastMessageState.SENT.getValue()
                 );
         scheduledMessages.forEach(message -> {
-            botSchemaRepository
+            botSchemeRepository
                     .findById(message.getBotSchemeId())
                     .ifPresentOrElse(
                             botScheme -> {
@@ -193,7 +193,7 @@ public class BroadcastMessageScheduler {
     @Async
     protected void sendBroadcastMessage(
             final TamTamBotAPI tamTamBotAPI,
-            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessage broadcastMessage,
             final long userId
     ) {
         try {
@@ -272,7 +272,7 @@ public class BroadcastMessageScheduler {
     @Async
     protected void eraseBroadcastMessage(
             final TamTamBotAPI tamTamBotAPI,
-            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessage broadcastMessage,
             final long userId
     ) {
         try {
@@ -289,7 +289,7 @@ public class BroadcastMessageScheduler {
         notifyUser(userId, broadcastMessage);
     }
 
-    private @Nullable TamTamBotAPI getTamTamBotAPI(BroadcastMessageEntity e, BotSchemeEntity botScheme) {
+    private @Nullable TamTamBotAPI getTamTamBotAPI(BroadcastMessage e, BotScheme botScheme) {
         TamBotEntity tamBot =
                 tamBotRepository.findById(new TamBotEntity.Id(botScheme.getBotId(), botScheme.getUserId()));
         if (tamBot == null) {
@@ -305,7 +305,7 @@ public class BroadcastMessageScheduler {
         return TamTamBotAPI.create(tamBot.getToken());
     }
 
-    private void notifyUser(final long userId, final BroadcastMessageEntity broadcastMessage) {
+    private void notifyUser(final long userId, final BroadcastMessage broadcastMessage) {
         notificationService.notifyUser(
                 userId,
                 new NotificationMessage(

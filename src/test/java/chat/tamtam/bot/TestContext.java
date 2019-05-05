@@ -2,7 +2,7 @@ package chat.tamtam.bot;
 
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
-import chat.tamtam.bot.domain.bot.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.botapi.model.UserWithPhoto;
 
@@ -17,8 +17,8 @@ public class TestContext {
     protected static final String LOGIN_ADMIN = "ADMIN";
     protected static final String PASSWORD_ADMIN = "ADMIN";
 
-    protected static final BotSchemeEntity BOT_SCHEME_ENTITY;
-    protected static final BotSchemeEntity BOT_SCHEME_ENTITY_WITH_TAM_BOT;
+    protected static final BotScheme BOT_SCHEME_ENTITY;
+    protected static final BotScheme BOT_SCHEME_ENTITY_WITH_TAM_BOT;
 
     protected static final Long TAM_BOT_ID = 2L;
     protected static final Long TAM_BOT_USER_ID = 3L;
@@ -31,8 +31,8 @@ public class TestContext {
     protected static final UserWithPhoto USER_WITH_PHOTO;
 
     static {
-        BOT_SCHEME_ENTITY = new BotSchemeEntity(USER_ID, BOT_NAME);
-        BOT_SCHEME_ENTITY_WITH_TAM_BOT = new BotSchemeEntity(USER_ID, BOT_NAME);
+        BOT_SCHEME_ENTITY = new BotScheme(USER_ID, BOT_NAME);
+        BOT_SCHEME_ENTITY_WITH_TAM_BOT = new BotScheme(USER_ID, BOT_NAME);
         BOT_SCHEME_ENTITY_WITH_TAM_BOT.setBotId(TAM_BOT_ID);
         USER_WITH_PHOTO = new UserWithPhoto(
                 null,

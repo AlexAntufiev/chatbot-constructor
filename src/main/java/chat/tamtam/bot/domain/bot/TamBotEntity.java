@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Entity
-@Table(name = "TamBot")
+@Table
 @NoArgsConstructor
 public class TamBotEntity {
     @EmbeddedId

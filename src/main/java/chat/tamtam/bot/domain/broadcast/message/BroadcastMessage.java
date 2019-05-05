@@ -18,12 +18,12 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @NoArgsConstructor
-@Table(name = "BroadcastMessage", indexes = {
+@Table(indexes = {
         @Index(columnList = "firingTime"),
         @Index(columnList = "erasingTime"),
         @Index(columnList = "state")
 })
-public class BroadcastMessageEntity {
+public class BroadcastMessage {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)

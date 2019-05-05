@@ -22,7 +22,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import com.auth0.jwt.JWT;
 
 import chat.tamtam.bot.controller.Endpoint;
-import chat.tamtam.bot.domain.session.SessionEntity;
+import chat.tamtam.bot.domain.session.Session;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.service.UserDetailsServiceImpl;
 
@@ -56,14 +56,14 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
         if (params != null) {
             String autoLoginTempAccessToken = params[0];
             if (autoLoginTempAccessToken != null) {
-                SessionEntity temporarySession = sessionRepository.findByToken(autoLoginTempAccessToken);
+                Session temporarySession = sessionRepository.findByToken(autoLoginTempAccessToken);
                 if (temporarySession != null && !temporarySession.isExpired()) {
                     String permanentAccessToken = TOKEN_PREFIX
                             + JWT.create()
                                     .withExpiresAt(new Date())
                                     .sign(HMAC512(SECRET.getBytes()));
-                    SessionEntity permanentSession =
-                            new SessionEntity(
+                    Session permanentSession =
+                            new Session(
                                     permanentAccessToken,
                                     temporarySession.getUserId(),
                                     temporarySession.getLogin(),
@@ -84,7 +84,7 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
                     .filter(cookie -> cookie.getName().equals(SecurityConstants.COOKIE_AUTH))
                     .findFirst();
             if (authCookie.isPresent()) {
-                SessionEntity session = sessionRepository.findByToken(authCookie.get().getValue());
+                Session session = sessionRepository.findByToken(authCookie.get().getValue());
                 if (session == null || session.isExpired()) {
                     response.sendRedirect(Endpoint.API_LOGOUT);
                     return;
@@ -102,7 +102,7 @@ public class AuthenticationFilter extends BasicAuthenticationFilter {
         if (token == null) {
             return null;
         }
-        SessionEntity session = sessionRepository.findByToken(token);
+        Session session = sessionRepository.findByToken(token);
         if (session == null) {
             return null;
         }

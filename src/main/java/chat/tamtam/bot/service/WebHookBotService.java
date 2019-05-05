@@ -14,8 +14,9 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
 import chat.tamtam.bot.domain.bot.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
-import chat.tamtam.bot.domain.builder.component.Component;
+import chat.tamtam.bot.domain.builder.component.BuilderComponent;
 import chat.tamtam.bot.domain.builder.component.ComponentType;
 import chat.tamtam.bot.domain.webhook.BotContext;
 import chat.tamtam.bot.repository.BotContextRepository;
@@ -43,7 +44,7 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class WebHookBotService {
     private final BotContextRepository botContextRepository;
-    private final BotSchemeRepository botSchemaRepository;
+    private final BotSchemeRepository botSchemeRepository;
     private final TamBotRepository tamBotRepository;
     private final ComponentRepository componentRepository;
 
@@ -73,34 +74,34 @@ public class WebHookBotService {
         private Byte[] botContextLockKey;
 
         private void execute(final BotContext context, final Update update) {
-            Component component =
+            BuilderComponent builderComponent =
                     componentRepository
                             .findById(context.getState())
                             .orElseThrow(
                                     () -> new NoSuchElementException(
-                                            "Can't find component with id=" + context.getState()
+                                            "Can't find builderComponent with id=" + context.getState()
                                     )
                             );
 
-            TamTamBotAPI api = getTamTamBotAPI(component);
+            TamTamBotAPI api = getTamTamBotAPI(builderComponent);
 
             while (true) {
-                switch (ComponentType.getById(component.getType())) {
+                switch (ComponentType.getById(builderComponent.getType())) {
                     case INPUT:
                         if (update instanceof MessageCreatedUpdate) {
                             componentProcessorService
-                                    .process(((MessageCreatedUpdate) update), context, component, api);
+                                    .process(((MessageCreatedUpdate) update), context, builderComponent, api);
                         }
                         if (update instanceof MessageCallbackUpdate) {
                             componentProcessorService
-                                    .process(((MessageCallbackUpdate) update), context, component, api);
+                                    .process(((MessageCallbackUpdate) update), context, builderComponent, api);
                         }
                         botContextRepository.save(context);
                         break;
 
                     case INFO:
                         componentProcessorService
-                                .process(context, component, api);
+                                .process(context, builderComponent, api);
                         botContextRepository.save(context);
                         break;
 
@@ -114,27 +115,27 @@ public class WebHookBotService {
                     break;
                 }
 
-                component =
+                builderComponent =
                         componentRepository
                                 .findById(context.getState())
                                 .orElseThrow(
                                         () -> new NoSuchElementException(
-                                                "Can't find next component with id=" + context.getState()
+                                                "Can't find next builderComponent with id=" + context.getState()
                                         )
                                 );
-                if (ComponentType.getById(component.getType()) == ComponentType.INPUT) {
+                if (ComponentType.getById(builderComponent.getType()) == ComponentType.INPUT) {
                     break;
                 }
             }
         }
 
-        private @NotNull TamTamBotAPI getTamTamBotAPI(Component component) {
-            BotSchemeEntity botScheme =
-                    botSchemaRepository
-                            .findById(component.getSchemeId())
+        private @NotNull TamTamBotAPI getTamTamBotAPI(BuilderComponent builderComponent) {
+            BotScheme botScheme =
+                    botSchemeRepository
+                            .findById(builderComponent.getSchemeId())
                             .orElseThrow(
                                     () -> new NoSuchElementException(
-                                            "Can't find botScheme with id=" + component.getSchemeId()
+                                            "Can't find botScheme with id=" + builderComponent.getSchemeId()
                                     )
                             );
             TamBotEntity tamBot =
@@ -228,8 +229,8 @@ public class WebHookBotService {
         }
 
         private BotContext initContext(final long userId) {
-            BotSchemeEntity botScheme =
-                    botSchemaRepository.findById(botSchemeId)
+            BotScheme botScheme =
+                    botSchemeRepository.findById(botSchemeId)
                             .orElseThrow(
                                     () -> new NoSuchElementException("Can't find bot scheme with id=" + botSchemeId)
                             );
@@ -237,7 +238,7 @@ public class WebHookBotService {
             BotContext context = new BotContext();
 
             context.setId(new BotContext.Id(userId, botSchemeId));
-            context.setState(botScheme.getSchema());
+            context.setState(botScheme.getScheme());
 
             return botContextRepository.save(context);
         }
