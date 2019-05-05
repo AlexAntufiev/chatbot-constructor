@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table
 @NoArgsConstructor
-public class BuilderComponent {
+public class SchemeComponent {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
