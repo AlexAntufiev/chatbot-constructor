@@ -51,7 +51,7 @@ public class WebHookBotService {
 
     private final HazelcastInstance hazelcastInstance;
     private IMap<Byte[], Object> botContextLockMap;
-    private final static String BOT_CONTEXT_LOCK_MAP = "bot-context-lock-map";
+    private static final String BOT_CONTEXT_LOCK_MAP = "bot-context-lock-map";
 
     @PostConstruct
     public void initLockMap() {

@@ -12,7 +12,7 @@ public class HazelcastConfiguration {
     @Bean
     public Config hazelCastConfig() {
         return new Config()
-                        .setInstanceName("hazelcast-instance");
+                .setInstanceName("hazelcast-instance");
     }
 
     @Bean
