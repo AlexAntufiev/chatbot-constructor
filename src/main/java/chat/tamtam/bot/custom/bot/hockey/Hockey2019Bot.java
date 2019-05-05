@@ -2,7 +2,6 @@ package chat.tamtam.bot.custom.bot.hockey;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,7 +57,13 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class Hockey2019Bot extends AbstractCustomBot {
 
+    private static final String INFO_MESSAGE = "Чемпионат мира\uD83C\uDFC6\uD83C\uDF0D по хоккею\uD83C\uDFD2 стартует в 83 раз.\n" +
+            "Местом его проведения была выбрана Словакия\uD83C\uDDF8\uD83C\uDDF0 (города Братислава и Кошица).\n" +
+            "Соревнование начнется 10 мая и продлиться до 26 мая\uD83D\uDCC5.\n" +
+            "В этом году чемпионский титул будет защищать сборная Швеции\uD83C\uDDF8\uD83C\uDDEA.\n" +
+            "Впервые с 1994 года на чемпионате мира выступит сборная Великобритании\uD83C\uDDEC\uD83C\uDDE7.";
     private static final String HELLO_MESSAGE = "Чемпионат мира по хоккею 2019";
+    private static final String INFO = "/инфо";
     private static final String NEWS = "/новости";
     private static final String TEAM_NEWS = "/новости_команды";
     private static final String CALENDAR = "/календарь";
@@ -66,14 +71,17 @@ public class Hockey2019Bot extends AbstractCustomBot {
     private static final String MATCH = "/матч";
 
     private static final String HELP_MESSAGE = String.format(
-            "%s:\n\n%s\n%s\n%s\n%s\n%s\n",
+            "%s:\n\n%s\n%s\n%s\n%s\n%s\n%s\n",
             HELLO_MESSAGE,
+            INFO,
             NEWS,
             TEAM_NEWS,
             CALENDAR,
             RESULTS,
             MATCH
     );
+    private static final Stream<NewMessageBody> teams;
+    private static final NewMessageBody helpMessage;
 
     private final @NonNull Hockey2019Service hockey2019Service;
     private final @NonNull Environment environment;
@@ -89,10 +97,21 @@ public class Hockey2019Bot extends AbstractCustomBot {
     private String host;
 
     private String url;
-    private boolean subscribed = false;
     private TamTamBotAPI botAPI;
 
     private Hockey2019BotVisitor hockey2019BotVisitor;
+
+    static {
+        teams = Stream.of(messageOf(
+                "Выбери команду",
+                List.of(new InlineKeyboardAttachmentRequest(new InlineKeyboardAttachmentRequestPayload(Stream.of(Team.values())
+                        .map(team -> new ArrayList<Button>() {{
+                            add(new CallbackButton(team.getName(), team.getName(), Intent.DEFAULT));
+                        }})
+                        .collect(Collectors.toList()))))
+        ));
+        helpMessage = messageOf(HELP_MESSAGE);
+    }
 
     @PostConstruct
     public void subscribe() {
@@ -153,15 +172,13 @@ public class Hockey2019Bot extends AbstractCustomBot {
     }
 
     private Stream<NewMessageBody> resolve(final Message message) {
-        String[] cmd = Optional
-                .ofNullable(message.getBody().getText())
-                .orElse("")
-                .split(" ");
-        switch (cmd[0]) {
+        switch (message.getBody().getText()) {
+            case INFO:
+                return info();
             case NEWS:
                 return news();
             case TEAM_NEWS:
-                return selectTeam(message);
+                return teams;
             case CALENDAR:
                 return calendar();
             case RESULTS:
@@ -170,8 +187,12 @@ public class Hockey2019Bot extends AbstractCustomBot {
                 // @todo ##CC-173 implement match of id function
                 return match(1);
             default:
-                return Stream.of(messageOf(HELP_MESSAGE));
+                return Stream.of(helpMessage);
         }
+    }
+
+    private static Stream<NewMessageBody> info() {
+        return Stream.of(messageOf(INFO_MESSAGE));
     }
 
     private void callbackUpdate(MessageCallbackUpdate update) {
@@ -207,21 +228,6 @@ public class Hockey2019Bot extends AbstractCustomBot {
                 .getCalendar()
                 .getMessages()
                 .map(AbstractCustomBot::messageOf);
-    }
-
-    private static Stream<NewMessageBody> selectTeam(Message message) {
-
-        return Stream.of(messageOf(
-                "Выбери команду",
-                List.of(
-                        new InlineKeyboardAttachmentRequest(new InlineKeyboardAttachmentRequestPayload(
-                                Stream.of(Team.values())
-                                .map(team -> new ArrayList<Button>() {{
-                                    String teamName = team.getName();
-                                    add(new CallbackButton(teamName, teamName, Intent.DEFAULT));
-                                }})
-                                .collect(Collectors.toList()))))
-        ));
     }
 
     private Stream<NewMessageBody> news() {
