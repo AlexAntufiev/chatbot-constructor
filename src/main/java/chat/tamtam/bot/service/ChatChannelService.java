@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import chat.tamtam.bot.configuration.logging.Loggable;
-import chat.tamtam.bot.domain.bot.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.chatchannel.ChatChannelEntity;
 import chat.tamtam.bot.domain.chatchannel.SelectedChatChannelEntity;
@@ -46,7 +46,7 @@ public class ChatChannelService {
             int botSchemeId,
             final Long currentMarker
     ) {
-        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
         TamTamBotAPI tamTamBotAPI = TamTamBotAPI.create(tamBot.getToken());
         try {
@@ -95,7 +95,7 @@ public class ChatChannelService {
                     null
             );
         }
-        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
         TamTamBotAPI tamTamBotAPI = TamTamBotAPI.create(tamBot.getToken());
         try {
@@ -146,7 +146,7 @@ public class ChatChannelService {
             final String authToken,
             int botSchemeId
     ) {
-        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
         return new SuccessResponseListWrapper<>(
                 chatChannelRepository
@@ -161,7 +161,7 @@ public class ChatChannelService {
             int botSchemeId,
             long chatId
     ) {
-        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
         ChatChannelEntity chatChannel = chatChannelRepository
                 .findByIdBotSchemeIdAndIdTamBotIdAndIdChatId(
@@ -189,7 +189,7 @@ public class ChatChannelService {
             int botSchemeId,
             long chatChannelId
     ) {
-        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
         if (!chatChannelRepository
                 .existsByIdBotSchemeIdAndIdTamBotIdAndIdChatId(
@@ -219,7 +219,7 @@ public class ChatChannelService {
 
     @Loggable
     public ChatChannelEntity getChatChannel(
-            final BotSchemeEntity botScheme,
+            final BotScheme botScheme,
             final TamBotEntity tamBot,
             long chatChannelId
     ) {

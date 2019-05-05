@@ -68,7 +68,7 @@ export function removeAttachment(botSchemeId, chatChannelId, messageId, attachme
     handleRequest(axios.post(url), callbackSuccess, callbackFail, context);
 }
 
-export function addAndRemoveAttachments(botSchemeId, chatChannelId, messageId, attachments, callbackSuccess, callbackFail, context) {
+export function addAttachments(botSchemeId, chatChannelId, messageId, attachments, callbackSuccess, callbackFail, context) {
     const addUrl = makeTemplateStr(ApiPoints.ADD_ATTACHMENT, {
         id: botSchemeId,
         chatChannelId: chatChannelId,
@@ -79,7 +79,20 @@ export function addAndRemoveAttachments(botSchemeId, chatChannelId, messageId, a
     attachments.forEach((attach) => {
         if (!attach.id && !attach.removed) {
             attachmentsReq.push(axios.post(addUrl, attach));
-        } else if (attach.id && attach.removed) {
+        }
+    });
+    if (attachmentsReq.length > 0) {
+        handleMultiplyRequests(axios.all(attachmentsReq), callbackSuccess, callbackFail, context);
+    } else {
+        callbackSuccess && callbackSuccess();
+    }
+}
+
+
+export function removeAttachments(botSchemeId, chatChannelId, messageId, attachments, callbackSuccess, callbackFail, context) {
+    let attachmentsReq = [];
+    attachments.forEach((attach) => {
+        if (attach.id && attach.removed) {
             const removeUrl = makeTemplateStr(ApiPoints.REMOVE_ATTACHMENT, {
                 id: botSchemeId,
                 chatChannelId: chatChannelId,

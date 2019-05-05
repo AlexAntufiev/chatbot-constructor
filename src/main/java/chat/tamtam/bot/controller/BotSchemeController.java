@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import chat.tamtam.bot.domain.bot.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.service.BotSchemeService;
 import chat.tamtam.bot.service.UserService;
 import lombok.AllArgsConstructor;
@@ -43,7 +43,7 @@ public class BotSchemeController {
 
     @PostMapping(Endpoint.ADD)
     public ResponseEntity<?> addBot(
-            @RequestBody final BotSchemeEntity bot,
+            @RequestBody final BotScheme bot,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
     ) {
         try {
@@ -69,7 +69,7 @@ public class BotSchemeController {
 
     @PostMapping(Endpoint.ID + Endpoint.SAVE)
     public ResponseEntity<?> saveBot(
-            @PathVariable final Integer id, @RequestBody final BotSchemeEntity bot,
+            @PathVariable final Integer id, @RequestBody final BotScheme bot,
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken
     ) {
         Long userId = userService.getUserIdByToken(authToken);

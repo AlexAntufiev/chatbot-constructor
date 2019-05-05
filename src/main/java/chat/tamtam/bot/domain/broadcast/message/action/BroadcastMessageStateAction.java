@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
+import chat.tamtam.bot.domain.broadcast.message.BroadcastMessage;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
 import chat.tamtam.bot.domain.exception.UpdateBroadcastMessageException;
@@ -14,7 +14,7 @@ import chat.tamtam.bot.service.Error;
 public abstract class BroadcastMessageStateAction {
 
     public abstract void doAction(
-            BroadcastMessageEntity broadcastMessage,
+            BroadcastMessage broadcastMessage,
             BroadcastMessageUpdate broadcastMessageUpdate
     );
 
@@ -60,7 +60,7 @@ public abstract class BroadcastMessageStateAction {
     }
 
     protected void updateText(
-            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessage broadcastMessage,
             final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
         if (broadcastMessageUpdate.getText() == null) {
@@ -70,12 +70,12 @@ public abstract class BroadcastMessageStateAction {
     }
 
     protected abstract void setText(
-            BroadcastMessageEntity broadcastMessage,
+            BroadcastMessage broadcastMessage,
             BroadcastMessageUpdate broadcastMessageUpdate
     );
 
     protected void rejectTextUpdate(
-            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessage broadcastMessage,
             final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
         throw new UpdateBroadcastMessageException(
@@ -89,7 +89,7 @@ public abstract class BroadcastMessageStateAction {
     }
 
     protected void applyTextUpdate(
-            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessage broadcastMessage,
             final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
         if (broadcastMessageUpdate.getText().isEmpty()) {

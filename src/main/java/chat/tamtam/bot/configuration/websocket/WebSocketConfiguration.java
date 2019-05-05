@@ -17,7 +17,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
-import chat.tamtam.bot.domain.session.SessionEntity;
+import chat.tamtam.bot.domain.session.Session;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.security.SecurityConstants;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +64,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
         }
 
         private Principal getPrincipal(final Cookie authCookie) {
-            SessionEntity session = sessionRepository.findByToken(authCookie.getValue());
+            Session session = sessionRepository.findByToken(authCookie.getValue());
             if (session == null) {
                 return null;
             }
