@@ -7,8 +7,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import chat.tamtam.bot.domain.builder.button.ButtonPayload;
-import chat.tamtam.bot.domain.builder.component.BuilderComponent;
 import chat.tamtam.bot.domain.builder.component.ComponentType;
+import chat.tamtam.bot.domain.builder.component.SchemeComponent;
 import chat.tamtam.bot.domain.builder.validator.ComponentValidator;
 import chat.tamtam.bot.domain.builder.validator.ValidatorType;
 import chat.tamtam.bot.domain.builder.validator.wrapper.EqualTextValidatorWrapper;
@@ -44,33 +44,33 @@ public class ComponentProcessorService {
      * */
     public void process(
             final BotContext context,
-            final BuilderComponent builderComponent,
+            final SchemeComponent schemeComponent,
             final TamTamBotAPI api
     ) {
         try {
             SendMessageResult result =
                     api.sendMessage(
                             new NewMessageBody(
-                                    builderComponent.getText(),
-                                    getAttachments(builderComponent.getId(), true)
+                                    schemeComponent.getText(),
+                                    getAttachments(schemeComponent.getId(), true)
                             )
                     ).userId(context.getId().getUserId())
                             .execute();
-            if (builderComponent.isHasCallbacks()) {
+            if (schemeComponent.isHasCallbacks()) {
                 final String mid = result.getMessage().getBody().getMid();
                 context.setPendingMessage(
                         ByteBuffer.allocate(Long.BYTES + mid.length())
-                                .putLong(builderComponent.getId())
+                                .putLong(schemeComponent.getId())
                                 .put(mid.getBytes())
                                 .array()
                 );
             }
-            context.setState(builderComponent.getNextState());
+            context.setState(schemeComponent.getNextState());
         } catch (APIException | ClientException e) {
             log.error(
                     String.format(
                             "Message sending produced exception(%s, %s, %s)",
-                            context, builderComponent, api
+                            context, schemeComponent, api
                     ),
                     e
             );
@@ -100,13 +100,13 @@ public class ComponentProcessorService {
     public void process(
             final MessageCreatedUpdate update,
             final BotContext context,
-            final BuilderComponent builderComponent,
+            final SchemeComponent schemeComponent,
             final TamTamBotAPI api
     ) {
         // update pending message
         updatePendingMessage(context, api);
 
-        Iterable<ComponentValidator> validators = validatorRepository.findAllByComponentId(builderComponent.getId());
+        Iterable<ComponentValidator> validators = validatorRepository.findAllByComponentId(schemeComponent.getId());
         for (ComponentValidator componentValidator
                 : validators) {
             switch (ValidatorType.getById(componentValidator.getType())) {
@@ -120,7 +120,7 @@ public class ComponentProcessorService {
                     break;
             }
         }
-        context.setState(builderComponent.getNextState());
+        context.setState(schemeComponent.getNextState());
     }
 
     /*
@@ -129,7 +129,7 @@ public class ComponentProcessorService {
     public void process(
             final MessageCallbackUpdate update,
             final BotContext context,
-            final BuilderComponent builderComponent,
+            final SchemeComponent schemeComponent,
             final TamTamBotAPI api
     ) {
         try {
@@ -193,7 +193,7 @@ public class ComponentProcessorService {
             log.error(
                     String.format(
                             "MessageCallback processing produced exception(%s, %s, %s, %s)",
-                            update, context, builderComponent, api
+                            update, context, schemeComponent, api
                     ),
                     e
             );
