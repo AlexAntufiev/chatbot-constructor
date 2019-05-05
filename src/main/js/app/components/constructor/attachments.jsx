@@ -6,6 +6,7 @@ import {injectIntl} from "react-intl";
 import * as BroadcastMessageService from "app/service/broadcastMessage";
 import * as TamBotService from "app/service/tamBot";
 import {Growl} from "primereact/growl";
+import * as AxiosMessages from 'app/utils/axiosMessages';
 
 class Attachments extends React.Component {
     constructor(props) {
@@ -20,6 +21,7 @@ class Attachments extends React.Component {
         this.uploadFilesToTam = this.uploadFilesToTam.bind(this);
         this.saveAttachments = this.saveAttachments.bind(this);
         this.refreshAttachments = this.refreshAttachments.bind(this);
+        this.getCountByTypes = this.getCountByTypes.bind(this);
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -36,6 +38,58 @@ class Attachments extends React.Component {
         }
     }
 
+    static typeById(id) {
+        switch (id) {
+            case 0:
+                return "photo";
+            case 1:
+                return "video";
+            case 2:
+                return "audio";
+            default:
+                return "file";
+        }
+    }
+
+    static getTypeByStr(str) {
+        if (str.startsWith("image/")) return "photo";
+        if (str.startsWith("video/")) return "video";
+        if (str.startsWith("audio/m4a")) return "audio";
+        return "file";
+    }
+
+    static getTokenFromResp(res, type) {
+        switch (type) {
+            case "photo":
+                const firstKey = Object.keys(res["photos"])[0];
+                return res["photos"][firstKey].token;
+            case "audio":
+            case "video":
+                return res.id;
+            case "file":
+                return res.fileId;
+            default:
+                return null;
+        }
+    }
+
+    getCountByTypes() {
+        let counts = {
+            photo: 0,
+            video: 0,
+            audio: 0,
+            file: 0
+        };
+
+        this.state.attachments.forEach((attachment) => {
+            if (!attachment.removed) {
+                counts[attachment.type]++;
+            }
+        });
+        return counts;
+    }
+
+
     uploadFilesToTam(files) {
         if (files.length === 0) {
             return;
@@ -45,8 +99,35 @@ class Attachments extends React.Component {
             attachmentChanged: true
         });
         let uploaded = 0;
+        let counts = this.getCountByTypes();
+        let reqCounts = files.length;
         for (let i = 0; i < files.length; ++i) {
-            TamBotService.getAttachmentUploadLink(this.props.botSchemeId, "photo",
+            if (files[i].size > 2147483648) { // more than 2Gb
+                continue;
+            }
+            const attachType = Attachments.getTypeByStr(files[i].type);
+            const {intl} = this.props;
+            //check attachments count
+            counts[attachType]++;
+            if (counts.file > 0 && (counts.photo > 0 || counts.video > 0 || counts.audio > 0)) {
+                AxiosMessages.customError(this, intl.formatMessage({id: "errors.broadcast.message.has.too.much.attachments"}));
+                counts[attachType]--;
+                reqCounts--;
+                continue;
+            }
+            if (counts.audio > 0 && (counts.photo > 0 || counts.video > 0 || counts.file > 0)) {
+                AxiosMessages.customError(this, intl.formatMessage({id: "errors.broadcast.message.has.too.much.attachments"}));
+                counts[attachType]--;
+                reqCounts--;
+                continue;
+            }
+            if (counts.photo > 10 || counts.video > 10 || (counts.video + counts.photo > 10)) {
+                AxiosMessages.customError(this, intl.formatMessage({id: "errors.broadcast.message.has.too.much.attachments"}));
+                counts[attachType]--;
+                reqCounts--;
+                continue;
+            }
+            TamBotService.getAttachmentUploadLink(this.props.botSchemeId, attachType,
                 (res) => {
                     const data = new FormData();
                     const xhr = new XMLHttpRequest();
@@ -56,17 +137,16 @@ class Attachments extends React.Component {
                     xhr.onreadystatechange = function () {
                         if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                             const uploadedObj = JSON.parse(xhr.responseText);
-                            const firstKey = Object.keys(uploadedObj["photos"])[0];
                             let attachments = self.state.attachments.slice();
                             attachments.push({
                                 title: files[i].name,
-                                token: uploadedObj["photos"][firstKey].token,
-                                type: "photo"
+                                token: Attachments.getTokenFromResp(uploadedObj, attachType),
+                                type: attachType
                             });
                             self.setState({attachments: attachments});
                         }
                         uploaded++;
-                        if (uploaded === files.length) {
+                        if (uploaded === reqCounts) {
                             self.setState({ajaxUploadAttachProcess: false});
                             self.uploadButton.type = "";
                             self.uploadButton.type = "file";
@@ -75,21 +155,33 @@ class Attachments extends React.Component {
                     xhr.send(data);
                 }, () => {
                     uploaded++;
-                    if (uploaded === files.length) {
-                        self.setState({ajaxUploadAttachProcess: false});
-                        self.uploadButton.type = "";
-                        self.uploadButton.type = "file";
+                    if (uploaded === reqCounts) {
+                        this.setState({ajaxUploadAttachProcess: false});
+                        this.uploadButton.type = "";
+                        this.uploadButton.type = "file";
                     }
                 }, this);
+        }
+        if (uploaded === reqCounts) {
+            this.setState({ajaxUploadAttachProcess: false});
+            this.uploadButton.type = "";
+            this.uploadButton.type = "file";
         }
     }
 
     saveAttachments(callbackSuccess = () => {}, callbackFalse = () => {}) {
-        BroadcastMessageService.addAndRemoveAttachments(this.props.botSchemeId, this.props.chatChannelId, this.props.message.id,
+        BroadcastMessageService.removeAttachments(this.props.botSchemeId, this.props.chatChannelId, this.props.message.id,
             this.state.attachments, () => {
-                callbackSuccess();
-                this.setState({attachmentChanged: false});
-                this.refreshAttachments();
+                BroadcastMessageService.addAttachments(this.props.botSchemeId, this.props.chatChannelId, this.props.message.id,
+                    this.state.attachments, () => {
+                        callbackSuccess();
+                        this.setState({attachmentChanged: false});
+                        this.refreshAttachments();
+                    }, () => {
+                        callbackFalse();
+                        this.setState({attachmentChanged: false});
+                        this.refreshAttachments();
+                    }, this);
             }, () => {
                 callbackFalse();
                 this.setState({attachmentChanged: false});
@@ -105,7 +197,7 @@ class Attachments extends React.Component {
                     title: attach.title,
                     id: attach.id,
                     token: attach.attachmentIdentifier,
-                    type: "photo"
+                    type: Attachments.typeById(attach.type)
                 });
             });
             this.setState({attachments: attachments});
@@ -153,7 +245,7 @@ class Attachments extends React.Component {
                         || this.props.message.state === BroadcastMessageState.ERASED_BY_SCHEDULE}/>
                 {this.state.ajaxUploadAttachProcess &&
                 <ProgressBar mode="indeterminate" className={'attach-progressbar'}/>}
-                <input accept="image/*" className={"attach-input"} name={"data"}
+                <input className={"attach-input"} name={"data"}
                        ref={(obj) => this.uploadButton = obj} type={"file"}
                        multiple={true} onInput={(event) => this.uploadFilesToTam(event.target.files)}/>
                 <div className={"attach-container"}>

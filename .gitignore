@@ -30,3 +30,4 @@ lombok.config
 .DS_Store
 *.jar
 !/gradle/wrapper/gradle-wrapper.jar
+chatbot-constructor.pid
