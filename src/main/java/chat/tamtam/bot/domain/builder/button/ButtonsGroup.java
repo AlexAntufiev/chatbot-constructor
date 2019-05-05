@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "CallbackButtonsGroup")
 public class ButtonsGroup {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @Column(nullable = false)
     private Byte[] buttons;

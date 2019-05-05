@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as ApiPoints from 'app/constants/apiPoints';
 import makeTemplateStr from 'app/utils/makeTemplateStr'
-import handleRequest from 'app/service/handleRequest'
+import {handleRequest} from 'app/service/handleRequest'
 
 export function connect(botSchemeId, token, callbackSuccess, callbackFail, context) {
     const url = makeTemplateStr(ApiPoints.CONNECT_BOT, {id: botSchemeId});

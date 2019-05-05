@@ -48,7 +48,7 @@ class BotBroadcastingDetail extends Component {
         if (!remove) {
             messageList[message.id] = message;
         } else {
-           delete messageList[message.id];
+            delete messageList[message.id];
         }
         this.setState({messageList: messageList});
     }
@@ -119,6 +119,8 @@ class BotBroadcastingDetail extends Component {
     }
 
     createMessagesList() {
+        const dispMess = Number(this.props.match.params.messageId);
+
         let renderMessageList = [];
         for (let messageId in this.state.messageList) {
             const message = this.state.messageList[messageId];
@@ -133,6 +135,7 @@ class BotBroadcastingDetail extends Component {
                         {this.getLabelByState(message)}
                     </div>
                     <Button label={message.title} icon='pi pi-envelope'
+                            className={dispMess && Number(messageId) === dispMess ? "broadcasting-message selected" : "broadcasting-message"}
                             onClick={() => {
                                 this.props.history.push(messUrl);
                             }}/>
@@ -143,7 +146,7 @@ class BotBroadcastingDetail extends Component {
     }
 
     render() {
-        const channelsList = this.createMessagesList();
+        const messagesList = this.createMessagesList();
         const {intl} = this.props;
         const message = Number(this.props.match.params.messageId)
             ? this.state.messageList[Number(this.props.match.params.messageId)]
@@ -157,7 +160,7 @@ class BotBroadcastingDetail extends Component {
                             disabled={this.state.ajaxRefreshProcess}
                             onClick={this.refreshMessageList}/>
                 </div>
-                {channelsList}
+                {messagesList}
                 <div className="bot-broadcasting_elements-container_element">
                     <Button label={intl.formatMessage({id: 'app.dialog.append'})} icon='pi pi-plus'
                             onClick={this.onAddMessage}/>
