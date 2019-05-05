@@ -9,7 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import chat.tamtam.bot.TestContext;
-import chat.tamtam.bot.domain.bot.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
 import chat.tamtam.bot.repository.BotSchemeRepository;
 
@@ -28,7 +28,7 @@ class BotSchemeServiceTest extends TestContext {
     @MockBean
     private UserService userService;
     @MockBean
-    private BotSchemeRepository botSchemaRepository;
+    private BotSchemeRepository botSchemeRepository;
 
     @BeforeEach
     void setUp() {
@@ -37,8 +37,8 @@ class BotSchemeServiceTest extends TestContext {
 
     @Test
     void getBot() {
-        when(botSchemaRepository.findByUserIdAndId(eq(USER_ID), eq(BOT_SCHEME_ID))).thenReturn(BOT_SCHEME_ENTITY);
-        BotSchemeEntity bot = botSchemeService.getBotScheme(AUTH_TOKEN, BOT_SCHEME_ID);
+        when(botSchemeRepository.findByUserIdAndId(eq(USER_ID), eq(BOT_SCHEME_ID))).thenReturn(BOT_SCHEME_ENTITY);
+        BotScheme bot = botSchemeService.getBotScheme(AUTH_TOKEN, BOT_SCHEME_ID);
         assertNotNull(bot, "BotScheme entity must be return");
         assertEquals(USER_ID, bot.getUserId(), "User id must be set");
         assertEquals(BOT_NAME, bot.getName(), "BotScheme name must be set");
@@ -46,7 +46,7 @@ class BotSchemeServiceTest extends TestContext {
 
     @Test
     void getNullBot() {
-        when(botSchemaRepository.findByUserIdAndId(eq(USER_ID), eq(BOT_SCHEME_ID))).thenReturn(null);
+        when(botSchemeRepository.findByUserIdAndId(eq(USER_ID), eq(BOT_SCHEME_ID))).thenReturn(null);
         assertThrows(NotFoundEntityException.class, () -> botSchemeService.getBotScheme(AUTH_TOKEN, BOT_SCHEME_ID));
     }
 }

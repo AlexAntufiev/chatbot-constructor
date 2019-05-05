@@ -6,7 +6,7 @@ import java.time.ZonedDateTime;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
+import chat.tamtam.bot.domain.broadcast.message.BroadcastMessage;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
 import chat.tamtam.bot.domain.exception.UpdateBroadcastMessageException;
@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public final class CreatedStateAction extends BroadcastMessageStateAction {
     @Override
     protected void setText(
-            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessage broadcastMessage,
             final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
         applyTextUpdate(broadcastMessage, broadcastMessageUpdate);
@@ -26,7 +26,7 @@ public final class CreatedStateAction extends BroadcastMessageStateAction {
 
     @Override
     public void doAction(
-            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessage broadcastMessage,
             final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
         updateText(broadcastMessage, broadcastMessageUpdate);

@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @NoArgsConstructor
-@Table(name = "WebHookBotContext")
+@Table
 public class BotContext {
     @EmbeddedId
     private Id id;

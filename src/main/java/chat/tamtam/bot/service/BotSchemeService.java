@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 
 import chat.tamtam.bot.configuration.logging.Loggable;
-import chat.tamtam.bot.domain.bot.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
 import chat.tamtam.bot.domain.response.SuccessResponse;
@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class BotSchemeService {
-    private final @NonNull BotSchemeRepository botSchemaRepository;
+    private final @NonNull BotSchemeRepository botSchemeRepository;
     private final @NonNull TamBotRepository tamBotRepository;
 
     private final @NonNull UserService userService;
@@ -28,32 +28,32 @@ public class BotSchemeService {
     private final @NonNull TransactionalUtils transactionalUtils;
 
     @Loggable
-    public BotSchemeEntity addBot(final BotSchemeEntity bot, Long userId) throws IllegalArgumentException {
+    public BotScheme addBot(final BotScheme bot, Long userId) throws IllegalArgumentException {
         if (bot.getName().isEmpty() || bot.getId() != null) {
             throw new IllegalArgumentException("Invalid bot entity " + bot);
         }
         bot.setUserId(userId);
-        return botSchemaRepository.save(bot);
+        return botSchemeRepository.save(bot);
     }
 
     @Loggable
-    public BotSchemeEntity saveBot(
-            final BotSchemeEntity bot,
+    public BotScheme saveBot(
+            final BotScheme bot,
             Long userId,
             Integer id
     ) throws NoSuchElementException {
-        if (!botSchemaRepository.existsByUserIdAndId(userId, id)) {
+        if (!botSchemeRepository.existsByUserIdAndId(userId, id)) {
             throw new NoSuchElementException("Does not exist bot with userId=" + userId + " and id=" + id);
         }
         bot.setUserId(userId);
         bot.setId(id);
-        return botSchemaRepository.save(bot);
+        return botSchemeRepository.save(bot);
     }
 
     @Loggable
-    public BotSchemeEntity getBotScheme(String authToken, int botSchemeId) throws NotFoundEntityException {
+    public BotScheme getBotScheme(String authToken, int botSchemeId) throws NotFoundEntityException {
         Long userId = userService.getUserIdByToken(authToken);
-        BotSchemeEntity bot = botSchemaRepository.findByUserIdAndId(userId, botSchemeId);
+        BotScheme bot = botSchemeRepository.findByUserIdAndId(userId, botSchemeId);
         if (bot == null) {
             throw new NotFoundEntityException("Does not exist bot with userId=" + userId + " and id=" + botSchemeId);
         } else {
@@ -63,10 +63,10 @@ public class BotSchemeService {
 
     @Loggable
     public void deleteByUserIdAndId(Long userId, Integer id) throws NoSuchElementException {
-        if (!botSchemaRepository.existsByUserIdAndId(userId, id)) {
+        if (!botSchemeRepository.existsByUserIdAndId(userId, id)) {
             throw new NoSuchElementException("Does not exist bot with userId=" + userId + " and id=" + id);
         }
-        botSchemaRepository.deleteByUserIdAndId(userId, id);
+        botSchemeRepository.deleteByUserIdAndId(userId, id);
     }
 
     @Loggable
@@ -74,7 +74,7 @@ public class BotSchemeService {
             final String authToken,
             final int botSchemeId
     ) {
-        BotSchemeEntity botScheme = getBotScheme(authToken, botSchemeId);
+        BotScheme botScheme = getBotScheme(authToken, botSchemeId);
         transactionalUtils.invokeRunnable(() -> {
             if (botScheme.getBotId() != null) {
                 TamBotEntity tamBot = tamBotRepository.findById(
@@ -84,13 +84,13 @@ public class BotSchemeService {
                     tamBotRepository.deleteById(tamBot.getId());
                 }
             }
-            botSchemaRepository.deleteByUserIdAndId(botScheme.getUserId(), botScheme.getId());
+            botSchemeRepository.deleteByUserIdAndId(botScheme.getUserId(), botScheme.getId());
         });
         return new SuccessResponse();
     }
 
     @Loggable
-    public SuccessResponseWrapper<List<BotSchemeEntity>> getList(final Long userId) {
-        return new SuccessResponseWrapper<>(botSchemaRepository.findAllByUserId(userId));
+    public SuccessResponseWrapper<List<BotScheme>> getList(final Long userId) {
+        return new SuccessResponseWrapper<>(botSchemeRepository.findAllByUserId(userId));
     }
 }

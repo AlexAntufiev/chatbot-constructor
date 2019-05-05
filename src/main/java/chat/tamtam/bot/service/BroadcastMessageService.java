@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import chat.tamtam.bot.configuration.logging.Loggable;
-import chat.tamtam.bot.domain.bot.BotSchemeEntity;
+import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
-import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
+import chat.tamtam.bot.domain.broadcast.message.BroadcastMessage;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
 import chat.tamtam.bot.domain.broadcast.message.action.CreatedStateAction;
@@ -54,14 +54,14 @@ public class BroadcastMessageService {
     private final SentStateAction sentStateAction;
 
     @Loggable
-    public BroadcastMessageEntity getBroadcastMessage(
-            final BotSchemeEntity botScheme,
+    public BroadcastMessage getBroadcastMessage(
+            final BotScheme botScheme,
             final TamBotEntity tamBot,
             final Long chatChannelId,
             final Long broadcastMessageId
     ) {
         ChatChannelEntity chatChannel = chatChannelService.getChatChannel(botScheme, tamBot, chatChannelId);
-        BroadcastMessageEntity broadcastMessage =
+        BroadcastMessage broadcastMessage =
                 broadcastMessageRepository
                         .findByBotSchemeIdAndTamBotIdAndChatChannelIdAndIdAndStateIsNotIn(
                                 botScheme.getId(),
@@ -94,9 +94,9 @@ public class BroadcastMessageService {
             long chatChannelId,
             long broadcastMessageId
     ) {
-        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
-        BroadcastMessageEntity broadcastMessage = getBroadcastMessage(
+        BroadcastMessage broadcastMessage = getBroadcastMessage(
                 botScheme,
                 tamBot,
                 chatChannelId,
@@ -111,10 +111,10 @@ public class BroadcastMessageService {
             int botSchemeId,
             long chatChannelId
     ) {
-        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
         ChatChannelEntity chatChannel = chatChannelService.getChatChannel(botScheme, tamBot, chatChannelId);
-        List<BroadcastMessageEntity> broadcastMessages =
+        List<BroadcastMessage> broadcastMessages =
                 broadcastMessageRepository
                         .findAllByBotSchemeIdAndTamBotIdAndChatChannelIdAndStateIsNotIn(
                                 botScheme.getId(),
@@ -132,7 +132,7 @@ public class BroadcastMessageService {
             long chatChannelId,
             long broadcastMessageId
     ) {
-        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
         return new SuccessResponseWrapper<>(
                 transactionalUtils.invokeCallable(
@@ -147,12 +147,12 @@ public class BroadcastMessageService {
         );
     }
 
-    private BroadcastMessageEntity setBroadcastMessageStateAttempt(
-            Supplier<BroadcastMessageEntity> broadcastMessageSupplier,
-            Predicate<BroadcastMessageEntity> broadcastMessagePredicate,
+    private BroadcastMessage setBroadcastMessageStateAttempt(
+            Supplier<BroadcastMessage> broadcastMessageSupplier,
+            Predicate<BroadcastMessage> broadcastMessagePredicate,
             final BroadcastMessageState targetState
     ) {
-        BroadcastMessageEntity broadcastMessage = broadcastMessageSupplier.get();
+        BroadcastMessage broadcastMessage = broadcastMessageSupplier.get();
 
         if (broadcastMessagePredicate.test(broadcastMessage)
         ) {
@@ -179,9 +179,9 @@ public class BroadcastMessageService {
             long messageId,
             final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
-        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBotEntity = tamBotService.getTamBot(botScheme);
-        BroadcastMessageEntity broadcastMessage =
+        BroadcastMessage broadcastMessage =
                 getBroadcastMessage(
                         botScheme,
                         tamBotEntity,
@@ -195,11 +195,11 @@ public class BroadcastMessageService {
         );
     }
 
-    private BroadcastMessageEntity updateMessageAttempt(
+    private BroadcastMessage updateMessageAttempt(
             final BroadcastMessageUpdate broadcastMessageUpdate,
             long messageId
     ) {
-        BroadcastMessageEntity broadcastMessage =
+        BroadcastMessage broadcastMessage =
                 broadcastMessageRepository
                         .findById(messageId)
                         .orElseThrow(
@@ -267,8 +267,8 @@ public class BroadcastMessageService {
                     Error.BROADCAST_MESSAGE_TITLE_IS_EMPTY
             );
         }
-        BroadcastMessageEntity broadcastMessage = new BroadcastMessageEntity();
-        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        BroadcastMessage broadcastMessage = new BroadcastMessage();
+        BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
         ChatChannelEntity chatChannel = chatChannelService.getChatChannel(botScheme, tamBot, chatChannelId);
         broadcastMessage.setBotSchemeId(botScheme.getId());
@@ -287,10 +287,10 @@ public class BroadcastMessageService {
             final long broadcastMessageId,
             final BroadcastMessageAttachmentUpdate broadcastMessageAttachmentUpdate
     ) {
-        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
         return (SuccessResponse) transactionalUtils.invokeCallable(() -> {
-            BroadcastMessageEntity broadcastMessage =
+            BroadcastMessage broadcastMessage =
                     getBroadcastMessage(botScheme, tamBot, chatChannelId, broadcastMessageId);
             BroadcastMessageState state = BroadcastMessageState.getById(broadcastMessage.getState());
             if (!BroadcastMessageState.isAttachmentUpdatable(state)) {
@@ -343,10 +343,10 @@ public class BroadcastMessageService {
             final long broadcastMessageId,
             final long attachmentId
     ) {
-        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
         transactionalUtils.invokeRunnable(() -> {
-            BroadcastMessageEntity broadcastMessage =
+            BroadcastMessage broadcastMessage =
                     getBroadcastMessage(botScheme, tamBot, chatChannelId, broadcastMessageId);
             BroadcastMessageState state = BroadcastMessageState.getById(broadcastMessage.getState());
 
@@ -404,9 +404,9 @@ public class BroadcastMessageService {
             final long chatChannelId,
             final long broadcastMessageId
     ) {
-        BotSchemeEntity botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+        BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         TamBotEntity tamBot = tamBotService.getTamBot(botScheme);
-        BroadcastMessageEntity broadcastMessage =
+        BroadcastMessage broadcastMessage =
                 getBroadcastMessage(botScheme, tamBot, chatChannelId, broadcastMessageId);
         return new SuccessResponseWrapper<>(
                 broadcastMessageAttachmentRepository.findAllByBroadcastMessageId(broadcastMessageId)

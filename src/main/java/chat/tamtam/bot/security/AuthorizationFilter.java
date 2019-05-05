@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.auth0.jwt.JWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import chat.tamtam.bot.domain.session.SessionEntity;
+import chat.tamtam.bot.domain.session.Session;
 import chat.tamtam.bot.domain.user.UserAuthEntity;
 import chat.tamtam.bot.domain.user.UserAuthorizedEntity;
 import chat.tamtam.bot.domain.user.UserEntity;
@@ -81,7 +81,7 @@ public class AuthorizationFilter extends UsernamePasswordAuthenticationFilter {
                 .withExpiresAt(expireDate)
                 .sign(HMAC512(SECRET.getBytes()));
         UserEntity user = userRepository.findByLogin(principal.getUsername());
-        sessionRepository.save(new SessionEntity(token, user.getId(), user.getLogin(), expireDate));
+        sessionRepository.save(new Session(token, user.getId(), user.getLogin(), expireDate));
         response.addHeader(HttpHeaders.AUTHORIZATION, token);
         response
                 .getWriter()

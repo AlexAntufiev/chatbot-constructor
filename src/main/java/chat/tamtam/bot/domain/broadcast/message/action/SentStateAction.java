@@ -4,7 +4,7 @@ import java.time.Instant;
 
 import org.springframework.stereotype.Component;
 
-import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
+import chat.tamtam.bot.domain.broadcast.message.BroadcastMessage;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageState;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
 import chat.tamtam.bot.service.Error;
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public final class SentStateAction extends BroadcastMessageStateAction {
     @Override
     protected void setText(
-            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessage broadcastMessage,
             final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
         rejectTextUpdate(broadcastMessage, broadcastMessageUpdate);
@@ -23,7 +23,7 @@ public final class SentStateAction extends BroadcastMessageStateAction {
 
     @Override
     public void doAction(
-            final BroadcastMessageEntity broadcastMessage,
+            final BroadcastMessage broadcastMessage,
             final BroadcastMessageUpdate broadcastMessageUpdate
     ) {
         updateText(broadcastMessage, broadcastMessageUpdate);

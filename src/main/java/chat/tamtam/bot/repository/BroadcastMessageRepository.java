@@ -9,11 +9,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageEntity;
+import chat.tamtam.bot.domain.broadcast.message.BroadcastMessage;
 
 @Repository
-public interface BroadcastMessageRepository extends CrudRepository<BroadcastMessageEntity, Long> {
-    BroadcastMessageEntity findByBotSchemeIdAndTamBotIdAndChatChannelIdAndIdAndStateIsNotIn(
+public interface BroadcastMessageRepository extends CrudRepository<BroadcastMessage, Long> {
+    BroadcastMessage findByBotSchemeIdAndTamBotIdAndChatChannelIdAndIdAndStateIsNotIn(
             int botSchemeId,
             long tamBotId,
             long chatChannelId,
@@ -21,7 +21,7 @@ public interface BroadcastMessageRepository extends CrudRepository<BroadcastMess
             Collection<Byte> excludedStates
     );
 
-    List<BroadcastMessageEntity> findAllByBotSchemeIdAndTamBotIdAndChatChannelIdAndStateIsNotIn(
+    List<BroadcastMessage> findAllByBotSchemeIdAndTamBotIdAndChatChannelIdAndStateIsNotIn(
             int botSchemeId,
             long tamBotId,
             long chatChannelId,
@@ -43,7 +43,7 @@ public interface BroadcastMessageRepository extends CrudRepository<BroadcastMess
             long messageId
     );
 
-    List<BroadcastMessageEntity> findAllByFiringTimeBeforeAndState(Instant instant, byte state);
+    List<BroadcastMessage> findAllByFiringTimeBeforeAndState(Instant instant, byte state);
 
-    List<BroadcastMessageEntity> findAllByErasingTimeBeforeAndState(Instant instant, byte state);
+    List<BroadcastMessage> findAllByErasingTimeBeforeAndState(Instant instant, byte state);
 }

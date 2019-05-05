@@ -21,7 +21,7 @@ import chat.tamtam.bot.converter.EnabledIds;
 import chat.tamtam.bot.converter.EnabledIdsConverter;
 import chat.tamtam.bot.custom.bot.AbstractCustomBot;
 import chat.tamtam.bot.custom.bot.BotType;
-import chat.tamtam.bot.domain.session.SessionEntity;
+import chat.tamtam.bot.domain.session.Session;
 import chat.tamtam.bot.domain.user.UserEntity;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.repository.UserRepository;
@@ -271,14 +271,14 @@ public class RegistrationBot extends AbstractCustomBot {
                 + JWT.create()
                         .withExpiresAt(new Date())
                         .sign(HMAC512(SECRET.getBytes()));
-        SessionEntity sessionEntity =
-                new SessionEntity(
+        Session session =
+                new Session(
                         tempAccessToken,
                         user.getId(),
                         user.getLogin(),
                         new Date(System.currentTimeMillis() + EXPIRATION_TIME)
                 );
-        sessionRepository.save(sessionEntity);
+        sessionRepository.save(session);
         String tempAccessUrl = host + "/?" + SecurityConstants.AUTO_LOGIN_TEMP_ACCESS_TOKEN + "=" + tempAccessToken;
         LinkButton button = new LinkButton(tempAccessUrl, "sign in", Intent.DEFAULT);
         return new InlineKeyboardAttachmentRequest(

@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import chat.tamtam.bot.domain.builder.button.ButtonsGroupUpdate;
-import chat.tamtam.bot.domain.builder.validator.Validator;
+import chat.tamtam.bot.domain.builder.validator.ComponentValidator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ComponentUpdate {
-    private Component component;
-    private List<Validator> validators = Collections.emptyList();
+    private BuilderComponent builderComponent;
+    private List<ComponentValidator> componentValidators = Collections.emptyList();
     private ButtonsGroupUpdate buttonsGroup;
 }
