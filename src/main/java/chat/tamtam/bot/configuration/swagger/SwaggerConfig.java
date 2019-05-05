@@ -24,7 +24,7 @@ public class SwaggerConfig {
             "/swagger-ui.html",
             "/webjars/**"
     };
-    private static final String BASE_PACKAGE = "chatChannel.tamtam.bot";
+    private static final String BASE_PACKAGE = "chat.tamtam.bot";
 
     @Bean
     public Docket api() {
