@@ -29,7 +29,7 @@ import lombok.Setter;
 @Table
 public class BroadcastMessageAttachment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
     @Setter(value = AccessLevel.NONE)
