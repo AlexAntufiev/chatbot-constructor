@@ -57,11 +57,14 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class Hockey2019Bot extends AbstractCustomBot {
 
-    private static final String INFO_MESSAGE = "Чемпионат мира\uD83C\uDFC6\uD83C\uDF0D по хоккею\uD83C\uDFD2 стартует в 83 раз.\n" +
-            "Местом его проведения была выбрана Словакия\uD83C\uDDF8\uD83C\uDDF0 (города Братислава и Кошица).\n" +
-            "Соревнование начнется 10 мая и продлиться до 26 мая\uD83D\uDCC5.\n" +
-            "В этом году чемпионский титул будет защищать сборная Швеции\uD83C\uDDF8\uD83C\uDDEA.\n" +
-            "Впервые с 1994 года на чемпионате мира выступит сборная Великобритании\uD83C\uDDEC\uD83C\uDDE7.";
+    // CHECKSTYLE_OFF: ALMOST_ALL
+    private static final String INFO_MESSAGE =
+            "Чемпионат мира\uD83C\uDFC6\uD83C\uDF0D по хоккею\uD83C\uDFD2 стартует в 83 раз.\n"
+            + "Местом его проведения была выбрана Словакия\uD83C\uDDF8\uD83C\uDDF0 (города Братислава и Кошица).\n"
+            + "Соревнование начнется 10 мая и продлиться до 26 мая\uD83D\uDCC5.\n"
+            + "В этом году чемпионский титул будет защищать сборная Швеции\uD83C\uDDF8\uD83C\uDDEA.\n"
+            + "Впервые с 1994 года на чемпионате мира выступит сборная Великобритании\uD83C\uDDEC\uD83C\uDDE7.";
+    // CHECKSTYLE_OFF: ALMOST_ALL
     private static final String HELLO_MESSAGE = "Чемпионат мира по хоккею 2019";
     private static final String INFO = "/инфо";
     private static final String NEWS = "/новости";
@@ -80,8 +83,8 @@ public class Hockey2019Bot extends AbstractCustomBot {
             RESULTS,
             MATCH
     );
-    private static final Stream<NewMessageBody> teams;
-    private static final NewMessageBody helpMessage;
+    private static final Stream<NewMessageBody> TEAMS;
+    private static final NewMessageBody HELP_MESSAGE_BODY;
 
     private final @NonNull Hockey2019Service hockey2019Service;
     private final @NonNull Environment environment;
@@ -102,15 +105,16 @@ public class Hockey2019Bot extends AbstractCustomBot {
     private Hockey2019BotVisitor hockey2019BotVisitor;
 
     static {
-        teams = Stream.of(messageOf(
+        TEAMS = Stream.of(messageOf(
                 "Выбери команду",
-                List.of(new InlineKeyboardAttachmentRequest(new InlineKeyboardAttachmentRequestPayload(Stream.of(Team.values())
+                List.of(new InlineKeyboardAttachmentRequest(new InlineKeyboardAttachmentRequestPayload(
+                        Stream.of(Team.values())
                         .map(team -> new ArrayList<Button>() {{
                             add(new CallbackButton(team.getName(), team.getName(), Intent.DEFAULT));
                         }})
                         .collect(Collectors.toList()))))
         ));
-        helpMessage = messageOf(HELP_MESSAGE);
+        HELP_MESSAGE_BODY = messageOf(HELP_MESSAGE);
     }
 
     @PostConstruct
@@ -178,7 +182,7 @@ public class Hockey2019Bot extends AbstractCustomBot {
             case NEWS:
                 return news();
             case TEAM_NEWS:
-                return teams;
+                return TEAMS;
             case CALENDAR:
                 return calendar();
             case RESULTS:
@@ -187,7 +191,7 @@ public class Hockey2019Bot extends AbstractCustomBot {
                 // @todo ##CC-173 implement match of id function
                 return match(1);
             default:
-                return Stream.of(helpMessage);
+                return Stream.of(HELP_MESSAGE_BODY);
         }
     }
 
