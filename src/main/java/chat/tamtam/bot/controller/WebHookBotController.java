@@ -1,8 +1,11 @@
 package chat.tamtam.bot.controller;
 
-import org.springframework.http.HttpStatus;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,16 +27,25 @@ public class WebHookBotController {
     private final WebHookBotService webHookBotService;
 
     @PostMapping(Endpoint.ID)
-    public ResponseEntity<?> webHookMessage(
+    public void webHookMessage(
             @PathVariable("id") final int botId,
-            @RequestBody final Update update
+            @RequestBody final Update update,
+            final HttpServletResponse response
     ) {
         try {
+            PrintWriter writer = response.getWriter();
+            writer.write(HttpServletResponse.SC_OK);
+            writer.flush();
+            writer.close();
             webHookBotService.submit(botId, update);
-        } catch (RuntimeException e) {
-            //log
-        } finally {
-            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (IOException e) {
+            log.error(
+                    String.format(
+                            "Response to bot webhook produced exception(botSchemeId=%d, update=%s)",
+                            botId, update
+                    ),
+                    e
+            );
         }
     }
 }

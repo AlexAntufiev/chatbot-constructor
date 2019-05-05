@@ -51,7 +51,7 @@ public class WebHookBotService {
 
     private final HazelcastInstance hazelcastInstance;
     private IMap<Byte[], Object> botContextLockMap;
-    private final String BOT_CONTEXT_LOCK_MAP = "bot-context-lock-map";
+    private final static String BOT_CONTEXT_LOCK_MAP = "bot-context-lock-map";
 
     @PostConstruct
     public void initLockMap() {
@@ -69,12 +69,10 @@ public class WebHookBotService {
 
     @RequiredArgsConstructor
     private class WebHookBotVisitor implements Update.Visitor {
-        // @todo @CC-141 Implement kind of lock that depends on userId and botId
         private final int botSchemeId;
         private Byte[] botContextLockKey;
 
         private void execute(final BotContext context, final Update update) {
-            System.out.println("EXECUTION " + Thread.currentThread());
             Component component =
                     componentRepository
                             .findById(context.getState())
@@ -155,15 +153,10 @@ public class WebHookBotService {
         }
 
         private BotContext getContext(final long userId) {
-            BotContext context = botContextRepository
+            return botContextRepository
                     .findByIdUserIdAndIdBotSchemeId(userId, botSchemeId)
+                    .filter(context -> context.getState() != null)
                     .orElseGet(() -> initContext(userId));
-            if (context.getState() == null) {
-                throw new IllegalStateException(
-                        String.format("Context state is null(userId=%d, botSchemeId=%d)", userId, botSchemeId)
-                );
-            }
-            return context;
         }
 
         @Override
