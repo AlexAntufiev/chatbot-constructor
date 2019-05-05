@@ -1,4 +1,4 @@
-package chat.tamtam.bot.configuration.hazelcast;
+package chat.tamtam.bot.configuration.distribution;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
