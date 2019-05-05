@@ -46,7 +46,12 @@ export function handleMultiplyRequests(request, callbackSuccess, callbackFail, c
                 result.data = {
                     payload: result.data
                 };
-                result.data.success = result.status === 200;
+                if (result.status === 200) {
+                    result.data.success = true;
+                } else {
+                    result.data.success = false;
+                    result.data.error = "app.errormessage.serverwrongresponse";
+                }
             }
 
             if (!result.data.success) {
