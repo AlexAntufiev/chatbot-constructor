@@ -7,9 +7,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import chat.tamtam.bot.domain.builder.button.ButtonPayload;
-import chat.tamtam.bot.domain.builder.component.Component;
 import chat.tamtam.bot.domain.builder.component.ComponentType;
-import chat.tamtam.bot.domain.builder.validator.Validator;
+import chat.tamtam.bot.domain.builder.component.SchemeComponent;
+import chat.tamtam.bot.domain.builder.validator.ComponentValidator;
 import chat.tamtam.bot.domain.builder.validator.ValidatorType;
 import chat.tamtam.bot.domain.builder.validator.wrapper.EqualTextValidatorWrapper;
 import chat.tamtam.bot.domain.webhook.BotContext;
@@ -40,37 +40,37 @@ public class ComponentProcessorService {
     private final ComponentRepository componentRepository;
 
     /*
-     * Process component with type INFO
+     * Process builderComponent with type INFO
      * */
     public void process(
             final BotContext context,
-            final Component component,
+            final SchemeComponent schemeComponent,
             final TamTamBotAPI api
     ) {
         try {
             SendMessageResult result =
                     api.sendMessage(
                             new NewMessageBody(
-                                    component.getText(),
-                                    getAttachments(component.getId(), true)
+                                    schemeComponent.getText(),
+                                    getAttachments(schemeComponent.getId(), true)
                             )
                     ).userId(context.getId().getUserId())
                             .execute();
-            if (component.isHasCallbacks()) {
+            if (schemeComponent.isHasCallbacks()) {
                 final String mid = result.getMessage().getBody().getMid();
                 context.setPendingMessage(
                         ByteBuffer.allocate(Long.BYTES + mid.length())
-                                .putLong(component.getId())
+                                .putLong(schemeComponent.getId())
                                 .put(mid.getBytes())
                                 .array()
                 );
             }
-            context.setState(component.getNextState());
+            context.setState(schemeComponent.getNextState());
         } catch (APIException | ClientException e) {
             log.error(
                     String.format(
                             "Message sending produced exception(%s, %s, %s)",
-                            context, component, api
+                            context, schemeComponent, api
                     ),
                     e
             );
@@ -95,23 +95,23 @@ public class ComponentProcessorService {
     }
 
     /*
-     * Process component with type INPUT on MessageCreatedUpdate
+     * Process builderComponent with type INPUT on MessageCreatedUpdate
      * */
     public void process(
             final MessageCreatedUpdate update,
             final BotContext context,
-            final Component component,
+            final SchemeComponent schemeComponent,
             final TamTamBotAPI api
     ) {
         // update pending message
         updatePendingMessage(context, api);
 
-        Iterable<Validator> validators = validatorRepository.findAllByComponentId(component.getId());
-        for (Validator validator
+        Iterable<ComponentValidator> validators = validatorRepository.findAllByComponentId(schemeComponent.getId());
+        for (ComponentValidator componentValidator
                 : validators) {
-            switch (ValidatorType.getById(validator.getType())) {
+            switch (ValidatorType.getById(componentValidator.getType())) {
                 case EQUAL_TEXT:
-                    EqualTextValidatorWrapper validatorWrapper = new EqualTextValidatorWrapper(validator);
+                    EqualTextValidatorWrapper validatorWrapper = new EqualTextValidatorWrapper(componentValidator);
                     if (!validatorWrapper.validate(update, context)) {
                         return;
                     }
@@ -120,16 +120,16 @@ public class ComponentProcessorService {
                     break;
             }
         }
-        context.setState(component.getNextState());
+        context.setState(schemeComponent.getNextState());
     }
 
     /*
-     * Process component with type INPUT on MessageCallbackUpdate
+     * Process builderComponent with type INPUT on MessageCallbackUpdate
      * */
     public void process(
             final MessageCallbackUpdate update,
             final BotContext context,
-            final Component component,
+            final SchemeComponent schemeComponent,
             final TamTamBotAPI api
     ) {
         try {
@@ -137,9 +137,9 @@ public class ComponentProcessorService {
             componentRepository.findById(payload.getNextState())
                     .ifPresentOrElse(
                             foundComponent -> {
-                                // check type of next component
+                                // check type of next builderComponent
                                 if (ComponentType.getById(foundComponent.getType()) == ComponentType.INFO) {
-                                    // answer on callback with next component
+                                    // answer on callback with next builderComponent
                                     final boolean success =
                                             answerOnCallback(
                                                     new CallbackAnswer()
@@ -193,7 +193,7 @@ public class ComponentProcessorService {
             log.error(
                     String.format(
                             "MessageCallback processing produced exception(%s, %s, %s, %s)",
-                            update, context, component, api
+                            update, context, schemeComponent, api
                     ),
                     e
             );

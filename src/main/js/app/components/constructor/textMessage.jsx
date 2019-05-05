@@ -104,8 +104,8 @@ class TextMessage extends React.Component {
                         AxiosMessages.successOperation(this, 'app.broadcastmessage.saved');
                         this.props.updateMessageList(res.data.payload);
                     };
-                    uploadSuccessCallback = uploadSuccessCallback.bind(this);
-                    this.attachments.getWrappedInstance().saveAttachments(uploadSuccessCallback);
+
+                    this.attachments.getWrappedInstance().saveAttachments(uploadSuccessCallback, () => this.setState({ajaxUpdateProcess: false}));
                 }
             },
             () => {

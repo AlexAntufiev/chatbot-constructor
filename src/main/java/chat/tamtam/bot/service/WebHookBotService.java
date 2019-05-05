@@ -1,15 +1,22 @@
 package chat.tamtam.bot.service;
 
+import java.nio.ByteBuffer;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import chat.tamtam.bot.domain.bot.BotSchemeEntity;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
+
+import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
-import chat.tamtam.bot.domain.builder.component.Component;
 import chat.tamtam.bot.domain.builder.component.ComponentType;
+import chat.tamtam.bot.domain.builder.component.SchemeComponent;
 import chat.tamtam.bot.domain.webhook.BotContext;
 import chat.tamtam.bot.repository.BotContextRepository;
 import chat.tamtam.bot.repository.BotSchemeRepository;
@@ -36,11 +43,20 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class WebHookBotService {
     private final BotContextRepository botContextRepository;
-    private final BotSchemeRepository botSchemaRepository;
+    private final BotSchemeRepository botSchemeRepository;
     private final TamBotRepository tamBotRepository;
     private final ComponentRepository componentRepository;
 
     private final ComponentProcessorService componentProcessorService;
+
+    private final HazelcastInstance hazelcastInstance;
+    private IMap<Byte[], Object> botContextLockMap;
+    private static final String BOT_CONTEXT_LOCK_MAP = "bot-context-lock-map";
+
+    @PostConstruct
+    public void initLockMap() {
+        botContextLockMap = hazelcastInstance.getMap(BOT_CONTEXT_LOCK_MAP);
+    }
 
     public void submit(final int botSchemeId, final Update update) {
         try {
@@ -53,38 +69,38 @@ public class WebHookBotService {
 
     @RequiredArgsConstructor
     private class WebHookBotVisitor implements Update.Visitor {
-        // @todo @CC-141 Implement kind of lock that depends on userId and botId
         private final int botSchemeId;
+        private Byte[] botContextLockKey;
 
         private void execute(final BotContext context, final Update update) {
-            Component component =
+            SchemeComponent schemeComponent =
                     componentRepository
                             .findById(context.getState())
                             .orElseThrow(
                                     () -> new NoSuchElementException(
-                                            "Can't find component with id=" + context.getState()
+                                            "Can't find builderComponent with id=" + context.getState()
                                     )
                             );
 
-            TamTamBotAPI api = getTamTamBotAPI(component);
+            TamTamBotAPI api = getTamTamBotAPI(schemeComponent);
 
             while (true) {
-                switch (ComponentType.getById(component.getType())) {
+                switch (ComponentType.getById(schemeComponent.getType())) {
                     case INPUT:
                         if (update instanceof MessageCreatedUpdate) {
                             componentProcessorService
-                                    .process(((MessageCreatedUpdate) update), context, component, api);
+                                    .process(((MessageCreatedUpdate) update), context, schemeComponent, api);
                         }
                         if (update instanceof MessageCallbackUpdate) {
                             componentProcessorService
-                                    .process(((MessageCallbackUpdate) update), context, component, api);
+                                    .process(((MessageCallbackUpdate) update), context, schemeComponent, api);
                         }
                         botContextRepository.save(context);
                         break;
 
                     case INFO:
                         componentProcessorService
-                                .process(context, component, api);
+                                .process(context, schemeComponent, api);
                         botContextRepository.save(context);
                         break;
 
@@ -98,27 +114,27 @@ public class WebHookBotService {
                     break;
                 }
 
-                component =
+                schemeComponent =
                         componentRepository
                                 .findById(context.getState())
                                 .orElseThrow(
                                         () -> new NoSuchElementException(
-                                                "Can't find next component with id=" + context.getState()
+                                                "Can't find next builderComponent with id=" + context.getState()
                                         )
                                 );
-                if (ComponentType.getById(component.getType()) == ComponentType.INPUT) {
+                if (ComponentType.getById(schemeComponent.getType()) == ComponentType.INPUT) {
                     break;
                 }
             }
         }
 
-        private @NotNull TamTamBotAPI getTamTamBotAPI(Component component) {
-            BotSchemeEntity botScheme =
-                    botSchemaRepository
-                            .findById(component.getSchemeId())
+        private @NotNull TamTamBotAPI getTamTamBotAPI(SchemeComponent schemeComponent) {
+            BotScheme botScheme =
+                    botSchemeRepository
+                            .findById(schemeComponent.getSchemeId())
                             .orElseThrow(
                                     () -> new NoSuchElementException(
-                                            "Can't find botScheme with id=" + component.getSchemeId()
+                                            "Can't find botScheme with id=" + schemeComponent.getSchemeId()
                                     )
                             );
             TamBotEntity tamBot =
@@ -137,25 +153,32 @@ public class WebHookBotService {
         }
 
         private BotContext getContext(final long userId) {
-            BotContext context = botContextRepository
+            return botContextRepository
                     .findByIdUserIdAndIdBotSchemeId(userId, botSchemeId)
+                    .filter(context -> context.getState() != null)
                     .orElseGet(() -> initContext(userId));
-            if (context.getState() == null) {
-                throw new IllegalStateException(
-                        String.format("Context state is null(userId=%d, botSchemeId=%d)", userId, botSchemeId)
-                );
-            }
-            return context;
         }
 
         @Override
         public void visit(final MessageCreatedUpdate model) {
-            execute(getContext(model.getMessage().getSender().getUserId()), model);
+            setBotContextLockKey(model.getMessage().getSender().getUserId());
+            lock();
+            try {
+                execute(getContext(model.getMessage().getSender().getUserId()), model);
+            } finally {
+                unlock();
+            }
         }
 
         @Override
         public void visit(MessageCallbackUpdate model) {
-            execute(getContext(model.getCallback().getUser().getUserId()), model);
+            setBotContextLockKey(model.getCallback().getUser().getUserId());
+            lock();
+            try {
+                execute(getContext(model.getCallback().getUser().getUserId()), model);
+            } finally {
+                unlock();
+            }
         }
 
         @Override
@@ -195,12 +218,18 @@ public class WebHookBotService {
 
         @Override
         public void visit(BotStartedUpdate model) {
-            execute(initContext(model.getUserId()), model);
+            setBotContextLockKey(model.getUserId());
+            lock();
+            try {
+                execute(initContext(model.getUserId()), model);
+            } finally {
+                unlock();
+            }
         }
 
         private BotContext initContext(final long userId) {
-            BotSchemeEntity botScheme =
-                    botSchemaRepository.findById(botSchemeId)
+            BotScheme botScheme =
+                    botSchemeRepository.findById(botSchemeId)
                             .orElseThrow(
                                     () -> new NoSuchElementException("Can't find bot scheme with id=" + botSchemeId)
                             );
@@ -208,7 +237,7 @@ public class WebHookBotService {
             BotContext context = new BotContext();
 
             context.setId(new BotContext.Id(userId, botSchemeId));
-            context.setState(botScheme.getSchema());
+            context.setState(botScheme.getScheme());
 
             return botContextRepository.save(context);
         }
@@ -221,6 +250,25 @@ public class WebHookBotService {
         @Override
         public void visitDefault(Update model) {
 
+        }
+
+        private void lock() {
+            botContextLockMap.lock(botContextLockKey);
+        }
+
+        // must be called in finally section
+        private void unlock() {
+            botContextLockMap.unlock(botContextLockKey);
+        }
+
+        private void setBotContextLockKey(final long userId) {
+            byte[] bytes =
+                    ByteBuffer
+                            .allocate(Long.BYTES + Integer.BYTES)
+                            .putLong(userId)
+                            .putInt(botSchemeId)
+                            .array();
+            botContextLockKey = ArrayUtils.toObject(bytes);
         }
     }
 }
