@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import chat.tamtam.bot.domain.rss.RssFeedEntry;
+import chat.tamtam.bot.domain.broadcast.rss.RssFeedEntry;
 
 @Repository
 public interface RssFeedRepository extends CrudRepository<RssFeedEntry, Long> {

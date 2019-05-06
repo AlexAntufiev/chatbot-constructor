@@ -91,7 +91,7 @@ tamtam:
     bot:
       token: Iu9O0wVu2dtllKK8MV-Sw9gbFMkM8Z5cLYCTnl8PMGg
 #    feeds:
-#      - enabled: true
+#      - enabled: false
 #        channel: -70694478588716
 #        url: https://www.feedforall.com/blog-feed.xml
 #        format: title-link

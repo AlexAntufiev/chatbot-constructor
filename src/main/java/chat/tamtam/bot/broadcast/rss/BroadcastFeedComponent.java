@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -23,7 +22,7 @@ import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 
-import chat.tamtam.bot.domain.rss.RssFeedEntry;
+import chat.tamtam.bot.domain.broadcast.rss.RssFeedEntry;
 import chat.tamtam.bot.repository.RssFeedRepository;
 import chat.tamtam.bot.utils.TransactionalUtils;
 import chat.tamtam.botapi.TamTamBotAPI;
@@ -170,7 +169,6 @@ public class BroadcastFeedComponent {
                     Instant i2 = o2.getPublishedDate().toInstant();
                     return i1.isBefore(i2) ? -1 : i1.equals(i2) ? 0 : 1;
                 }))
-                .collect(Collectors.toList())
                 .forEach(entry -> feed.setInstant(sendMessage(entry, feed)));
     }
 

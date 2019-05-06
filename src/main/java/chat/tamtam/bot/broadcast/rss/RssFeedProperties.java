@@ -1,6 +1,6 @@
 package chat.tamtam.bot.broadcast.rss;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @ConfigurationProperties(prefix = "tamtam.rss")
 public class RssFeedProperties {
     private Bot bot;
-    private List<Feed> feeds = new ArrayList<>();
+    private List<Feed> feeds = Collections.emptyList();
 
     @Data
     @NoArgsConstructor

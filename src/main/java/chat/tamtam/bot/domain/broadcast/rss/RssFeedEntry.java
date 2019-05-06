@@ -1,4 +1,4 @@
-package chat.tamtam.bot.domain.rss;
+package chat.tamtam.bot.domain.broadcast.rss;
 
 import java.io.Serializable;
 import java.time.Instant;
