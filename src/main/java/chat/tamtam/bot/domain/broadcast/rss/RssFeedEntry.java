@@ -19,7 +19,6 @@ public class RssFeedEntry {
     @EmbeddedId
     private FeedId feedId;
     private Instant instant;
-    private Boolean enabled;
     private String format;
 
     @Data

@@ -22,7 +22,6 @@ public class RssFeedProperties {
     @Data
     @NoArgsConstructor
     public static class Feed {
-        private Boolean enabled;
         private Long channel;
         private String url;
         private String format;
