@@ -25,10 +25,19 @@ function send_message() {
 }
 
 function main() {
+
+    if [ "$server_type" != "test" ] && [ "$server_type" != "prod" ]; then
+        echo "Mode must be set and 'test' or 'prod'"
+        exit
+    fi
+
+    if [ -z "$host" ] && [ "$server_type" != "local" ]; then
+        echo "host must be set or be 'local'"
+        exit
+    fi
+
     send_message "${server_type} останавливается"
     docker stop ${application_name}
-    docker rm -f ${application_name}
-    docker image rm -f ${application_name}
     send_message "${server_type} остановлен"
 
     echo "Set profile to ${server_type}"
@@ -38,6 +47,7 @@ function main() {
 
     send_message "${server_type} запускается"
     docker run -d \
+               --restart=on-failure:5 \
                -p 80:8090 \
                -v ~/${application_name}/logs:/logs \
                --name ${application_name} \
@@ -45,9 +55,13 @@ function main() {
                --log-opt max-file=3 \
                ${application_name}
 
-    sleep 40
+
+    sleep 25
 
     send_message "${server_type} запущен: http://${host}/index.html \n managing config: http://${host}:${config_service_port}/ui/dc1/services"
+
+    docker image rm -f ${application_name}
+    rm -f ${application_name}.jar Dockerfile run.sh
 }
 
 main
