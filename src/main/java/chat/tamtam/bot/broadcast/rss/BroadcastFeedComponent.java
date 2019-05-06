@@ -186,8 +186,6 @@ public class BroadcastFeedComponent {
                                 .append(entry.getTitle())
                                 .append("\n")
                                 .append(entry.getLink())
-                                .append("\n")
-                                .append(entry.getPublishedDate())
                                 .toString(),
                         null
                 );
