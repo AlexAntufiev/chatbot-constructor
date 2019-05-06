@@ -148,7 +148,7 @@ public class BroadcastFeedComponent {
                                 log.error(String.format("Can't fetch rss feed(%s)", feed), e);
                             }
                         })));
-        // @todo #CC-212 Change execution flow(let's store tasks in database with markers(when task was started and current state)
+        // @todo #CC-212 Change execution flow - let's store tasks in database with markers
         futureList.forEach(this::get);
     }
 
