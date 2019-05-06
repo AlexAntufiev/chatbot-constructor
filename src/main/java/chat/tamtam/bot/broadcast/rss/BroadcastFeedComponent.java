@@ -53,12 +53,6 @@ public class BroadcastFeedComponent {
 
     private List<RssFeedProperties.Feed> enabledFeeds = new ArrayList<>();
 
-    @java.beans.ConstructorProperties( {
-            "broadcastFeedExecutor",
-            "properties",
-            "rssFeedRepository",
-            "transactionalUtils"
-    })
     public BroadcastFeedComponent(
             final ThreadPoolTaskExecutor broadcastFeedExecutor,
             final RssFeedProperties properties,
