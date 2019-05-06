@@ -51,7 +51,7 @@ public class BroadcastFeedComponent {
 
     private TamTamBotAPI api;
 
-    private List<RssFeedProperties.Feed> enabledFeeds = new ArrayList<>();
+    private List<RssFeedProperties.Feed> enabledFeeds;
 
     public BroadcastFeedComponent(
             final ThreadPoolTaskExecutor broadcastFeedExecutor,
