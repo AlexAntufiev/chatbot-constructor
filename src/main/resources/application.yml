@@ -5,6 +5,8 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
+        jdbc:
+          time_zone: UTC
         dialect: org.hibernate.dialect.PostgreSQL95Dialect
         show-sql: false
         format_sql: false
@@ -81,3 +83,15 @@ tamtam:
     executor:
       corePoolSize: 2
       maxPoolSize: 4
+  rss:
+    enabled: true
+    executor:
+      corePoolSize: 2
+      maxPoolSize: 4
+    bot:
+      token: Iu9O0wVu2dtllKK8MV-Sw9gbFMkM8Z5cLYCTnl8PMGg
+#    feeds:
+#      - enabled: true
+#        channel: -70694478588716
+#        url: https://www.feedforall.com/blog-feed.xml
+#        format: title-link
