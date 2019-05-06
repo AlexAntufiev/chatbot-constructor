@@ -1,4 +1,4 @@
-package chat.tamtam.bot.configuration.scheduler;
+package chat.tamtam.bot.broadcast.message;
 
 import java.nio.ByteBuffer;
 import java.time.Instant;
@@ -52,7 +52,7 @@ import lombok.extern.log4j.Log4j2;
 )
 @RequiredArgsConstructor
 @RefreshScope
-public class BroadcastMessageScheduler {
+public class BroadcastMessageComponent {
     private static final long DEFAULT_SENDING_RATE = 10_000L;
     private static final long DEFAULT_ERASING_RATE = 10_000L;
 

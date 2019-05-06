@@ -46,6 +46,9 @@ dependencies {
     implementation 'org.springframework.security:spring-security-messaging:5.1.5.RELEASE'
     implementation 'com.hazelcast:hazelcast:3.12'
     implementation 'com.hazelcast:hazelcast-spring:3.12'
+    implementation 'org.springframework.boot:spring-boot-configuration-processor:2.1.4.RELEASE'
+    implementation 'com.rometools:rome:1.12.0'
+
 
 
     implementation 'org.jetbrains:annotations:16.0.3'
