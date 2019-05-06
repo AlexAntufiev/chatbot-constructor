@@ -11,7 +11,5 @@ import chat.tamtam.bot.domain.broadcast.rss.RssFeedEntry;
 public interface RssFeedRepository extends CrudRepository<RssFeedEntry, Long> {
     Optional<RssFeedEntry> findByFeedIdChannelIdAndFeedIdUrl(Long channelId, String url);
 
-    Optional<RssFeedEntry> findByFeedIdChannelIdAndFeedIdUrlAndEnabled(Long channelId, String url, Boolean enabled);
-
-    Iterable<RssFeedEntry> findAllByEnabled(Boolean enabled);
+    Iterable<RssFeedEntry> findAllByFeedIdChannelIdAndFeedIdUrl(Long channelId, String url);
 }
