@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.PreDestroy;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.env.Environment;
@@ -14,8 +12,6 @@ import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
 
-import chat.tamtam.bot.configuration.AppProfiles;
-import chat.tamtam.bot.controller.Endpoint;
 import chat.tamtam.bot.converter.EnabledIds;
 import chat.tamtam.bot.converter.EnabledIdsConverter;
 import chat.tamtam.bot.custom.bot.AbstractCustomBot;
@@ -25,7 +21,6 @@ import chat.tamtam.bot.domain.user.UserEntity;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.repository.UserRepository;
 import chat.tamtam.bot.security.SecurityConstants;
-import chat.tamtam.botapi.TamTamBotAPI;
 import chat.tamtam.botapi.exceptions.APIException;
 import chat.tamtam.botapi.exceptions.ClientException;
 import chat.tamtam.botapi.model.BotAddedToChatUpdate;
@@ -43,8 +38,6 @@ import chat.tamtam.botapi.model.MessageEditedUpdate;
 import chat.tamtam.botapi.model.MessageRemovedUpdate;
 import chat.tamtam.botapi.model.MessageRestoredUpdate;
 import chat.tamtam.botapi.model.NewMessageBody;
-import chat.tamtam.botapi.model.SimpleQueryResult;
-import chat.tamtam.botapi.model.SubscriptionRequestBody;
 import chat.tamtam.botapi.model.Update;
 import chat.tamtam.botapi.model.UserAddedToChatUpdate;
 import chat.tamtam.botapi.model.UserRemovedFromChatUpdate;
@@ -70,14 +63,12 @@ public class RegistrationBot extends AbstractCustomBot {
     private final @NonNull UserRepository userRepository;
     private final @NonNull SessionRepository sessionRepository;
     private final @NonNull BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final @NonNull Environment environment;
 
     private final EnabledIds enabledIds;
 
     private String url;
-    private TamTamBotAPI api;
 
-    private RegistrationBotVisitor visitor;
+    private final RegistrationBotVisitor visitor;
 
     // @todo #CC-91 dont create reg bot with nullable id and token
     public RegistrationBot(
@@ -91,13 +82,12 @@ public class RegistrationBot extends AbstractCustomBot {
             final Environment environment,
             final EnabledIdsConverter enabledIdsConverter
     ) {
-        super(id, token, host);
+        super(id, token, host, environment);
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.environment = environment;
         this.enabledIds = enabledIdsConverter.convert(enabledIds, getClass());
-        subscribe();
+        visitor = new RegistrationBotVisitor();
     }
 
     @Override
@@ -108,45 +98,6 @@ public class RegistrationBot extends AbstractCustomBot {
     @Override
     public String getToken() {
         return token;
-    }
-
-    public final void subscribe() {
-        api = TamTamBotAPI.create(token);
-        visitor = new RegistrationBotVisitor();
-        log.info(String.format("Registration bot(id:%s, token:%s) initialized", id, token));
-        if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
-            try {
-                url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
-                SimpleQueryResult result = api.subscribe(new SubscriptionRequestBody(url)).execute();
-                if (result.isSuccess()) {
-                    log.info(String.format("Registration bot(id:%s, token:%s) subscribed on %s", id, token, url));
-                } else {
-                    log.warn(String.format("Can't subscribe registration bot(id:%s, token:%s) on %s", id, token, url));
-                }
-            } catch (ClientException | APIException e) {
-                log.error(String.format("Can't subscribe bot with id = [%s] via url = [%s]", id, url), e);
-            }
-        }
-    }
-
-    @PreDestroy
-    public final void unsubscribe() {
-        if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
-            try {
-                SimpleQueryResult result = api.unsubscribe(url).execute();
-                log.info(String.format("Registration bot(id:%s, token:%s) unsubscribed from %s", id, token, url));
-                if (!result.isSuccess()) {
-                    log.warn(String.format(
-                            "Can't unsubscribe registration bot(id:%s, token:%s) on %s",
-                            id,
-                            token,
-                            url
-                    ));
-                }
-            } catch (ClientException | APIException e) {
-                log.error(String.format("Can't unsubscribe bot with id = [%s] via url = [%s]", id, url), e);
-            }
-        }
     }
 
     @Override
