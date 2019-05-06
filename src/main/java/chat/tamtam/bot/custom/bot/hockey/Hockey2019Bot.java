@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -46,15 +45,11 @@ import chat.tamtam.botapi.model.SubscriptionRequestBody;
 import chat.tamtam.botapi.model.Update;
 import chat.tamtam.botapi.model.UserAddedToChatUpdate;
 import chat.tamtam.botapi.model.UserRemovedFromChatUpdate;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @Component
 @RefreshScope
-@RequiredArgsConstructor
 public class Hockey2019Bot extends AbstractCustomBot {
 
     // CHECKSTYLE_OFF: ALMOST_ALL
@@ -86,46 +81,63 @@ public class Hockey2019Bot extends AbstractCustomBot {
     private static final Stream<NewMessageBody> TEAMS;
     private static final NewMessageBody HELP_MESSAGE_BODY;
 
-    private final @NonNull Hockey2019Service hockey2019Service;
-    private final @NonNull Environment environment;
-
-    @Getter
-    @Value("${tamtam.bot.hockey2019.id}")
-    private String id;
-
-    @Value("${tamtam.bot.hockey2019.token}")
-    private String token;
-
-    @Value("${tamtam.host}")
-    private String host;
-
-    private String url;
-    private TamTamBotAPI botAPI;
-
-    private Hockey2019BotVisitor hockey2019BotVisitor;
-
     static {
         TEAMS = Stream.of(messageOf(
                 "Выбери команду",
                 List.of(new InlineKeyboardAttachmentRequest(new InlineKeyboardAttachmentRequestPayload(
                         Stream.of(Team.values())
-                        .map(team -> new ArrayList<Button>() {{
-                            add(new CallbackButton(team.getName(), team.getName(), Intent.DEFAULT));
-                        }})
-                        .collect(Collectors.toList()))))
+                                .map(team -> new ArrayList<Button>() {{
+                                    add(new CallbackButton(team.getName(), team.getName(), Intent.DEFAULT));
+                                }})
+                                .collect(Collectors.toList()))))
         ));
         HELP_MESSAGE_BODY = messageOf(HELP_MESSAGE);
     }
 
-    @PostConstruct
-    public void subscribe() {
-        botAPI = TamTamBotAPI.create(token);
+    private final Hockey2019Service hockey2019Service;
+    private final Environment environment;
+
+    private String url;
+    private TamTamBotAPI api;
+
+    private Hockey2019BotVisitor hockey2019BotVisitor;
+
+    public Hockey2019Bot(
+            @Value("${tamtam.bot.hockey2019.id}") final String id,
+            @Value("${tamtam.bot.hockey2019.token}") final String token,
+            @Value("${tamtam.host}") final String host,
+            final Hockey2019Service hockey2019Service,
+            final Environment environment
+    ) {
+        super(id, token, host);
+        this.hockey2019Service = hockey2019Service;
+        this.environment = environment;
+        subscribe();
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public String getToken() {
+        return token;
+    }
+
+    @Override
+    public BotType getType() {
+        return BotType.Hockey2019;
+    }
+
+    public final void subscribe() {
+        api = TamTamBotAPI.create(token);
         hockey2019BotVisitor = new Hockey2019BotVisitor();
         url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
         log.info(String.format("Hockey 2019 bot(id:%s, token:%s) initialized", id, token));
         if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
             try {
-                SimpleQueryResult result = botAPI.subscribe(new SubscriptionRequestBody(url)).execute();
+                SimpleQueryResult result = api.subscribe(new SubscriptionRequestBody(url)).execute();
                 if (result.isSuccess()) {
                     log.info(String.format("Hockey 2019 bot(id:%s, token:%s) subscribed on %s", id, token, url));
                 } else {
@@ -138,10 +150,10 @@ public class Hockey2019Bot extends AbstractCustomBot {
     }
 
     @PreDestroy
-    public void unsubscribe() {
+    public final void unsubscribe() {
         if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
             try {
-                SimpleQueryResult result = botAPI.unsubscribe(url).execute();
+                SimpleQueryResult result = api.unsubscribe(url).execute();
                 log.info(String.format("Hockey 2019 bot(id:%s, token:%s) unsubscribed from %s", id, token, url));
                 if (!result.isSuccess()) {
                     log.warn(String.format("Can't unsubscribe Hockey 2019 bot(id:%s, token:%s) on %s", id, token, url));
@@ -311,14 +323,9 @@ public class Hockey2019Bot extends AbstractCustomBot {
 
     }
 
-    @Override
-    public BotType getType() {
-        return BotType.Hockey2019;
-    }
-
     private void sendMessage(Long userId, Long chatId,  NewMessageBody newMessage) {
         try {
-            botAPI.sendMessage(newMessage).userId(userId).chatId(chatId).execute();
+            api.sendMessage(newMessage).userId(userId).chatId(chatId).execute();
         } catch (APIException | ClientException e) {
             log.error(
                     String.format("Bot(id=%s) can't send message to user (id:%s) to chat (id:%s)", id, userId, chatId),
@@ -331,7 +338,7 @@ public class Hockey2019Bot extends AbstractCustomBot {
         Long userId = message.getSender().getUserId();
 
         try {
-            botAPI.answerOnCallback(
+            api.answerOnCallback(
                     new CallbackAnswer()
                             .userId(userId)
                             .message(newMessage),

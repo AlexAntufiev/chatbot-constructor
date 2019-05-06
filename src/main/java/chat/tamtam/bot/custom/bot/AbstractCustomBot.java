@@ -5,8 +5,15 @@ import java.util.List;
 import chat.tamtam.botapi.model.AttachmentRequest;
 import chat.tamtam.botapi.model.NewMessageBody;
 import chat.tamtam.botapi.model.Update;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractCustomBot {
+    protected final String id;
+    protected final String token;
+    protected final String host;
+
     public void process(Update update) {
         throw new UnsupportedOperationException("from " + getType());
     }

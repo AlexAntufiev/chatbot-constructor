@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -49,9 +48,7 @@ import chat.tamtam.botapi.model.SubscriptionRequestBody;
 import chat.tamtam.botapi.model.Update;
 import chat.tamtam.botapi.model.UserAddedToChatUpdate;
 import chat.tamtam.botapi.model.UserRemovedFromChatUpdate;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import static chat.tamtam.bot.security.SecurityConstants.EXPIRATION_TIME;
@@ -62,7 +59,6 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 @Log4j2
 @Component
 @RefreshScope
-@RequiredArgsConstructor
 public class RegistrationBot extends AbstractCustomBot {
     private static final String HELP_MESSAGE =
             "Available commands:\n\n"
@@ -76,36 +72,52 @@ public class RegistrationBot extends AbstractCustomBot {
     private final @NonNull BCryptPasswordEncoder bCryptPasswordEncoder;
     private final @NonNull Environment environment;
 
-    @Getter
-    @Value("${tamtam.bot.registration.id}")
-    private String id;
-    // @todo #CC-91 dont create reg bot with nullable id and token
-    @Value("${tamtam.bot.registration.token}")
-    private String token;
-
-    @Value("${tamtam.host}")
-    private String host;
-
-    @Value("${tamtam.bot.registration.enabledIds}")
-    private String ids;
-    private final EnabledIdsConverter enabledIdsConverter;
-    private EnabledIds enabledIds;
+    private final EnabledIds enabledIds;
 
     private String url;
-    private TamTamBotAPI botAPI;
+    private TamTamBotAPI api;
 
     private RegistrationBotVisitor visitor;
 
-    @PostConstruct
-    public void subscribe() {
-        enabledIds = enabledIdsConverter.convert(ids, getClass());
-        botAPI = TamTamBotAPI.create(token);
+    // @todo #CC-91 dont create reg bot with nullable id and token
+    public RegistrationBot(
+            @Value("${tamtam.bot.registration.id}") final String id,
+            @Value("${tamtam.bot.registration.token}") final String token,
+            @Value("${tamtam.host}") String host,
+            @Value("${tamtam.bot.registration.enabledIds}") final String enabledIds,
+            final UserRepository userRepository,
+            final SessionRepository sessionRepository,
+            final BCryptPasswordEncoder bCryptPasswordEncoder,
+            final Environment environment,
+            final EnabledIdsConverter enabledIdsConverter
+    ) {
+        super(id, token, host);
+        this.userRepository = userRepository;
+        this.sessionRepository = sessionRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.environment = environment;
+        this.enabledIds = enabledIdsConverter.convert(enabledIds, getClass());
+        subscribe();
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public String getToken() {
+        return token;
+    }
+
+    public final void subscribe() {
+        api = TamTamBotAPI.create(token);
         visitor = new RegistrationBotVisitor();
         log.info(String.format("Registration bot(id:%s, token:%s) initialized", id, token));
         if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
             try {
                 url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
-                SimpleQueryResult result = botAPI.subscribe(new SubscriptionRequestBody(url)).execute();
+                SimpleQueryResult result = api.subscribe(new SubscriptionRequestBody(url)).execute();
                 if (result.isSuccess()) {
                     log.info(String.format("Registration bot(id:%s, token:%s) subscribed on %s", id, token, url));
                 } else {
@@ -118,10 +130,10 @@ public class RegistrationBot extends AbstractCustomBot {
     }
 
     @PreDestroy
-    public void unsubscribe() {
+    public final void unsubscribe() {
         if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
             try {
-                SimpleQueryResult result = botAPI.unsubscribe(url).execute();
+                SimpleQueryResult result = api.unsubscribe(url).execute();
                 log.info(String.format("Registration bot(id:%s, token:%s) unsubscribed from %s", id, token, url));
                 if (!result.isSuccess()) {
                     log.warn(String.format(
@@ -151,7 +163,7 @@ public class RegistrationBot extends AbstractCustomBot {
         try {
             if (filter(update.getMessage().getSender().getUserId())) {
                 NewMessageBody messageBody = resolve(update.getMessage());
-                botAPI.sendMessage(messageBody)
+                api.sendMessage(messageBody)
                         .userId(update.getMessage().getSender().getUserId())
                         .execute();
             }
@@ -171,7 +183,7 @@ public class RegistrationBot extends AbstractCustomBot {
     private void response(final BotStartedUpdate update) {
         try {
             if (filter(update.getUserId())) {
-                botAPI.sendMessage(messageOf(HELP_MESSAGE))
+                api.sendMessage(messageOf(HELP_MESSAGE))
                         .userId(update.getUserId())
                         .execute();
             }
