@@ -60,8 +60,8 @@ function main() {
 
     send_message "${server_type} запущен: http://${host}/index.html \n managing config: http://${host}:${config_service_port}/ui/dc1/services"
 
-    docker image rm -f ${application_name}
-    rm -f ${application_name}.jar Dockerfile run.sh
+#    docker image rm -f ${application_name}
+#    rm -f ${application_name}.jar Dockerfile run.sh
 }
 
 main
