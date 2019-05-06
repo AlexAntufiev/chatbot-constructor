@@ -1,9 +1,28 @@
 #!/bin/bash
 
-echo "Docker installing... \n\n"
-./docker/install.sh
-echo "Docker installed \n\n"
+mode=$1
 
-echo "Consul installing... \n\n"
-./consul/install.sh
-echo "Consul installed \n\n"
+if [ "$mode" != "test" ] && [ "$mode" != "prod" ]; then
+    echo "Mode must be set and 'test' or 'prod'"
+    exit
+fi
+
+application_name="chatbot-constructor"
+
+mkdir -p ~/${application_name}
+
+echo "Docker installing..."
+./docker/install.sh
+echo "Docker installed"
+
+echo "Vpn installing..."
+./vpn/install.sh ${mode}
+echo "Vpn installed "
+
+echo "Consul installing..."
+./consul/install.sh ${mode}
+echo "Consul installed"
+
+echo "Postgres installing..."
+./postgres/install.sh ${mode}
+echo "Postgres installed"
