@@ -8,7 +8,7 @@ plugins {
     id 'idea'
 }
 
-version '1.0-SNAPSHOT'
+version '1.0.0'
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
@@ -29,6 +29,10 @@ repositories {
 
 test {
     useJUnitPlatform()
+}
+
+processResources {
+    expand(project.properties)
 }
 
 dependencies {

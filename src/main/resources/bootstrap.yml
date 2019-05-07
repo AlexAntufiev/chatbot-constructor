@@ -1,6 +1,7 @@
 spring:
   application:
     name: chatbot-constructor
+    version: 1.0.0
   devtools:
     add-properties: false
   cloud:
