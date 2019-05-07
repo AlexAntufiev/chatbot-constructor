@@ -1,13 +1,10 @@
-FROM openjdk:11
+FROM openjdk:11-jre-stretch
 
-ARG custom_profile=development
+ENV profile=development
+ENV app_name=chatbot-constructor.jar
 
-ENV profile=$custom_profile
-
-COPY run.sh chatbot-constructor.jar /
+COPY $app_name /
 
 EXPOSE 8090
 
-VOLUME chatbot-constructor
-
-ENTRYPOINT /run.sh -p ${profile} run
+ENTRYPOINT java -jar $app_name --spring.profiles.active=$profile

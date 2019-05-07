@@ -50,7 +50,7 @@ logging:
 
 server:
   address: 0.0.0.0
-  port: 8090
+  port: 80
 
 rest:
   timeout:
