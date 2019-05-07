@@ -29,6 +29,8 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+  main:
+    banner-mode: log
 
 logging:
   level:
@@ -50,7 +52,7 @@ logging:
 
 server:
   address: 0.0.0.0
-  port: 8090
+  port: 80
 
 rest:
   timeout:
