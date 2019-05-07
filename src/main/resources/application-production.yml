@@ -4,8 +4,8 @@ spring:
       ddl-auto: update
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://db:5432/${spring.datasource.username}
-    username: prod_database
+    url: jdbc:postgresql://db:5432/prod
+    username: prod
     password: QUFNRXNlY3JldDA0MDUyMDE5MzA4Cg==
   servlet:
     multipart:
