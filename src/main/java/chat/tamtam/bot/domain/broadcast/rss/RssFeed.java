@@ -15,11 +15,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class RssFeedEntry {
+public class RssFeed {
     @EmbeddedId
     private FeedId feedId;
     private Instant instant;
     private String format;
+    private Boolean enabled;
 
     @Data
     @Embeddable
