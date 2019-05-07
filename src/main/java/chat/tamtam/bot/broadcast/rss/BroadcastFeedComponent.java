@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.stream.StreamSupport;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,7 +22,7 @@ import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 
-import chat.tamtam.bot.domain.broadcast.rss.RssFeedEntry;
+import chat.tamtam.bot.domain.broadcast.rss.RssFeed;
 import chat.tamtam.bot.repository.RssFeedRepository;
 import chat.tamtam.bot.utils.TransactionalUtils;
 import chat.tamtam.botapi.TamTamBotAPI;
@@ -43,65 +45,46 @@ import lombok.extern.log4j.Log4j2;
 public class BroadcastFeedComponent {
     private static final long DEFAULT_REFRESH_RATE = 10_000L;
 
+    @Value("${tamtam.rss.enabled}")
+    private Boolean enabled;
+
     private final ThreadPoolTaskExecutor broadcastFeedExecutor;
-    private final RssFeedProperties properties;
+
     private final RssFeedRepository rssFeedRepository;
 
     private final TransactionalUtils transactionalUtils;
 
-    private TamTamBotAPI api;
-
-    private List<RssFeedProperties.Feed> enabledFeeds;
+    private final TamTamBotAPI api;
 
     public BroadcastFeedComponent(
+            @Value("${tamtam.rss.token}") final String token,
             final ThreadPoolTaskExecutor broadcastFeedExecutor,
-            final RssFeedProperties properties,
             final RssFeedRepository rssFeedRepository,
             final TransactionalUtils transactionalUtils
     ) {
+        log.info(String.format("BroadcastRssFeedComponent(token=%s) initializing...", token));
         this.broadcastFeedExecutor = broadcastFeedExecutor;
-        this.properties = properties;
         this.rssFeedRepository = rssFeedRepository;
         this.transactionalUtils = transactionalUtils;
-        init();
+        api = TamTamBotAPI.create(token);
+        transactionalUtils.invokeRunnable(this::init);
     }
 
     private void init() {
-        log.info(String.format("BroadcastRssFeedComponent(bot=%s) initializing...", properties.getBot()));
-        api = TamTamBotAPI.create(properties.getBot().getToken());
-        enabledFeeds = new ArrayList<>();
-        properties
-                .getFeeds()
-                .stream()
-                .filter(this::isWritableChannel)
-                .forEach(entry -> {
-                    transactionalUtils.invokeRunnable(() -> enableFeed(entry));
+        StreamSupport.stream(rssFeedRepository.findAllByEnabled(true).spliterator(), false)
+                .forEach(feed -> {
+                    if (isWritableChannel(feed)) {
+                        log.info(String.format("RSS %s is writable - enabled", feed));
+                    } else {
+                        log.warn(String.format("RSS %s is not writable(api=%s) - disabled", feed, api));
+                    }
                 });
-        log.info(String.format("BroadcastRssFeedComponent was initialized for %s", enabledFeeds));
     }
 
-    private void enableFeed(final RssFeedProperties.Feed feed) {
-        rssFeedRepository
-                .findByFeedIdChannelIdAndFeedIdUrl(feed.getChannel(), feed.getUrl())
-                .ifPresentOrElse(
-                        entry -> enabledFeeds.add(feed),
-                        () -> {
-                            rssFeedRepository.save(
-                                    new RssFeedEntry(
-                                            new RssFeedEntry.FeedId(feed.getChannel(), feed.getUrl()),
-                                            Instant.now(),
-                                            feed.getFormat()
-                                    ));
-                            enabledFeeds.add(feed);
-                        }
-                );
-        log.info(String.format("Feed(%s) was enabled by configuration", feed));
-    }
-
-    private boolean isWritableChannel(final RssFeedProperties.Feed feed) {
+    private boolean isWritableChannel(final RssFeed feed) {
         try {
-            Chat chat = api.getChat(feed.getChannel()).execute();
-            ChatMember member = api.getMembership(feed.getChannel()).execute();
+            Chat chat = api.getChat(feed.getFeedId().getChannelId()).execute();
+            ChatMember member = api.getMembership(feed.getFeedId().getChannelId()).execute();
             if (chat.getType() != ChatType.CHANNEL) {
                 throw new IllegalStateException("Chat is not channel");
             }
@@ -118,22 +101,11 @@ public class BroadcastFeedComponent {
     @Scheduled(fixedRate = DEFAULT_REFRESH_RATE)
     public void refresh() {
         List<Future> futureList = new ArrayList<>();
-        enabledFeeds.forEach(enabled ->
-                rssFeedRepository
-                        .findAllByFeedIdChannelIdAndFeedIdUrl(enabled.getChannel(), enabled.getUrl())
-                        .forEach(feed -> futureList.add(
-                                broadcastFeedExecutor.submit(() -> {
-                                    try {
-                                        SyndFeed externalFeed =
-                                                new SyndFeedInput()
-                                                        .build(new XmlReader(new URL(feed.getFeedId().getUrl())));
-                                        updateFeed(externalFeed, feed);
-                                        rssFeedRepository.save(feed);
-                                    } catch (IOException | FeedException e) {
-                                        log.error(String.format("Can't fetch rss feed(%s)", feed), e);
-                                    }
-                                }))
-                        ));
+        StreamSupport.stream(rssFeedRepository.findAllByEnabled(true).spliterator(), false)
+                .filter(this::isWritableChannel)
+                .forEach(
+                        feed -> futureList.add(broadcastFeedExecutor.submit(() -> submit(feed)))
+                );
 
         // @todo #CC-212 Change execution flow - let's store tasks in database with markers
         futureList.forEach(this::get);
@@ -147,7 +119,22 @@ public class BroadcastFeedComponent {
         }
     }
 
-    private void updateFeed(final SyndFeed externalFeed, final RssFeedEntry feed) {
+    private void submit(final RssFeed feed) {
+        try {
+            SyndFeed externalFeed =
+                    new SyndFeedInput()
+                            .build(new XmlReader(new URL(feed.getFeedId().getUrl())));
+            if (feed.getInstant() == null) {
+                feed.setInstant(Instant.now());
+            }
+            updateFeed(externalFeed, feed);
+            rssFeedRepository.save(feed);
+        } catch (IOException | FeedException e) {
+            log.error(String.format("Can't fetch rss feed(%s)", feed), e);
+        }
+    }
+
+    private void updateFeed(final SyndFeed externalFeed, final RssFeed feed) {
         externalFeed
                 .getEntries()
                 .stream()
@@ -160,7 +147,7 @@ public class BroadcastFeedComponent {
                 .forEach(entry -> feed.setInstant(sendMessage(entry, feed)));
     }
 
-    private Instant sendMessage(final SyndEntry entry, final RssFeedEntry feed) {
+    private Instant sendMessage(final SyndEntry entry, final RssFeed feed) {
         try {
             api.sendMessage(getMessageBody(entry, feed))
                     .chatId(feed.getFeedId().getChannelId())
@@ -172,7 +159,7 @@ public class BroadcastFeedComponent {
         }
     }
 
-    private NewMessageBody getMessageBody(final SyndEntry entry, final RssFeedEntry feed) {
+    private NewMessageBody getMessageBody(final SyndEntry entry, final RssFeed feed) {
         switch (feed.getFormat()) {
             case FeedFormat.TITLE_AND_LINK:
                 return new NewMessageBody(
