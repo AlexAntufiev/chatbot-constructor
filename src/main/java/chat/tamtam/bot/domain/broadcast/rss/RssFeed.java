@@ -34,6 +34,7 @@ public class RssFeed {
      * null -> all available posts
      * 0 -> all available posts
      * */
+    @Column(nullable = false)
     private Short postsPerUpdate;
 
     @Data
