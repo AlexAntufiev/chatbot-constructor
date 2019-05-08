@@ -182,7 +182,7 @@ public class BroadcastFeedComponent {
         short amount = feed.getPostsPerUpdate();
         int startsFrom = updates.size() - amount;
 
-        for (int i = startsFrom - 1; i < updates.size(); i++) {
+        for (int i = startsFrom; i < updates.size(); i++) {
             sendMessage(updates.get(i), feed);
         }
     }
