@@ -1,0 +1,33 @@
+version: '3.7'
+services:
+  app:
+    build: .
+    container_name: app
+    restart: unless-stopped
+    env_file: app.env
+    ports:
+      - "80:8090"
+    networks:
+      - default
+    depends_on:
+      - db
+  db:
+    container_name: db
+    image: postgres
+    restart: unless-stopped
+    volumes:
+      - data:/var/lib/postgresql/data/
+    env_file: db.env
+    ports:
+      - "5432:5432"
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1450
+
+volumes:
+  data:

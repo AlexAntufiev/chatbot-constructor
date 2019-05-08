@@ -36,29 +36,11 @@ function main() {
         exit
     fi
 
-    send_message "${server_type} останавливается"
-    docker stop ${application_name}
-    send_message "${server_type} остановлен"
+    send_message "${server_type} будет перезагружен"
+    docker-compose build app
+    docker-compose restart app
 
-    echo "Set profile to ${server_type}"
-    docker build --build-arg custom_profile=${server_type} \
-                 -t ${application_name} \
-                 .
-
-    send_message "${server_type} запускается"
-    docker run -d \
-               --restart=on-failure:5 \
-               -p 80:8090 \
-               -v ~/${application_name}/logs:/logs \
-               --name ${application_name} \
-               --log-opt max-size=50m \
-               --log-opt max-file=3 \
-               ${application_name}
-
-
-    sleep 25
-
-    send_message "${server_type} запущен: http://${host}/index.html \n managing config: http://${host}:${config_service_port}/ui/dc1/services"
+    send_message "${server_type} перезапустился: http://${host}/index.html \n managing config: http://${host}:${config_service_port}/ui/dc1/services"
 
 #    docker image rm -f ${application_name}
 #    rm -f ${application_name}.jar Dockerfile run.sh

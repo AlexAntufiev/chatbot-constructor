@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="pattern" value="%black(%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread]) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable"/>
+    <property name="pattern" value="%white(%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread]) %highlight(%-5level) [%green(%t)] %yellow(%C{1.}): %msg%n%throwable"/>
 
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">

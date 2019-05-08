@@ -8,8 +8,8 @@ spring:
         format_sql: true
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/${spring.datasource.username}
-    username: test_database
+    url: jdbc:postgresql://db:5432/test
+    username: test
     password: MDYwNTIwMTlxd2VydHkK
 
 logging:
