@@ -19,16 +19,23 @@ import lombok.NoArgsConstructor;
 public class RssFeed {
     @EmbeddedId
     private FeedId feedId;
-    private Instant instant;
+    /*
+     * Presents last publish time.
+     * */
+    private Instant lastUpdate;
     private String format;
     private Boolean enabled;
+    /*
+     * Presents last refresh time(refresh event depends on refreshPeriod param).
+     * */
+    private Instant lastRefresh;
     /*
      * Defines time period IN SECONDS, after which we should send new posts in count of postsPerUpdate.
      * null -> each refresh
      * 0 -> each refresh
      * */
     @Column(nullable = false)
-    private Long updatePeriod;
+    private Long refreshPeriod;
     /*
      * Defines new posts amount(starts from newest), that will be published after each rss refresh.
      * null -> all available posts

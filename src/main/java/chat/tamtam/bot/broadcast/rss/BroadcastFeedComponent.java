@@ -127,22 +127,46 @@ public class BroadcastFeedComponent {
                         String.format("Parameter postsPerUpdate=%d(less 0)", feed.getPostsPerUpdate())
                 );
             }
-            if (feed.getUpdatePeriod() < 0) {
+            if (feed.getRefreshPeriod() < 0) {
                 throw new IllegalStateException(
-                        String.format("Parameter updatePeriod=%d(less 0)", feed.getUpdatePeriod())
+                        String.format("Parameter refreshPeriod=%d(less 0)", feed.getRefreshPeriod())
                 );
             }
             SyndFeed externalFeed =
                     new SyndFeedInput()
                             .build(new XmlReader(new URL(feed.getFeedId().getUrl())));
-            if (feed.getInstant() == null) {
-                feed.setInstant(Instant.now());
+
+            Instant now = Instant.now();
+
+            // In case of first feed refresh
+            if (feed.getLastUpdate() == null) {
+                feed.setLastUpdate(now);
+                feed.setLastRefresh(now);
+                updateAndStore(externalFeed, feed);
+                return;
             }
-            updateFeed(externalFeed, feed);
-            rssFeedRepository.save(feed);
+
+            // In case if lastRefresh was set to null
+            if (feed.getLastRefresh() == null) {
+                feed.setLastRefresh(now);
+                updateAndStore(externalFeed, feed);
+                return;
+            }
+
+            // In case if it is time to refresh and update
+            if (now.getEpochSecond() - feed.getLastRefresh().getEpochSecond() >= feed.getRefreshPeriod()) {
+                feed.setLastRefresh(now);
+                updateAndStore(externalFeed, feed);
+            }
+
         } catch (IOException | FeedException e) {
             log.error(String.format("Can't fetch rss feed(%s)", feed), e);
         }
+    }
+
+    private void updateAndStore(final SyndFeed externalFeed, final RssFeed feed) {
+        updateFeed(externalFeed, feed);
+        rssFeedRepository.save(feed);
     }
 
     private void updateFeed(final SyndFeed externalFeed, final RssFeed feed) {
@@ -150,27 +174,17 @@ public class BroadcastFeedComponent {
                 externalFeed
                         .getEntries()
                         .stream()
-                        .filter(entry -> feed.getInstant().isBefore(entry.getPublishedDate().toInstant()))
-                        .sorted(this::compareSyndEntry)
+                        .filter(entry -> feed.getLastUpdate().isBefore(entry.getPublishedDate().toInstant()))
+                        .sorted((o1, o2) -> {
+                            Instant i1 = o1.getPublishedDate().toInstant();
+                            Instant i2 = o2.getPublishedDate().toInstant();
+                            return i1.isBefore(i2) ? -1 : i1.equals(i2) ? 0 : 1;
+                        })
                         .collect(Collectors.toList());
-
         if (updates.isEmpty()) {
             return;
         }
-
-        // Check if it is time to send updates(it depends on updatePeriod parameter)
-        Instant lastPublishTime = updates.get(updates.size() - 1).getPublishedDate().toInstant();
-        if (lastPublishTime.getEpochSecond() - feed.getInstant().getEpochSecond() < feed.getUpdatePeriod()) {
-            return;
-        }
-
         sendUpdates(feed, updates);
-    }
-
-    private int compareSyndEntry(SyndEntry o1, SyndEntry o2) {
-        Instant i1 = o1.getPublishedDate().toInstant();
-        Instant i2 = o2.getPublishedDate().toInstant();
-        return i1.isBefore(i2) ? -1 : i1.equals(i2) ? 0 : 1;
     }
 
     private void sendUpdates(final RssFeed feed, List<SyndEntry> updates) {
@@ -185,10 +199,13 @@ public class BroadcastFeedComponent {
         for (int i = startsFrom; i < updates.size(); i++) {
             sendMessage(updates.get(i), feed);
         }
+
+        log.info(String.format("BroadcastFeedComponent sent %d messages to %s", updates.size() - startsFrom, feed));
     }
 
     private void sendAll(final RssFeed feed, List<SyndEntry> updates) {
         updates.forEach(entry -> sendMessage(entry, feed));
+        log.info(String.format("BroadcastFeedComponent sent %d messages to %s", updates.size(), feed));
     }
 
     private void sendMessage(final SyndEntry entry, final RssFeed feed) {
@@ -196,7 +213,7 @@ public class BroadcastFeedComponent {
             api.sendMessage(getMessageBody(entry, feed))
                     .chatId(feed.getFeedId().getChannelId())
                     .execute();
-            feed.setInstant(entry.getPublishedDate().toInstant());
+            feed.setLastUpdate(entry.getPublishedDate().toInstant());
         } catch (APIException | ClientException | IllegalStateException e) {
             log.error(String.format("Can't send message(feed=%s, api=%s)", feed, api), e);
         }
@@ -204,12 +221,23 @@ public class BroadcastFeedComponent {
 
     private NewMessageBody getMessageBody(final SyndEntry entry, final RssFeed feed) {
         switch (feed.getFormat()) {
-            case FeedFormat.TITLE_AND_LINK:
+            case FeedFormat.TITLE_LINK:
                 return new NewMessageBody(
                         new StringBuilder()
                                 .append(entry.getTitle())
                                 .append("\n")
                                 .append(entry.getLink())
+                                .toString(),
+                        null
+                );
+            case FeedFormat.TITLE_LINK_TIME:
+                return new NewMessageBody(
+                        new StringBuilder()
+                                .append(entry.getTitle())
+                                .append("\n")
+                                .append(entry.getLink())
+                                .append("\n")
+                                .append(entry.getPublishedDate())
                                 .toString(),
                         null
                 );
