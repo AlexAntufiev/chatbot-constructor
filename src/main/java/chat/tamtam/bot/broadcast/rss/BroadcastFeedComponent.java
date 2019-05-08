@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -74,9 +75,9 @@ public class BroadcastFeedComponent {
         StreamSupport.stream(rssFeedRepository.findAllByEnabled(true).spliterator(), false)
                 .forEach(feed -> {
                     if (isWritableChannel(feed)) {
-                        log.info(String.format("RSS %s is writable - enabled", feed));
+                        log.info(String.format("RSS %s - enabled", feed));
                     } else {
-                        log.warn(String.format("RSS %s is not writable(api=%s) - disabled", feed, api));
+                        log.warn(String.format("RSS %s has insufficient permissions - disabled", feed, api));
                     }
                 });
     }
@@ -121,6 +122,16 @@ public class BroadcastFeedComponent {
 
     private void submit(final RssFeed feed) {
         try {
+            if (feed.getPostsPerUpdate() < 0) {
+                throw new IllegalStateException(
+                        String.format("Parameter postsPerUpdate=%d(less 0)", feed.getPostsPerUpdate())
+                );
+            }
+            if (feed.getUpdatePeriod() < 0) {
+                throw new IllegalStateException(
+                        String.format("Parameter updatePeriod=%d(less 0)", feed.getUpdatePeriod())
+                );
+            }
             SyndFeed externalFeed =
                     new SyndFeedInput()
                             .build(new XmlReader(new URL(feed.getFeedId().getUrl())));
@@ -135,27 +146,59 @@ public class BroadcastFeedComponent {
     }
 
     private void updateFeed(final SyndFeed externalFeed, final RssFeed feed) {
-        externalFeed
-                .getEntries()
-                .stream()
-                .filter(entry -> feed.getInstant().isBefore(entry.getPublishedDate().toInstant()))
-                .sorted(((o1, o2) -> {
-                    Instant i1 = o1.getPublishedDate().toInstant();
-                    Instant i2 = o2.getPublishedDate().toInstant();
-                    return i1.isBefore(i2) ? -1 : i1.equals(i2) ? 0 : 1;
-                }))
-                .forEach(entry -> feed.setInstant(sendMessage(entry, feed)));
+        List<SyndEntry> updates =
+                externalFeed
+                        .getEntries()
+                        .stream()
+                        .filter(entry -> feed.getInstant().isBefore(entry.getPublishedDate().toInstant()))
+                        .sorted(this::compareSyndEntry)
+                        .collect(Collectors.toList());
+
+        if (updates.isEmpty()) {
+            return;
+        }
+
+        // Check if it is time to send updates(it depends on updatePeriod parameter)
+        Instant lastPublishTime = updates.get(updates.size() - 1).getPublishedDate().toInstant();
+        if (lastPublishTime.getEpochSecond() - feed.getInstant().getEpochSecond() < feed.getUpdatePeriod()) {
+            return;
+        }
+
+        sendUpdates(feed, updates);
     }
 
-    private Instant sendMessage(final SyndEntry entry, final RssFeed feed) {
+    private int compareSyndEntry(SyndEntry o1, SyndEntry o2) {
+        Instant i1 = o1.getPublishedDate().toInstant();
+        Instant i2 = o2.getPublishedDate().toInstant();
+        return i1.isBefore(i2) ? -1 : i1.equals(i2) ? 0 : 1;
+    }
+
+    private void sendUpdates(final RssFeed feed, List<SyndEntry> updates) {
+        if (feed.getPostsPerUpdate() == 0 || feed.getPostsPerUpdate() >= updates.size()) {
+            sendAll(feed, updates);
+            return;
+        }
+
+        short amount = feed.getPostsPerUpdate();
+        int startsFrom = updates.size() - amount;
+
+        for (int i = startsFrom - 1; i < updates.size(); i++) {
+            sendMessage(updates.get(i), feed);
+        }
+    }
+
+    private void sendAll(final RssFeed feed, List<SyndEntry> updates) {
+        updates.forEach(entry -> sendMessage(entry, feed));
+    }
+
+    private void sendMessage(final SyndEntry entry, final RssFeed feed) {
         try {
             api.sendMessage(getMessageBody(entry, feed))
                     .chatId(feed.getFeedId().getChannelId())
                     .execute();
-            return entry.getPublishedDate().toInstant();
+            feed.setInstant(entry.getPublishedDate().toInstant());
         } catch (APIException | ClientException | IllegalStateException e) {
             log.error(String.format("Can't send message(feed=%s, api=%s)", feed, api), e);
-            return feed.getInstant();
         }
     }
 
