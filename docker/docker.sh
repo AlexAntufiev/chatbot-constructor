@@ -42,7 +42,7 @@ function main() {
     send_message "${server_type} остановлен"
 
     docker build ./
-    docker-compose start app
+    docker-compose up -d app
     send_message "${server_type} перезапустился: http://${host}/index.html \n managing config: http://${host}:${config_service_port}/ui/dc1/services"
 }
 
