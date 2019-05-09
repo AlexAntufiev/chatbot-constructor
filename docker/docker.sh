@@ -36,14 +36,13 @@ function main() {
         exit
     fi
 
-    send_message "${server_type} будет перезагружен"
-    docker-compose build app
-    docker-compose restart app
+    send_message "${server_type} будет остановлен"
+    docker-compose stop app
+    docker-compose rm -f app
+    send_message "${server_type} остановлен"
 
+    docker-compose start app
     send_message "${server_type} перезапустился: http://${host}/index.html \n managing config: http://${host}:${config_service_port}/ui/dc1/services"
-
-#    docker image rm -f ${application_name}
-#    rm -f ${application_name}.jar Dockerfile run.sh
 }
 
 main

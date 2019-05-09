@@ -1,7 +1,7 @@
 FROM openjdk:11-jre-stretch
 
 ENV profile=development
-ENV app_name=chatbot-constructor.jar
+ENV app_name=chatbot-constructor*.jar
 
 COPY $app_name /
 
