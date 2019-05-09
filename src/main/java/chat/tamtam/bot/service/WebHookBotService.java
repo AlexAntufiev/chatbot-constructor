@@ -70,9 +70,20 @@ public class WebHookBotService {
     @RequiredArgsConstructor
     private class WebHookBotVisitor implements Update.Visitor {
         private final int botSchemeId;
+
         private Byte[] botContextLockKey;
 
         private void execute(final BotContext context, final Update update) {
+            if (context.getState() == null) {
+                log.info(
+                        String.format(
+                                "%s has state==null, ignoring this update(%s), because bot is locked for this user",
+                                context, update
+                        )
+                );
+                return;
+            }
+
             SchemeComponent schemeComponent =
                     componentRepository
                             .findById(context.getState())
@@ -109,6 +120,14 @@ public class WebHookBotService {
                 }
 
                 if (context.getState() == null) {
+                    // In this case all further updates will be ignored
+                    componentProcessorService.updatePendingMessage(context, api);
+                    log.info(String.format("%s has state==null, bot is locked for this user", context, update));
+                    break;
+                }
+
+                if (context.getState().equals(context.getResetState())) {
+                    // In this case reset execution to start state and hang on for further update
                     componentProcessorService.updatePendingMessage(context, api);
                     initContext(context.getId().getUserId());
                     break;
@@ -155,7 +174,6 @@ public class WebHookBotService {
         private BotContext getContext(final long userId) {
             return botContextRepository
                     .findByIdUserIdAndIdBotSchemeId(userId, botSchemeId)
-                    .filter(context -> context.getState() != null)
                     .orElseGet(() -> initContext(userId));
         }
 
@@ -237,7 +255,8 @@ public class WebHookBotService {
             BotContext context = new BotContext();
 
             context.setId(new BotContext.Id(userId, botSchemeId));
-            context.setState(botScheme.getScheme());
+            context.setState(botScheme.getSchemeEnterState());
+            context.setState(botScheme.getSchemeResetState());
 
             return botContextRepository.save(context);
         }

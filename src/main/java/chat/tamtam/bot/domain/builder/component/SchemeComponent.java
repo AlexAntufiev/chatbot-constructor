@@ -1,6 +1,5 @@
 package chat.tamtam.bot.domain.builder.component;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,17 +19,21 @@ public class SchemeComponent {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column(name = "schemeId")
+
     private Integer schemeId;
-    @Column(name = "type")
+
     private Byte type;
-    @Column(name = "text")
+
     private String text;
-    @Column(name = "nextState")
+
     private Long nextState;
-    @Column(name = "groupId")
+
     private Long groupId;
+
+    private Long voteId;
+
     @JsonIgnore
-    @Column(name = "hasCallbacks")
     private boolean hasCallbacks;
+
+    private String title;
 }

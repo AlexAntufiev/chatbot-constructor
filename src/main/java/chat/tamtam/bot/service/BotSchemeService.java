@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
+import chat.tamtam.bot.domain.builder.component.SchemeComponent;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
 import chat.tamtam.bot.domain.response.SuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
 import chat.tamtam.bot.repository.BotSchemeRepository;
+import chat.tamtam.bot.repository.ComponentRepository;
 import chat.tamtam.bot.repository.TamBotRepository;
 import chat.tamtam.bot.utils.TransactionalUtils;
 import lombok.NonNull;
@@ -22,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class BotSchemeService {
     private final @NonNull BotSchemeRepository botSchemeRepository;
     private final @NonNull TamBotRepository tamBotRepository;
+    private final @NonNull ComponentRepository componentRepository;
 
     private final @NonNull UserService userService;
 
@@ -32,8 +35,14 @@ public class BotSchemeService {
         if (bot.getName().isEmpty() || bot.getId() != null) {
             throw new IllegalArgumentException("Invalid bot entity " + bot);
         }
+
         bot.setUserId(userId);
-        return botSchemeRepository.save(bot);
+        return ((BotScheme) transactionalUtils
+                .invokeCallable(() -> {
+                    SchemeComponent resetComponent = componentRepository.save(new SchemeComponent());
+                    bot.setSchemeResetState(resetComponent.getId());
+                    return botSchemeRepository.save(bot);
+                }));
     }
 
     @Loggable
@@ -42,8 +51,13 @@ public class BotSchemeService {
             Long userId,
             Integer id
     ) throws NoSuchElementException {
-        if (!botSchemeRepository.existsByUserIdAndId(userId, id)) {
-            throw new NoSuchElementException("Does not exist bot with userId=" + userId + " and id=" + id);
+        if (!botSchemeRepository.existsByUserIdAndIdAndSchemeResetState(userId, id, bot.getSchemeResetState())) {
+            throw new NoSuchElementException(
+                    String.format(
+                            "Does not exist bot with userId=%d, id=%d, resetState=%d",
+                            userId, id, bot.getSchemeResetState()
+                    )
+            );
         }
         bot.setUserId(userId);
         bot.setId(id);

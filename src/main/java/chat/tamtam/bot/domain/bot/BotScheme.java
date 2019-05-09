@@ -20,18 +20,15 @@ import lombok.RequiredArgsConstructor;
 public class BotScheme {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
     private Integer id;
 
-    @Column(name = "userId")
     private @NonNull Long userId;
 
-    @Column(name = "botId")
     private Long botId;
 
-    @Column(name = "name")
     private @NonNull String name;
 
-    @Column(name = "scheme")
-    private Long scheme;
+    private Long schemeEnterState;
+    @Column(nullable = false)
+    private Long schemeResetState;
 }
