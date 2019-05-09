@@ -39,10 +39,11 @@ function main() {
     send_message "${server_type} будет остановлен"
     docker-compose stop app
     docker-compose rm -f app
+    docker image rm -f chatbot-constructor_app
     send_message "${server_type} остановлен"
 
     docker build ./
-    docker-compose up -d app
+    docker-compose start app
     send_message "${server_type} перезапустился: http://${host}/index.html \n managing config: http://${host}:${config_service_port}/ui/dc1/services"
 }
 
