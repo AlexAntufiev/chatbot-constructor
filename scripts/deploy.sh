@@ -17,12 +17,12 @@ else
     exit
 fi
 
-cp ./build/libs/chatbot-constructor.jar ./docker/chatbot-constructor.jar
+cp ./build/libs/chatbot-constructor* ./docker/
 cd ./docker/
 printf "profile=${server_type}" > app.env
 printf "POSTGRES_USER=${server_type}\nPOSTGRES_PASSWORD=${db_password}" > db.env
 
+time ssh -i ${ssh_path} ${user}@${server}/${app_name} "rm -f ${app_name}*"
 rsync -avz --progress -e "ssh -i ${ssh_path}" ./ ${user}@${server}:/home/${user}/${app_name}
-time ssh -i ${ssh_path} ${user}@${server} "cd ${app_name} && \
-                                           chmod +x docker.sh && \
+time ssh -i ${ssh_path} ${user}@${server}/${app_name} "chmod +x docker.sh && \
                                            nohup ./docker.sh ${server_type} ${server} > /dev/null 2>&1 &"

@@ -52,7 +52,7 @@ logging:
 
 server:
   address: 0.0.0.0
-  port: 80
+  port: 8090
 
 rest:
   timeout:
