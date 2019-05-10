@@ -25,6 +25,7 @@ import chat.tamtam.bot.repository.BotSchemeRepository;
 import chat.tamtam.bot.repository.ButtonsGroupRepository;
 import chat.tamtam.bot.repository.ComponentRepository;
 import chat.tamtam.bot.repository.ComponentValidatorRepository;
+import chat.tamtam.bot.utils.SchemeComponentUtils;
 import chat.tamtam.bot.utils.TransactionalUtils;
 import chat.tamtam.botapi.model.Intent;
 import lombok.Getter;
@@ -85,6 +86,13 @@ public class BuilderService {
     ) {
         // @todo #CC-163 Split logic by builderComponent type(e.g. if type is INPUT then ignore buttonsGroup)
         BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+
+        if (!SchemeComponentUtils.isGraphIsNonCyclic(components)) {
+            throw new ChatBotConstructorException(
+                    String.format("Components graph(%s) is cyclic(botScheme=%s)", components, botScheme),
+                    Error.SCHEME_BUILDER_COMPONENT_GRAPH_IS_CYCLIC
+            );
+        }
 
         Object updatedComponents =
                 transactionalUtils.invokeCallable(() -> {
