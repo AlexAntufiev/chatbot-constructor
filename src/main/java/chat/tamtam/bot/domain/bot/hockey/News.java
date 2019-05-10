@@ -3,7 +3,6 @@ package chat.tamtam.bot.domain.bot.hockey;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -33,9 +32,14 @@ public class News {
         }
     }
 
-    public Stream<String> getMessages() {
-        return news.stream()
-                .map(Entity::getInfo);
+    public String getMessages() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        news.forEach(entity -> {
+            stringBuilder.append(entity.getInfo());
+            stringBuilder.append("\n\n");
+        });
+        return stringBuilder.toString();
     }
 
 }

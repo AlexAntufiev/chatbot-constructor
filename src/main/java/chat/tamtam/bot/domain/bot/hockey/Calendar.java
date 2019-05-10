@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import chat.tamtam.bot.utils.DateUtils;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
@@ -17,24 +18,25 @@ public class Calendar {
 
     private List<Entity> matches;
 
-    public Stream<String> getMessages() {
-        return matches.stream().map(Entity::getInfo);
+    public String getMessages() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        matches.forEach(entity -> {
+            stringBuilder.append(entity.getInfo());
+            stringBuilder.append("\n\n");
+        });
+        return stringBuilder.toString();
     }
 
-//    public String getMessages() {
-//        StringBuilder stringBuilder = new StringBuilder();
-//
-//        matches.forEach(entity -> {
-//            stringBuilder.append(entity.getInfo());
-//            stringBuilder.append("\n\n");
-//        });
-//        return stringBuilder.toString();
-//    }
+    public Stream<Entity> getAvailableMatches() {
+        return matches.stream();
+    }
 
     @Setter
     @NoArgsConstructor
-    private static class Entity {
+    public static class Entity {
 
+        @Getter
         private int id;
         private String team1;
         @JsonProperty("team1_id")
@@ -51,6 +53,15 @@ public class Calendar {
         @JsonProperty("is_active")
         private int active;
         private URL url;
+
+        public String getMatchInfo() {
+            return String.format(
+                    "%s %s %s",
+                    Team.getById(Integer.parseInt(team1Id)).getName(),
+                    score,
+                    Team.getById(Integer.parseInt(team2Id)).getName()
+            );
+        }
 
         public String getInfo() {
             return String.format(

@@ -1,6 +1,7 @@
 package chat.tamtam.bot.domain.bot.hockey;
 
-import java.util.stream.Stream;
+import java.util.HashMap;
+import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,17 +28,23 @@ public enum Team {
     GREAT_BRITAIN(1533, "Великобритания", "Великобритания \uD83C\uDDEC\uD83C\uDDE7"),
     ;
 
-    // @todo #CC-173 add hashmap realization
-
+    private static final Map<Integer, Team> VALUES;
     private final int id;
     private final String name;
     private final String nameWithSmile;
 
-    public static int getIdByName(String name) {
-        return Stream.of(values())
-                .parallel()
-                .filter(team -> team.name.equals(name))
-                .findAny()
-                .orElseThrow(() -> new IllegalArgumentException(String.format("Team with name %s not found", name))).id;
+    static {
+        VALUES = new HashMap<>(values().length);
+        for (Team team : values()) {
+            int id = team.id;
+            if (VALUES.containsKey(id)) {
+                throw new IllegalStateException("Duplicate id=" + id);
+            }
+            VALUES.put(id, team);
+        }
+    }
+
+    public static Team getById(int teamId) {
+        return VALUES.get(teamId);
     }
 }
