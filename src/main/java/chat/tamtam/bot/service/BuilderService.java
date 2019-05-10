@@ -87,6 +87,10 @@ public class BuilderService {
         // @todo #CC-163 Split logic by builderComponent type(e.g. if type is INPUT then ignore buttonsGroup)
         BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
 
+        /*
+         * Check that graph is non-cyclicality.
+         * In case if false -> throws exception.
+         * */
         if (!SchemeComponentUtils.isGraphIsNonCyclic(components)) {
             throw new ChatBotConstructorException(
                     String.format("Components graph(%s) is cyclic(botScheme=%s)", components, botScheme),
