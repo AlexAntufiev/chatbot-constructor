@@ -143,7 +143,14 @@ public class BuilderService {
 
                         updated.add(new ComponentUpdate(schemeComponent, componentValidators, buttonsGroupUpdate));
                     }
-                    botScheme.setScheme(components.stream().findFirst().orElseThrow().getSchemeComponent().getId());
+                    botScheme.setSchemeEnterState(
+                            components
+                                    .stream()
+                                    .findFirst()
+                                    .orElseThrow()
+                                    .getSchemeComponent()
+                                    .getId()
+                    );
                     botSchemeRepository.save(botScheme);
                     return updated;
                 });

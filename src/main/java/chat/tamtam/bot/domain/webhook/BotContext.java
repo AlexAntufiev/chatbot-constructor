@@ -19,12 +19,15 @@ import lombok.NoArgsConstructor;
 public class BotContext {
     @EmbeddedId
     private Id id;
-    @Column(name = "state")
+
     private Long state;
-    @Column(name = "variables")
+
     private String variables;
-    @Column(name = "pendingMessage")
+
     private byte[] pendingMessage;
+
+    @Column(nullable = false)
+    private Long resetState;
 
     @Data
     @NoArgsConstructor
