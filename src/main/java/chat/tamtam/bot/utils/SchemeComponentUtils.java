@@ -19,11 +19,16 @@ import lombok.extern.log4j.Log4j2;
 @UtilityClass
 public class SchemeComponentUtils {
     public boolean isGraphIsNonCyclic(final List<ComponentUpdate> updates) {
+        System.out.println("TEST");
+        System.out.println(updates);
         Set<Long> metComponents = new HashSet<>();
         Map<Long, SchemeComponent> components = new HashMap<>();
+        if (updates.isEmpty()) {
+            return true;
+        }
         for (ComponentUpdate update
                 : updates) {
-            SchemeComponent component = update.getSchemeComponent();
+            SchemeComponent component = update.getComponent();
 
             if (component.getId() == null) {
                 throw new ChatBotConstructorException(
