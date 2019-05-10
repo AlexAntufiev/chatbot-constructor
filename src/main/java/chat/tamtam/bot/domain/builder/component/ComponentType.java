@@ -10,6 +10,7 @@ import lombok.Getter;
 public enum ComponentType {
     INPUT((byte) 0),
     INFO((byte) 1),
+    RESET((byte) 2)
     ;
 
     @Getter

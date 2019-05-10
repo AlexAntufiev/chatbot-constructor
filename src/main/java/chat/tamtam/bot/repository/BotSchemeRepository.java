@@ -20,5 +20,7 @@ public interface BotSchemeRepository extends CrudRepository<BotScheme, Integer> 
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
     void deleteByUserIdAndId(Long userId, Integer id);
 
+    boolean existsByUserIdAndIdAndSchemeResetState(Long userId, Integer id, Long resetState);
+
     boolean existsByUserIdAndId(Long userId, Integer id);
 }
