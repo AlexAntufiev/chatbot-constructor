@@ -30,8 +30,8 @@ services:
       - 'env.grafana'
     networks:
       - monitoring
-    volumes:
-      - /grafana_data:/var/lib/grafana
+#    volumes:
+#      - /grafana_data:/var/lib/grafana
 
 networks:
   monitoring:

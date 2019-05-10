@@ -19,7 +19,7 @@ public enum ComponentType {
     private static final Map<Byte, ComponentType> BY_ID;
 
     static {
-        BY_ID = new HashMap<>();
+        BY_ID = new HashMap<>(values().length);
         for (ComponentType type
                 : values()) {
             if (BY_ID.containsKey(type.type)) {

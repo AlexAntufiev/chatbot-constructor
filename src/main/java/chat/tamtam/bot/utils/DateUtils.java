@@ -14,7 +14,7 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_TIME;
 public class DateUtils {
 
     public String instantToString(Instant instant) {
-        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+        return LocalDateTime.ofInstant(instant, ZoneId.of("Europe/Moscow"))
                 .format(new DateTimeFormatterBuilder().parseCaseInsensitive()
                         .append(ISO_LOCAL_DATE)
                         .appendLiteral(' ')

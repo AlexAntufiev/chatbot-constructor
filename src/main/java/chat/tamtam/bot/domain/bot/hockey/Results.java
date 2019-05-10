@@ -3,7 +3,6 @@ package chat.tamtam.bot.domain.bot.hockey;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -17,12 +16,17 @@ public class Results {
     @Setter
     private List<Entity> matches;
 
-    public Stream<String> getMessages() {
+    public String getMessages() {
         if (matches.isEmpty()) {
-            return Stream.of("Матчи еще не начались. Наберись терпения");
+            return "Матчи еще не начались. Наберись терпения";
         } else {
-            return matches.stream()
-                    .map(Entity::getInfo);
+            StringBuilder stringBuilder = new StringBuilder();
+
+            matches.forEach(entity -> {
+                stringBuilder.append(entity.getInfo());
+                stringBuilder.append("\n\n");
+            });
+            return stringBuilder.toString();
         }
     }
 
@@ -43,7 +47,7 @@ public class Results {
 
         public String getInfo() {
             return String.format(
-                    "%s\n%s\n%s\n %s %s %s\n%s",
+                    "%s\n%s\n%s\n%s %s %s\n%s",
                     DateUtils.instantToString(date),
                     stage,
                     state,
