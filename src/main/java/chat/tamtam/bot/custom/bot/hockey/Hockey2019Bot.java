@@ -2,6 +2,7 @@ package chat.tamtam.bot.custom.bot.hockey;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,14 +46,6 @@ import lombok.extern.log4j.Log4j2;
 @RefreshScope
 public class Hockey2019Bot extends AbstractCustomBot {
 
-    // CHECKSTYLE_OFF: ALMOST_ALL
-    private static final String INFO_MESSAGE =
-            "Чемпионат мира\uD83C\uDFC6\uD83C\uDF0D по хоккею\uD83C\uDFD2 стартует в 83 раз.\n"
-            + "Местом его проведения была выбрана Словакия\uD83C\uDDF8\uD83C\uDDF0 (города Братислава и Кошица).\n"
-            + "Соревнование начнется 10 мая и продлиться до 26 мая\uD83D\uDCC5.\n"
-            + "В этом году чемпионский титул будет защищать сборная Швеции\uD83C\uDDF8\uD83C\uDDEA.\n"
-            + "Впервые с 1994 года на чемпионате мира выступит сборная Великобритании\uD83C\uDDEC\uD83C\uDDE7.";
-    // CHECKSTYLE_OFF: ALMOST_ALL
     private static final String HELLO_MESSAGE = "Чемпионат мира по хоккею 2019";
     private static final String INFO = "/инфо";
     private static final String NEWS = "/новости";
@@ -61,30 +54,41 @@ public class Hockey2019Bot extends AbstractCustomBot {
     private static final String RESULTS = "/результаты";
     private static final String MATCH = "/матч";
 
-    private static final String HELP_MESSAGE = String.format(
-            "%s:\n\n%s\n%s\n%s\n%s\n%s\n%s\n",
-            HELLO_MESSAGE,
-            INFO,
-            NEWS,
-            TEAM_NEWS,
-            CALENDAR,
-            RESULTS,
-            MATCH
-    );
-    private static final Stream<NewMessageBody> TEAMS;
-    private static final NewMessageBody HELP_MESSAGE_BODY;
+    private static final NewMessageBody INFO_MESSAGE;
+    private static final NewMessageBody HELP_MESSAGE;
+    private static final List<NewMessageBody> TEAMS;
+    private static final Collector<NewMessageBody, Object, List<NewMessageBody>> collector;
 
     static {
-        TEAMS = Stream.of(messageOf(
-                "Выбери команду",
-                List.of(new InlineKeyboardAttachmentRequest(new InlineKeyboardAttachmentRequestPayload(
-                        Stream.of(Team.values())
-                                .map(team -> new ArrayList<Button>() {{
-                                    add(new CallbackButton(team.getName(), team.getName(), Intent.DEFAULT));
-                                }})
-                                .collect(Collectors.toList()))))
+        // CHECKSTYLE_OFF: ALMOST_ALL
+        INFO_MESSAGE = messageOf("Чемпионат мира\uD83C\uDFC6\uD83C\uDF0D по хоккею\uD83C\uDFD2 стартует в 83 раз.\n"
+                + "Местом его проведения была выбрана Словакия\uD83C\uDDF8\uD83C\uDDF0 (города Братислава и Кошица).\n"
+                + "Соревнование начнется 10 мая и продлиться до 26 мая\uD83D\uDCC5.\n"
+                + "В этом году чемпионский титул будет защищать сборная Швеции\uD83C\uDDF8\uD83C\uDDEA.\n"
+                + "Впервые с 1994 года на чемпионате мира выступит сборная Великобритании\uD83C\uDDEC\uD83C\uDDE7.");
+        // CHECKSTYLE_OFF: ALMOST_ALL
+        HELP_MESSAGE = messageOf(String.format("%s:\n\n%s\n%s\n%s\n%s\n%s\n%s\n",
+                HELLO_MESSAGE,
+                INFO,
+                NEWS,
+                TEAM_NEWS,
+                CALENDAR,
+                RESULTS,
+                MATCH
         ));
-        HELP_MESSAGE_BODY = messageOf(HELP_MESSAGE);
+
+        TEAMS = List.of(messageOf("Выбери команду",
+                List.of(new InlineKeyboardAttachmentRequest(new InlineKeyboardAttachmentRequestPayload(Stream.of(Team.values())
+                        .map(team -> new ArrayList<Button>() {{
+                            add(new CallbackButton(team.getName(), team.getName(), Intent.DEFAULT));
+                        }})
+                        .collect(Collectors.toList()))))
+        ));
+
+        collector = Collectors.collectingAndThen(Collectors.toList(), list -> {
+            list.add(HELP_MESSAGE);
+            return list;
+        });
     }
 
     private final Hockey2019Service hockey2019Service;
@@ -143,7 +147,7 @@ public class Hockey2019Bot extends AbstractCustomBot {
                 );
     }
 
-    private Stream<NewMessageBody> resolve(final Message message) {
+    private List<NewMessageBody> resolve(final Message message) {
         switch (message.getBody().getText()) {
             case INFO:
                 return info();
@@ -159,12 +163,12 @@ public class Hockey2019Bot extends AbstractCustomBot {
                 // @todo ##CC-173 implement match of id function
                 return match(1);
             default:
-                return Stream.of(HELP_MESSAGE_BODY);
+                return List.of(HELP_MESSAGE);
         }
     }
 
-    private static Stream<NewMessageBody> info() {
-        return Stream.of(messageOf(INFO_MESSAGE));
+    private static List<NewMessageBody> info() {
+        return List.of(INFO_MESSAGE, HELP_MESSAGE);
     }
 
     private void callbackUpdate(MessageCallbackUpdate update) {
@@ -183,37 +187,41 @@ public class Hockey2019Bot extends AbstractCustomBot {
         );
     }
 
-    private Stream<NewMessageBody> match(int matchId) {
-        return Stream.of(messageOf("Скоро будет сделано"));
+    private List<NewMessageBody> match(int matchId) {
+        return Stream.of(messageOf("Скоро будет сделано")).collect(collector);
 //        return hockey2019Service.getMatch(matchId).getMessages();
     }
 
-    private Stream<NewMessageBody> results() {
+    private List<NewMessageBody> results() {
         return hockey2019Service
                 .getResults()
                 .getMessages()
-                .map(AbstractCustomBot::messageOf);
+                .map(AbstractCustomBot::messageOf)
+                .collect(collector);
     }
 
-    private Stream<NewMessageBody> calendar() {
+    private List<NewMessageBody> calendar() {
         return hockey2019Service
                 .getCalendar()
                 .getMessages()
-                .map(AbstractCustomBot::messageOf);
+                .map(AbstractCustomBot::messageOf)
+                .collect(collector);
     }
 
-    private Stream<NewMessageBody> news() {
+    private List<NewMessageBody> news() {
         return hockey2019Service
                 .getNews()
                 .getMessages()
-                .map(AbstractCustomBot::messageOf);
+                .map(AbstractCustomBot::messageOf)
+                .collect(collector);
     }
 
-    private Stream<NewMessageBody> news(String teamName) {
+    private List<NewMessageBody> news(String teamName) {
         return hockey2019Service
                 .getNewsOfTeam(Team.getIdByName(teamName))
                 .getMessages()
-                .map(AbstractCustomBot::messageOf);
+                .map(AbstractCustomBot::messageOf)
+                .collect(collector);
     }
 
     private class Hockey2019BotVisitor implements Update.Visitor {
@@ -264,7 +272,7 @@ public class Hockey2019Bot extends AbstractCustomBot {
 
         @Override
         public void visit(BotStartedUpdate model) {
-            sendMessage(model.getUserId(), model.getChatId(), messageOf(HELP_MESSAGE));
+            sendMessage(model.getUserId(), model.getChatId(), HELP_MESSAGE);
         }
 
         @Override

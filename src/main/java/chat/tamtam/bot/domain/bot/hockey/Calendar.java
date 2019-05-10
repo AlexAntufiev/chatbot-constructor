@@ -21,6 +21,16 @@ public class Calendar {
         return matches.stream().map(Entity::getInfo);
     }
 
+//    public String getMessages() {
+//        StringBuilder stringBuilder = new StringBuilder();
+//
+//        matches.forEach(entity -> {
+//            stringBuilder.append(entity.getInfo());
+//            stringBuilder.append("\n\n");
+//        });
+//        return stringBuilder.toString();
+//    }
+
     @Setter
     @NoArgsConstructor
     private static class Entity {
