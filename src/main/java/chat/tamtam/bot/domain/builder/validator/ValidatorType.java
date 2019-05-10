@@ -17,9 +17,8 @@ public enum ValidatorType {
     private static final Map<Byte, ValidatorType> BY_ID;
 
     static {
-        BY_ID = new HashMap<>();
-        for (ValidatorType type
-                : values()) {
+        BY_ID = new HashMap<>(values().length);
+        for (ValidatorType type : values()) {
             if (BY_ID.containsKey(type.type)) {
                 throw new IllegalStateException("Duplicate id=" + type.type);
             }
