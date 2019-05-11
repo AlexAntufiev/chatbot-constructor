@@ -39,6 +39,7 @@ function main() {
     if [[ $(docker-compose ps) != *"db"* ]];
     then
         send_message "${server_type} будет создан"
+        docker-compose build
         docker-compose up -d
         send_message "${server_type} создался: http://${host}/index.html \n managing config: http://${host}:${config_service_port}/ui/dc1/services"
     else
@@ -48,6 +49,7 @@ function main() {
         docker image rm -f chatbot-constructor_app
         send_message "${server_type} остановлен"
 
+        docker-compose build
         docker-compose up -d app
         send_message "${server_type} перезапустился: http://${host}/index.html \n managing config: http://${host}:${config_service_port}/ui/dc1/services"
     fi

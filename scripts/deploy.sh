@@ -6,12 +6,13 @@ ssh_deploy_file_prod="/tmp/prod_ssh"
 user="centos"
 server_type=$1
 server=$2
-db_password=MDYwNTIwMTlxd2VydHkK
 
 if [ "$server_type" == "test" ]; then
     ssh_path=${ssh_deploy_file_test}
+    db_password=MDYwNTIwMTlxd2VydHkK
 elif [ "$server_type" == "prod" ]; then
     ssh_path=${ssh_deploy_file_prod}
+    db_password=QUFNRXNlY3JldDA0MDUyMDE5MzA4Cg==
 else
     echo "Incorrect server type"
     exit

@@ -7,10 +7,6 @@ if [ "$mode" != "test" ] && [ "$mode" != "prod" ]; then
     exit
 fi
 
-application_name="chatbot-constructor"
-
-mkdir -p ~/${application_name}
-
 echo "Docker installing..."
 ./docker/install.sh
 echo "Docker installed"
