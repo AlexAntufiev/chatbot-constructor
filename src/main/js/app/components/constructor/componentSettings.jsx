@@ -28,6 +28,7 @@ class ComponentSettings extends Component {
         this.saveButton = this.saveButton.bind(this);
         this.removeButton = this.removeButton.bind(this);
         this.checkEmptyRows = this.checkEmptyRows.bind(this);
+        this.findMessage = this.findMessage.bind(this);
     }
 
     createNextStatesList() {
@@ -110,7 +111,7 @@ class ComponentSettings extends Component {
     renderButton(elem, row, col) {
         return (
             <Button label={elem.text} className={"button-elem"} onClick={() => {
-                this.settingsButtonDialog.getWrappedInstance().onShow(elem, row, col)
+                this.settingsButtonDialog.getWrappedInstance().onShow(elem, row, col, this.findMessage(elem.nextState))
             }}/>
         );
     }
@@ -177,6 +178,20 @@ class ComponentSettings extends Component {
         }
     }
 
+    findMessage(idBtn) {
+        if (!idBtn) {
+            return null;
+        }
+        const ind = this.props.findComponentInd(0, idBtn);
+        if (ind !== -1) {
+            const component = this.props.components[0][ind];
+            if (component.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO && !component.buttonsGroup) {
+                return component;
+            }
+        }
+        return null;
+    }
+
     render() {
         if (!this.props.component) {
             return (<div/>);
@@ -184,6 +199,7 @@ class ComponentSettings extends Component {
         this.checkEmptyRows();
         const nextComponentList = this.createNextStatesList();
         const buttonsList = this.createButtonsList();
+
         return (
             <div className={"text-card"}>
                 <div className={"text-card_detail-element"}>

@@ -28,7 +28,7 @@ class ButtonSettingsDialog extends BaseDialog {
         this.removeButton = this.removeButton.bind(this);
     }
 
-    onShow(button, row, col) {
+    onShow(button, row, col, message) {
         super.onShow();
         this.setState({
             text: button.text,
@@ -36,7 +36,8 @@ class ButtonSettingsDialog extends BaseDialog {
             intent: button.intent,
             nextState: button.nextState,
             row: row,
-            col: col
+            col: col,
+            message: message
         });
     }
 
@@ -67,6 +68,7 @@ class ButtonSettingsDialog extends BaseDialog {
     }
 
     onSave() {
+        console.log(this.state);
         const btn = {
             text: this.state.text,
             value: this.state.value,
