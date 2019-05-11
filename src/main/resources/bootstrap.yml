@@ -1,13 +1,13 @@
 spring:
   application:
     name: chatbot-constructor
-    version: 1.0.0
+    version: 1.0.1-SNAPSHOT
   devtools:
     add-properties: false
   cloud:
     consul:
       enabled: false
-      host: 192.168.9.152
+      host: localhost
       port: 8500
       discovery:
         healthCheckInterval: 300s

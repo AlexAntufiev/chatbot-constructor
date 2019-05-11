@@ -30,7 +30,6 @@ public class AopLogger {
             + "||@annotation(org.springframework.web.bind.annotation.PutMapping)"
             + "||@annotation(org.springframework.web.bind.annotation.PatchMapping)"
             + "||@annotation(org.springframework.web.bind.annotation.ExceptionHandler)"
-            + "||@annotation(org.springframework.scheduling.annotation.Scheduled)"
             + "||@annotation(org.springframework.scheduling.annotation.Async)"
             + "||@annotation(chat.tamtam.bot.configuration.logging.Loggable)"
     )
