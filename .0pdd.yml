@@ -1,8 +1,8 @@
 errors:
-  - nechaev.m.s@yandex.ru
+  - gorbatov.eg@gmail.com
 alerts:
   github:
-    - nms403
+    - gorbatovea
 format:
   - short-title
   - title-length=100
