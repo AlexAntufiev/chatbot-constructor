@@ -70,7 +70,7 @@ public class BuilderService {
                                     .ifPresent(group -> update.setButtonsGroup(new ButtonsGroupUpdate(group)));
                             // @todo #CC-185 Fetch and add other attachments
                         case INPUT:
-                            // @todo #CC-185 Fetch and add componentValidators, actions etc.
+                            // @todo #CC-185 Fetch and add validators, actions etc.
                         default:
                             break;
                     }
@@ -172,11 +172,11 @@ public class BuilderService {
 
     private List<ComponentValidator> updateValidators(final ComponentUpdate update) {
         /*
-         * Check if all componentValidators belong to this
+         * Check if all validators belong to this
          * builderComponent(componentValidator.getComponentId == builderComponent.getId)
          * */
         for (ComponentValidator componentValidator
-                : update.getComponentValidators()) {
+                : update.getValidators()) {
             if (!update.getComponent().getId().equals(componentValidator.getComponentId())) {
                 throw new ChatBotConstructorException(
                         String.format(
@@ -189,7 +189,7 @@ public class BuilderService {
             }
         }
 
-        return Lists.newArrayList(validatorRepository.saveAll(update.getComponentValidators()));
+        return Lists.newArrayList(validatorRepository.saveAll(update.getValidators()));
     }
 
     private ButtonsGroupUpdate updateButtonsGroup(

@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ComponentUpdate {
     private SchemeComponent component;
-    private List<ComponentValidator> componentValidators = Collections.emptyList();
+    private List<ComponentValidator> validators = Collections.emptyList();
     private ButtonsGroupUpdate buttonsGroup;
 }

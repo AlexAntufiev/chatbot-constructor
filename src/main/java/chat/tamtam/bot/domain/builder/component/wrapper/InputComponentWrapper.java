@@ -6,5 +6,5 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class InputComponentWrapper {
     private final SchemeComponent schemeComponent;
-    // @todo #CC-141 Implement componentValidators and predicates invocation
+    // @todo #CC-141 Implement validators and predicates invocation
 }
