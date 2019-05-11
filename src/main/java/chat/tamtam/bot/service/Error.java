@@ -46,6 +46,11 @@ public enum Error {
     ATTACHMENT_DOES_NOT_EXIST("errors.attachment.does.not.exist"),
     ATTACHMENT_IDENTIFIER_IS_NOT_VALID("errors.attachment.token.is.not.valid"),
 
+    SCHEME_BUILDER_COMPONENT_ID_IS_NULL("errors.bot.scheme.builder.component.id.is.null"),
+    SCHEME_BUILDER_COMPONENT_DUPLICATION("errors.bot.scheme.builder.component.duplication"),
+    SCHEME_BUILDER_COMPONENT_DOES_NOT_EXIST("errors.bot.scheme.builder.component.is.absent"),
+    SCHEME_BUILDER_COMPONENT_GRAPH_IS_CYCLIC("errors.bot.scheme.builder.component.graph.is.cyclic"),
+
     SCHEME_BUILDER_INVALID_VALIDATOR("errors.bot.scheme.invalid.componentValidator"),
     SCHEME_BUILDER_BUTTONS_EMPTY_FIELDS("errors.bot.scheme.builder.buttons.empty.fields"),
     SCHEME_BUILDER_BUTTONS_UPDATE_BY_ID("errors.bot.scheme.builder.buttons.id.not.exist"),
