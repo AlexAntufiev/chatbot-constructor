@@ -27,26 +27,26 @@ class ComponentGroup extends Component {
                     }, null, this);
                 }
             },
-            {
-                label: "Vote list",
-                icon: "pi pi-list",
-                command: () => {
-                    BuilderService.newComponent(this.props.botSchemeId, (res) => {
-                        this.props.onCreateComponent(res.data.payload.componentId, BotConstructor.COMPONENT_TYPES.VOTE_LIST);
-                        this.menu.hide();
-                    }, null, this);
-                }
-            },
-            /*{
-                label: "User input",
-                icon: "pi pi-ellipsis-h",
-                command: () => {
-                    BuilderService.newComponent(this.props.botSchemeId, (res) => {
-                        this.props.onCreateComponent(res.data.payload.componentId, BotConstructor.COMPONENT_TYPES.USER_INPUT);
-                        this.menu.hide();
-                    }, null, this);
-                }
-            }*/
+            /* {
+                 label: "Vote list",
+                 icon: "pi pi-list",
+                 command: () => {
+                     BuilderService.newComponent(this.props.botSchemeId, (res) => {
+                         this.props.onCreateComponent(res.data.payload.componentId, BotConstructor.COMPONENT_TYPES.VOTE_LIST);
+                         this.menu.hide();
+                     }, null, this);
+                 }
+             },
+             {
+                 label: "User input",
+                 icon: "pi pi-ellipsis-h",
+                 command: () => {
+                     BuilderService.newComponent(this.props.botSchemeId, (res) => {
+                         this.props.onCreateComponent(res.data.payload.componentId, BotConstructor.COMPONENT_TYPES.USER_INPUT);
+                         this.menu.hide();
+                     }, null, this);
+                 }
+             }*/
         ];
 
         this.createComponentList = this.createComponentList.bind(this);
@@ -62,9 +62,9 @@ class ComponentGroup extends Component {
             let icon = "";
             let label = componentObj.component.title;
             switch (componentObj.component.type) {
-                case BotConstructor.COMPONENT_SCHEME_TYPES.INPUT:
+                /*case BotConstructor.COMPONENT_SCHEME_TYPES.INPUT:
                     icon = "pi pi-ellipsis-h";
-                    break;
+                    break;*/
                 case BotConstructor.COMPONENT_SCHEME_TYPES.INFO:
                     if (componentObj.buttonsGroup) {
                         icon = "pi pi-th-large";
