@@ -17,12 +17,14 @@ import chat.tamtam.bot.domain.builder.button.ButtonsGroupUpdate;
 import chat.tamtam.bot.domain.builder.component.ComponentType;
 import chat.tamtam.bot.domain.builder.component.ComponentUpdate;
 import chat.tamtam.bot.domain.builder.component.SchemeComponent;
+import chat.tamtam.bot.domain.builder.component.group.SchemeComponentGroup;
 import chat.tamtam.bot.domain.builder.validator.ComponentValidator;
 import chat.tamtam.bot.domain.exception.ChatBotConstructorException;
 import chat.tamtam.bot.domain.response.SuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
 import chat.tamtam.bot.repository.BotSchemeRepository;
 import chat.tamtam.bot.repository.ButtonsGroupRepository;
+import chat.tamtam.bot.repository.ComponentGroupRepository;
 import chat.tamtam.bot.repository.ComponentRepository;
 import chat.tamtam.bot.repository.ComponentValidatorRepository;
 import chat.tamtam.bot.utils.TransactionalUtils;
@@ -41,6 +43,8 @@ public class BuilderService {
 
     private final BotSchemeService botSchemeService;
     private final BotSchemeRepository botSchemeRepository;
+
+    private final ComponentGroupRepository componentGroupRepository;
 
     private final TransactionalUtils transactionalUtils;
 
@@ -298,5 +302,12 @@ public class BuilderService {
 
         update.getSchemeComponent().setHasCallbacks(true);
         return new ButtonsGroupUpdate(group);
+    }
+
+    public SuccessResponse addComponentGroup(final String authToken, final int schemeId) {
+        BotScheme botScheme = botSchemeService.getBotScheme(authToken, schemeId);
+        SchemeComponentGroup group = new SchemeComponentGroup();
+        group.setSchemeId(botScheme.getId());
+        gr
     }
 }

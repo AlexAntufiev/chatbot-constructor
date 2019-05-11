@@ -15,5 +15,7 @@ public class SchemeComponentGroup {
     @GeneratedValue
     private Long id;
 
+    private Integer schemeId;
+
     private String title;
 }
