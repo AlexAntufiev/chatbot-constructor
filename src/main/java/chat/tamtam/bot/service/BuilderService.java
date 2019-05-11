@@ -196,6 +196,9 @@ public class BuilderService {
             final ComponentUpdate update,
             final int botSchemeId
     ) throws IOException {
+        /*
+         * Check if buttons are presented in update
+         * */
         if (update.getButtonsGroup() == null
                 || update.getButtonsGroup().getButtons() == null
                 || update.getButtonsGroup().getButtons().isEmpty()) {
