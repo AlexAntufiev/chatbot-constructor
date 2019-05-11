@@ -90,6 +90,10 @@ export default {
     'errors.bot.scheme.builder.buttons.id.not.exist': 'Id группы кнопок не подходит',
     'errors.bot.scheme.builder.buttons.group.is.empty': 'Группа кнопок не может быть пустой',
     'errors.bot.scheme.builder.buttons.group.intent.malformed': 'Неверный цвет кнопки',
+    'errors.bot.scheme.builder.component.id.is.null': 'Пустой id компонента',
+    'errors.bot.scheme.builder.component.duplication': 'Повторяющийся id компонента',
+    'errors.bot.scheme.builder.component.is.absent': 'Отсутствует компонент с таким id',
+    'errors.bot.scheme.builder.component.graph.is.cyclic': 'Зацикленная схема бота',
 
     //Success messages
     'app.successmessage.successsumary': 'Успешно',

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ComponentUpdate {
-    private SchemeComponent schemeComponent;
+    private SchemeComponent component;
     private List<ComponentValidator> componentValidators = Collections.emptyList();
     private ButtonsGroupUpdate buttonsGroup;
 }

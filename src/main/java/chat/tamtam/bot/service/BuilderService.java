@@ -25,6 +25,7 @@ import chat.tamtam.bot.repository.BotSchemeRepository;
 import chat.tamtam.bot.repository.ButtonsGroupRepository;
 import chat.tamtam.bot.repository.ComponentRepository;
 import chat.tamtam.bot.repository.ComponentValidatorRepository;
+import chat.tamtam.bot.utils.SchemeComponentUtils;
 import chat.tamtam.bot.utils.TransactionalUtils;
 import chat.tamtam.botapi.model.Intent;
 import lombok.Getter;
@@ -60,7 +61,7 @@ public class BuilderService {
                 .findAllBySchemeId(botScheme.getId())
                 .forEach(component -> {
                     ComponentUpdate update = new ComponentUpdate();
-                    update.setSchemeComponent(component);
+                    update.setComponent(component);
 
                     switch (ComponentType.getById(component.getType())) {
                         case INFO:
@@ -85,6 +86,17 @@ public class BuilderService {
     ) {
         // @todo #CC-163 Split logic by builderComponent type(e.g. if type is INPUT then ignore buttonsGroup)
         BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+
+        /*
+         * Check that graph is non-cyclicality.
+         * In case if false -> throws exception.
+         * */
+        if (!SchemeComponentUtils.isGraphIsNonCyclic(components)) {
+            throw new ChatBotConstructorException(
+                    String.format("Components graph(%s) is cyclic(botScheme=%s)", components, botScheme),
+                    Error.SCHEME_BUILDER_COMPONENT_GRAPH_IS_CYCLIC
+            );
+        }
 
         Object updatedComponents =
                 transactionalUtils.invokeCallable(() -> {
@@ -131,14 +143,14 @@ public class BuilderService {
                         ButtonsGroupUpdate buttonsGroupUpdate = null;
                         List<ComponentValidator> componentValidators = null;
 
-                        switch (ComponentType.getById(update.getSchemeComponent().getType())) {
+                        switch (ComponentType.getById(update.getComponent().getType())) {
                             case INFO:
                                 buttonsGroupUpdate = updateButtonsGroup(update, botSchemeId);
                             case INPUT:
                                 componentValidators = updateValidators(update);
                             default:
-                                update.getSchemeComponent().setSchemeId(botScheme.getId());
-                                schemeComponent = componentRepository.save(update.getSchemeComponent());
+                                update.getComponent().setSchemeId(botScheme.getId());
+                                schemeComponent = componentRepository.save(update.getComponent());
                         }
 
                         updated.add(new ComponentUpdate(schemeComponent, componentValidators, buttonsGroupUpdate));
@@ -148,7 +160,7 @@ public class BuilderService {
                                     .stream()
                                     .findFirst()
                                     .orElseThrow()
-                                    .getSchemeComponent()
+                                    .getComponent()
                                     .getId()
                     );
                     botSchemeRepository.save(botScheme);
@@ -165,12 +177,12 @@ public class BuilderService {
          * */
         for (ComponentValidator componentValidator
                 : update.getComponentValidators()) {
-            if (!update.getSchemeComponent().getId().equals(componentValidator.getComponentId())) {
+            if (!update.getComponent().getId().equals(componentValidator.getComponentId())) {
                 throw new ChatBotConstructorException(
                         String.format(
                                 "Invalid componentValidator componentId=%d(should be %d)",
                                 componentValidator.getComponentId(),
-                                update.getSchemeComponent().getId()
+                                update.getComponent().getId()
                         ),
                         Error.SCHEME_BUILDER_INVALID_VALIDATOR
                 );
@@ -186,7 +198,7 @@ public class BuilderService {
     ) throws IOException {
         if (update.getButtonsGroup() == null) {
             buttonsGroupRepository
-                    .findByComponentId(update.getSchemeComponent().getId())
+                    .findByComponentId(update.getComponent().getId())
                     .ifPresent(group -> {
                         group.setComponentId(null);
                         buttonsGroupRepository.save(group);
@@ -200,14 +212,14 @@ public class BuilderService {
         if (update.getButtonsGroup().getId() != null) {
             if (!buttonsGroupRepository.existsByIdAndAndComponentId(
                     update.getButtonsGroup().getId(),
-                    update.getSchemeComponent().getId()
+                    update.getComponent().getId()
             )) {
                 throw new ChatBotConstructorException(
                         String.format(
                                 "Buttons group id(%d) "
                                         + "does not belong to this builderComponent(id=%d, botSchemeId=%d)",
                                 update.getButtonsGroup().getId(),
-                                update.getSchemeComponent().getId(),
+                                update.getComponent().getId(),
                                 botSchemeId
                         ),
                         Error.SCHEME_BUILDER_BUTTONS_UPDATE_BY_ID
@@ -219,7 +231,7 @@ public class BuilderService {
              * else new group should inherit id of previous(to rewrite it)
              * */
             buttonsGroupRepository
-                    .findByComponentId(update.getSchemeComponent().getId())
+                    .findByComponentId(update.getComponent().getId())
                     .ifPresent(g -> update.getButtonsGroup().setId(g.getId()));
         }
 
@@ -231,7 +243,7 @@ public class BuilderService {
                     String.format(
                             "Buttons group(id=%d, componentId=%d, botSchemeId=%d) is empty",
                             update.getButtonsGroup().getId(),
-                            update.getSchemeComponent().getId(),
+                            update.getComponent().getId(),
                             botSchemeId
                     ),
                     Error.SCHEME_BUILDER_BUTTONS_GROUP_IS_EMPTY
@@ -250,7 +262,7 @@ public class BuilderService {
                         String.format(
                                 "Buttons group(id=%d, componentId=%d, botSchemeId=%d) has empty list",
                                 update.getButtonsGroup().getId(),
-                                update.getSchemeComponent().getId(),
+                                update.getComponent().getId(),
                                 botSchemeId
                         ),
                         Error.SCHEME_BUILDER_BUTTONS_GROUP_IS_EMPTY
@@ -263,7 +275,7 @@ public class BuilderService {
                             String.format(
                                     "Button(%s) has empty text or payload"
                                             + "(botSchemeId=%d, componentId=%d)",
-                                    button, botSchemeId, update.getSchemeComponent().getId()
+                                    button, botSchemeId, update.getComponent().getId()
                             ),
                             Error.SCHEME_BUILDER_BUTTONS_EMPTY_FIELDS
                     );
@@ -280,7 +292,7 @@ public class BuilderService {
                     throw new ChatBotConstructorException(
                             String.format(
                                     "Malformed intent(%s, botSchemeId=%d, componentId=%d)",
-                                    update, botSchemeId, update.getSchemeComponent().getId()
+                                    update, botSchemeId, update.getComponent().getId()
                             ),
                             Error.SCHEME_BUILDER_BUTTONS_GROUP_INTENT_MALFORMED,
                             e
@@ -291,12 +303,12 @@ public class BuilderService {
 
         ButtonsGroup group = buttonsGroupRepository.save(
                 new ButtonsGroup(
-                        update.getSchemeComponent().getId(),
+                        update.getComponent().getId(),
                         update.getButtonsGroup()
                 )
         );
 
-        update.getSchemeComponent().setHasCallbacks(true);
+        update.getComponent().setHasCallbacks(true);
         return new ButtonsGroupUpdate(group);
     }
 }

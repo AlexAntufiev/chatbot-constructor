@@ -40,7 +40,7 @@ public class ComponentProcessorService {
     private final ComponentRepository componentRepository;
 
     /*
-     * Process builderComponent with type INFO
+     * Process сomponent with type INFO
      * */
     public void process(
             final BotContext context,
@@ -95,7 +95,7 @@ public class ComponentProcessorService {
     }
 
     /*
-     * Process builderComponent with type INPUT on MessageCreatedUpdate
+     * Process сomponent with type INPUT on MessageCreatedUpdate
      * */
     public void process(
             final MessageCreatedUpdate update,
@@ -124,7 +124,7 @@ public class ComponentProcessorService {
     }
 
     /*
-     * Process builderComponent with type INPUT on MessageCallbackUpdate
+     * Process сomponent with type INPUT on MessageCallbackUpdate
      * */
     public void process(
             final MessageCallbackUpdate update,
@@ -137,9 +137,9 @@ public class ComponentProcessorService {
             componentRepository.findById(payload.getNextState())
                     .ifPresentOrElse(
                             foundComponent -> {
-                                // check type of next builderComponent
+                                // check type of next сomponent
                                 if (ComponentType.getById(foundComponent.getType()) == ComponentType.INFO) {
-                                    // answer on callback with next builderComponent
+                                    // answer on callback with next сomponent
                                     final boolean success =
                                             answerOnCallback(
                                                     new CallbackAnswer()
