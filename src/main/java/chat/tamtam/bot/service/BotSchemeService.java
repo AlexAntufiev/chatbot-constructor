@@ -51,12 +51,9 @@ public class BotSchemeService {
             Long userId,
             Integer id
     ) throws NoSuchElementException {
-        if (!botSchemeRepository.existsByUserIdAndIdAndSchemeResetState(userId, id, bot.getSchemeResetState())) {
+        if (!botSchemeRepository.existsByUserIdAndId(userId, id)) {
             throw new NoSuchElementException(
-                    String.format(
-                            "Does not exist bot with userId=%d, id=%d, resetState=%d",
-                            userId, id, bot.getSchemeResetState()
-                    )
+                    String.format("Does not exist bot with userId=%d, id=%d", userId, id)
             );
         }
         bot.setUserId(userId);
