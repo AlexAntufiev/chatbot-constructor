@@ -44,6 +44,9 @@ export default {
     'app.dialog.append': 'Append',
     'app.dialog.refresh': 'Refresh',
     'app.dialog.attach': 'Attach',
+    'app.dialog.remove.button': 'Remove button',
+    'app.dialog.remove.message': 'Remove message',
+    'app.dialog.add.message': 'Add message',
 
     //Error messages
     'app.errormessage.errorsummary': 'Error Message',
@@ -117,6 +120,15 @@ export default {
     'template.message.error': 'Error when process message :name',
 
     //Common
-    'app.common.sigin.message': 'Please, sign in'
+    'app.common.sigin.message': 'Please, sign in',
+
+    'app.constructor.intent.positive': 'green',
+    'app.constructor.intent.negative': 'red',
+    'app.constructor.intent.default': 'gray',
+    'app.constructor.intent.select': 'Select color',
+    'app.constructor.select.next.component': 'Select next component',
+    'app.constructor.component.buttongroup': 'Button group',
+    'app.constructor.component.button': 'Button',
+    'app.constructor.message.text': 'Message text'
 };
 

@@ -6,6 +6,7 @@ import {withRouter} from "react-router";
 import {injectIntl} from "react-intl";
 import BotConstructor from "app/components/pages/botConstructor";
 import ButtonSettingsDialog from "app/components/constructor/buttonSettingsDialog";
+import {Growl} from "primereact/growl";
 
 class ComponentSettings extends Component {
     constructor(props) {
@@ -91,12 +92,13 @@ class ComponentSettings extends Component {
     }
 
     createButton(row) {
+        const {intl} = this.props;
         let buttons = this.state.buttonsGroup.buttons.slice();
         const buttonObj = {
             intent: null,
             nextState: null,
-            text: "button",
-            value: "button"
+            text: intl.formatMessage({id: 'app.constructor.component.button'}),
+            value: intl.formatMessage({id: 'app.constructor.component.button'})
         };
 
         if (row === -1) {
@@ -138,10 +140,8 @@ class ComponentSettings extends Component {
             }
             renderedMatrix.push(<div>{renderedRow}</div>);
         }
-        if (renderedMatrix.length < 5) {
-            renderedMatrix.push(<div><Button icon='pi pi-plus' className={"button-elem"}
-                                             onClick={() => this.createButton(-1)}/></div>);
-        }
+        renderedMatrix.push(<div><Button icon='pi pi-plus' className={"button-elem"}
+                                         onClick={() => this.createButton(-1)}/></div>);
         return renderedMatrix;
     }
 
@@ -155,12 +155,10 @@ class ComponentSettings extends Component {
         } else {
             this.setState({editedButton: this.props.components[0][messageInd]});
         }
-
     }
 
     checkEmptyRows() {
-        if (!this.state.buttonsGroup)
-        {
+        if (!this.state.buttonsGroup) {
             return;
         }
         let i = 0;
@@ -199,15 +197,19 @@ class ComponentSettings extends Component {
         this.checkEmptyRows();
         const nextComponentList = this.createNextStatesList();
         const buttonsList = this.createButtonsList();
+        const {intl} = this.props;
 
         return (
             <div className={"text-card"}>
+                <Growl ref={(el) => this.growl = el}/>
                 <div className={"text-card_detail-element"}>
-                    <InputText value={this.state.title} onChange={(e) => this.setState({title: e.target.value})}/>
+                    <InputText value={this.state.title} onChange={(e) => this.setState({title: e.target.value})}
+                               placeholder={intl.formatMessage({id: 'app.dialog.name'})}/>
                 </div>
                 <div className={"text-card_detail-element"}>
                     <InputTextarea rows={5} cols={60} value={this.state.text}
-                                   onChange={(e) => this.setState({text: e.target.value})}/>
+                                   onChange={(e) => this.setState({text: e.target.value})}
+                                   placeholder={intl.formatMessage({id: 'app.constructor.message.text'})}/>
                 </div>
                 {/*<div className={"text-card_detail-element"}>
                     <Dropdown value={this.state.nextState} options={nextComponentList}
@@ -215,7 +217,7 @@ class ComponentSettings extends Component {
                               editable={true} placeholder="Select next component"/>
                 </div>*/}
                 <div className="text-card_button-panel">
-                    <Button label={"Remove"}
+                    <Button label={intl.formatMessage({id: "app.bot.remove"})}
                             onClick={() => this.props.onRemove(this.props.component, this.props.groupId)}/>
                 </div>
                 <div className={"button-panel"}>

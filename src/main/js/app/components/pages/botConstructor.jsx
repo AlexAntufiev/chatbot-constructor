@@ -7,6 +7,8 @@ import * as routes from "app/constants/routes";
 import {withRouter} from "react-router";
 import {injectIntl} from "react-intl";
 import ComponentSettings from "app/components/constructor/componentSettings";
+import {Growl} from "primereact/growl";
+import * as AxiosMessages from 'app/utils/axiosMessages';
 
 class BotConstructor extends Component {
 
@@ -53,12 +55,13 @@ class BotConstructor extends Component {
                 title: ""
             }
         };
+        const {intl} = this.props;
 
         switch (type) {
             case BotConstructor.COMPONENT_TYPES.BUTTON_GROUP:
                 componentObj.buttonsGroup = {buttons: []};
                 componentObj.component.type = BotConstructor.COMPONENT_SCHEME_TYPES.INFO;
-                componentObj.component.title = "Button group";
+                componentObj.component.title = intl.formatMessage({id: 'app.constructor.component.buttongroup'});
                 break;
             case BotConstructor.COMPONENT_TYPES.USER_INPUT:
                 componentObj.component.type = BotConstructor.COMPONENT_SCHEME_TYPES.INPUT;
@@ -90,7 +93,7 @@ class BotConstructor extends Component {
                     component: {
                         id: res.data.payload.componentId,
                         groupId: 0,
-                        nextState:null,
+                        nextState: null,
                         schemeId: Number(this.props.match.params.id),
                         text: null,
                         title: "Shadow input",
@@ -126,6 +129,9 @@ class BotConstructor extends Component {
     }
 
     findComponentInd(groupId, componentId) {
+        if (!componentId) {
+            return -1;
+        }
         groupId = Number(groupId);
         componentId = Number(componentId);
         for (let i = 0; i < this.state.components[groupId].length; i++) {
@@ -138,12 +144,49 @@ class BotConstructor extends Component {
     }
 
     removeComponent(componentObj, groupId) {
-        let components = Object.assign({}, this.state.components);
         const ind = this.findComponentInd(groupId, componentObj.component.id);
         if (ind !== -1) {
-            components[groupId].splice(ind, 1);
-            this.setState({components: components});
+            this.state.components[groupId].splice(ind, 1);
+            const shadowInpInd = this.findComponentInd(groupId, componentObj.component.nextState);
+            if (shadowInpInd !== -1) {
+                if (this.state.components[groupId][shadowInpInd].component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INPUT) {
+                    this.state.components[groupId].splice(shadowInpInd, 1);
+                }
+            }
         }
+        if (componentObj.buttonsGroup) {
+            for (let i = 0; i < componentObj.buttonsGroup.buttons.length; i++) {
+                for (let j = 0; j < componentObj.buttonsGroup.buttons[i].length; j++) {
+                    const btn = componentObj.buttonsGroup.buttons[i][j];
+                    const nextElemInd = this.findComponentInd(groupId, btn.nextState);
+                    if (nextElemInd !== -1) {
+                        const nextElem = this.state.components[groupId][nextElemInd];
+                        if (nextElem.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INPUT && !nextElem.buttonsGroup) {
+                            this.state.components[groupId].splice(nextElemInd, 1);
+                        }
+                    }
+                }
+            }
+        }
+
+        for (let groupId in this.state.components) {
+            for (let i = 0; i < this.state.components[groupId].length; i++) {
+                const elem = this.state.components[groupId][i];
+                if (elem.component.nextState === componentObj.component.id) {
+                    elem.component.nextState = null;
+                }
+                if (elem.buttonsGroup) {
+                    for (let row = 0; row < elem.buttonsGroup.buttons.length; row++) {
+                        for (let col = 0; col < elem.buttonsGroup.buttons[row].length; col++) {
+                            if (elem.buttonsGroup.buttons[row][col].nextState === componentObj.component.id) {
+                                elem.buttonsGroup.buttons[row][col].nextState = null;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        this.setState({components: this.state.components});
     }
 
     changeComponent(componentObj, groupId) {
@@ -163,16 +206,17 @@ class BotConstructor extends Component {
                 components.push(this.state.components[groupId][i]);
             }
         }
-        console.log(components);
-        BuilderService.saveBotScheme(this.props.match.params.id, components);
+        BuilderService.saveBotScheme(this.props.match.params.id, components, () => AxiosMessages.successOperation(this), null, this);
     }
 
     render() {
         const groupId = 0;
         const idComponent = this.findComponentInd(groupId, Number(this.props.match.params.componentId));
         const component = idComponent === -1 ? null : this.state.components[groupId][idComponent];
+        const {intl} = this.props;
 
         return (<div>
+            <Growl ref={(el) => this.growl = el}/>
             <div className={"constructor-page p-grid"}>
                 <div className={"constructor-container p-col-7"}>
                     <ComponentGroup title={"Group1"} onCreateComponent={this.createComponent}
@@ -180,7 +224,8 @@ class BotConstructor extends Component {
                                     components={this.state.components[groupId]}
                                     groupId={groupId}/>
                     {/*<Button label={"Append group"} icon='pi pi-plus' onClick={this.refreshScheme}/>*/}
-                    <Button label={"Save"} icon='pi pi-plus' onClick={this.saveScheme}/>
+                    <Button label={intl.formatMessage({id: "app.dialog.save"})} icon='pi pi-plus'
+                            onClick={this.saveScheme}/>
                 </div>
                 <div className={"constructor-component-settings p-col-5"}>
                     <ComponentSettings components={this.state.components}

@@ -68,7 +68,6 @@ class ButtonSettingsDialog extends BaseDialog {
     }
 
     onSave() {
-        console.log(this.state);
         const btn = {
             text: this.state.text,
             value: this.state.value,
@@ -90,9 +89,9 @@ class ButtonSettingsDialog extends BaseDialog {
         );
 
         const intents = [
-            {label: "default", value: "default"},
-            {label: "positive", value: "positive"},
-            {label: "negative", value: "negative"},
+            {label: intl.formatMessage({id: 'app.constructor.intent.default'}), value: "default"},
+            {label: intl.formatMessage({id: 'app.constructor.intent.positive'}), value: "positive"},
+            {label: intl.formatMessage({id: 'app.constructor.intent.negative'}), value: "negative"},
         ];
         return (
             <div>
@@ -108,12 +107,14 @@ class ButtonSettingsDialog extends BaseDialog {
                                                text: e.target.value,
                                                value: e.target.value
                                            });
-                                       }}/>
+                                       }}
+                                       placeholder={intl.formatMessage({id: 'app.dialog.name'})}/>
                         </div>
                         <div className={"form_detail-element"}>
                             <Dropdown style={{width: '170px'}} value={this.state.intent} options={intents}
                                       onChange={(e) => this.setState({intent: e.value})}
-                                      editable={true} placeholder="Select intent"/>
+                                      editable={true}
+                                      placeholder={intl.formatMessage({id: 'app.constructor.intent.select'})}/>
                         </div>
                         <div className={"form_detail-element"}>
                             <Dropdown style={{width: '170px'}}
@@ -128,16 +129,18 @@ class ButtonSettingsDialog extends BaseDialog {
                                           }
                                       }
                                       }
-                                      editable={true} placeholder="Select next component"/>
+                                      editable={true}
+                                      placeholder={intl.formatMessage({id: 'app.constructor.select.next.component'})}/>
                         </div>
                         <div className={"form_detail-element"}>
-                            <Button label={"Remove button"}
+                            <Button label={intl.formatMessage({id: 'app.dialog.remove.button'})}
                                     onClick={this.removeButton}/>
                         </div>
                         <div className={"form_detail-element"}>
-                            {!this.state.message && <Button label={"Add message"}
-                                                            onClick={this.addMessage}/>}
-                            {this.state.message && <Button label={"Remove message"}
+                            {!this.state.message &&
+                            <Button label={intl.formatMessage({id: 'app.dialog.add.message'})}
+                                    onClick={this.addMessage}/>}
+                            {this.state.message && <Button label={intl.formatMessage({id: 'app.dialog.remove.message'})}
                                                            onClick={() => {
                                                                this.setState({
                                                                    nextState: this.state.message.component.nextState,
