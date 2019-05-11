@@ -196,7 +196,9 @@ public class BuilderService {
             final ComponentUpdate update,
             final int botSchemeId
     ) throws IOException {
-        if (update.getButtonsGroup() == null) {
+        if (update.getButtonsGroup() == null
+                || update.getButtonsGroup().getButtons() == null
+                || update.getButtonsGroup().getButtons().isEmpty()) {
             buttonsGroupRepository
                     .findByComponentId(update.getComponent().getId())
                     .ifPresent(group -> {
