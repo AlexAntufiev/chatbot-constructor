@@ -181,6 +181,12 @@ public class WebHookBotService {
 
         @Override
         public void visit(final MessageCreatedUpdate model) {
+            if (model.getMessage().getRecipient().getChatId() != null) {
+                log.info(
+                        String.format("Update from chat - ignoring(%s, botSchemeId=%d)", model, botSchemeId)
+                );
+                return;
+            }
             setBotContextLockKey(model.getMessage().getSender().getUserId());
             lock();
             try {
