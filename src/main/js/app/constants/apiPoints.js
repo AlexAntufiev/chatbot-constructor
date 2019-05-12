@@ -33,3 +33,8 @@ export const GET_UPLOAD_ATTACHMENT_LINK = API_POINT + "bot/:id/tam/upload/:attac
 
 const RESOURCES = '/resources/';
 export const GET_REGISTRATION_LINK = RESOURCES + "registration/bot/url";
+
+
+const BUILDER =  API_POINT + "bot/:id/builder/";
+export const BUILDER_NEW_COMPONENT = BUILDER + "builderComponent";
+export const BUILDER_SCHEME = BUILDER + "scheme";

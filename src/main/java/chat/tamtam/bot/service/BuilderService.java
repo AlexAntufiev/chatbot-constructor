@@ -161,6 +161,17 @@ public class BuilderService {
 
                         switch (ComponentType.getById(update.getComponent().getType())) {
                             case INFO:
+                                String text = update.getComponent().getText();
+                                if (StringUtils.isEmpty(update.getComponent().getText())
+                                        || update.getComponent().getText().trim().isEmpty()) {
+                                    throw new ChatBotConstructorException(
+                                            String.format(
+                                                    "Update(%s) has empty text(botSchemeId=%d)",
+                                                    update.getComponent(), botSchemeId
+                                            ),
+                                            Error.SCHEME_BUILDER_COMPONENT_TEXT_IS_EMPTY
+                                    );
+                                }
                                 buttonsGroupUpdate = updateButtonsGroup(update, botSchemeId);
                             case INPUT:
                                 componentValidators = updateValidators(update);
@@ -213,7 +224,12 @@ public class BuilderService {
             final ComponentUpdate update,
             final int botSchemeId
     ) throws IOException {
-        if (update.getButtonsGroup() == null) {
+        /*
+         * Check if buttons are presented in update
+         * */
+        if (update.getButtonsGroup() == null
+                || update.getButtonsGroup().getButtons() == null
+                || update.getButtonsGroup().getButtons().isEmpty()) {
             buttonsGroupRepository
                     .findByComponentId(update.getComponent().getId())
                     .ifPresent(group -> {
