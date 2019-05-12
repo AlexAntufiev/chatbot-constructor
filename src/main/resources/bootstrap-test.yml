@@ -2,11 +2,15 @@ spring:
   cloud:
     consul:
       enabled: true
-      host: 192.168.6.152
+      host: 192.168.9.152
       port: 8500
       discovery:
         healthCheckInterval: 300s
+        preferIpAddress: true
       config:
         watch:
           enabled: true
           delay: 1000 #ms
+    inetutils:
+      ignored-interfaces:
+        - docker0
