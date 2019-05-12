@@ -39,8 +39,8 @@ public class BotSchemeService {
         bot.setUpdate(Instant.now());
         return ((BotScheme) transactionalUtils
                 .invokeCallable(() -> {
-                    //                    SchemeComponent resetComponent = componentRepository.save(new SchemeComponent());
-//                    bot.setSchemeResetState(resetComponent.getId());
+                    //SchemeComponent resetComponent = componentRepository.save(new SchemeComponent());
+                    //bot.setSchemeResetState(resetComponent.getId());
                     return botSchemeRepository.save(bot);
                 }));
     }
