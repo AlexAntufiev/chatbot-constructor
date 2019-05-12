@@ -84,7 +84,7 @@ public class WebHookBotService {
                 return;
             }
 
-            SchemeComponent schemeComponent =
+            SchemeComponent component =
                     componentRepository
                             .findById(context.getState())
                             .orElseThrow(
@@ -93,25 +93,25 @@ public class WebHookBotService {
                                     )
                             );
 
-            TamTamBotAPI api = getTamTamBotAPI(schemeComponent);
+            TamTamBotAPI api = getTamTamBotAPI(component);
 
             while (true) {
-                switch (ComponentType.getById(schemeComponent.getType())) {
+                switch (ComponentType.getById(component.getType())) {
                     case INPUT:
                         if (update instanceof MessageCreatedUpdate) {
                             componentProcessorService
-                                    .process(((MessageCreatedUpdate) update), context, schemeComponent, api);
+                                    .process(((MessageCreatedUpdate) update), context, component, api);
                         }
                         if (update instanceof MessageCallbackUpdate) {
                             componentProcessorService
-                                    .process(((MessageCallbackUpdate) update), context, schemeComponent, api);
+                                    .process(((MessageCallbackUpdate) update), context, component, api);
                         }
                         botContextRepository.save(context);
                         break;
 
                     case INFO:
                         componentProcessorService
-                                .process(context, schemeComponent, api);
+                                .process(context, component, api);
                         botContextRepository.save(context);
                         break;
 
@@ -135,7 +135,7 @@ public class WebHookBotService {
                     break;
                 }*/
 
-                schemeComponent =
+                component =
                         componentRepository
                                 .findById(context.getState())
                                 .orElseThrow(
@@ -143,19 +143,19 @@ public class WebHookBotService {
                                                 "Can't find next builderComponent with id=" + context.getState()
                                         )
                                 );
-                if (ComponentType.getById(schemeComponent.getType()) == ComponentType.INPUT) {
+                if (ComponentType.getById(component.getType()) == ComponentType.INPUT) {
                     break;
                 }
             }
         }
 
-        private @NotNull TamTamBotAPI getTamTamBotAPI(SchemeComponent schemeComponent) {
+        private @NotNull TamTamBotAPI getTamTamBotAPI(SchemeComponent component) {
             BotScheme botScheme =
                     botSchemeRepository
-                            .findById(schemeComponent.getSchemeId())
+                            .findById(component.getSchemeId())
                             .orElseThrow(
                                     () -> new NoSuchElementException(
-                                            "Can't find botScheme with id=" + schemeComponent.getSchemeId()
+                                            "Can't find botScheme with id=" + component.getSchemeId()
                                     )
                             );
             TamBotEntity tamBot =
@@ -179,16 +179,20 @@ public class WebHookBotService {
                     .orElseGet(() -> initContext(userId));
         }
 
-        @Override
-        public void visit(final MessageCreatedUpdate model) {
-            if (model.getMessage().getRecipient().getChatId() != null) {
-                log.info(
-                        String.format("Update from chat - ignoring(%s, botSchemeId=%d)", model, botSchemeId)
-                );
+        private void rejectIfUpdateFromChat(Long userId, Update model) {
+            if (userId == null) {
+                log.info(String.format("Update from chat - ignoring(%s, botSchemeId=%d)", model, botSchemeId));
                 return;
             }
+        }
+
+        @Override
+        public void visit(final MessageCreatedUpdate model) {
+            rejectIfUpdateFromChat(model.getMessage().getRecipient().getUserId(), model);
+
             setBotContextLockKey(model.getMessage().getSender().getUserId());
             lock();
+
             try {
                 execute(getContext(model.getMessage().getSender().getUserId()), model);
             } finally {
@@ -200,6 +204,7 @@ public class WebHookBotService {
         public void visit(MessageCallbackUpdate model) {
             setBotContextLockKey(model.getCallback().getUser().getUserId());
             lock();
+
             try {
                 execute(getContext(model.getCallback().getUser().getUserId()), model);
             } finally {

@@ -97,6 +97,7 @@ export default {
     'errors.bot.scheme.builder.component.duplication': 'Duplicated component id',
     'errors.bot.scheme.builder.component.is.absent': 'No component with this id',
     'errors.bot.scheme.builder.component.graph.is.cyclic': 'Bot scheme is cyclic',
+    'errors.bot.scheme.builder.component.text.is.empty': 'Text should not be empty',
 
 
 //Success messages

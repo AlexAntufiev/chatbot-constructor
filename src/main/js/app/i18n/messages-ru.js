@@ -97,6 +97,7 @@ export default {
     'errors.bot.scheme.builder.component.duplication': 'Повторяющийся id компонента',
     'errors.bot.scheme.builder.component.is.absent': 'Отсутствует компонент с таким id',
     'errors.bot.scheme.builder.component.graph.is.cyclic': 'Зацикленная схема бота',
+    'errors.bot.scheme.builder.component.text.is.empty': 'Текст не должен быть пустым',
 
     //Success messages
     'app.successmessage.successsumary': 'Успешно',

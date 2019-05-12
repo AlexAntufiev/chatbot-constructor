@@ -145,6 +145,17 @@ public class BuilderService {
 
                         switch (ComponentType.getById(update.getComponent().getType())) {
                             case INFO:
+                                String text = update.getComponent().getText();
+                                if (StringUtils.isEmpty(update.getComponent().getText())
+                                        || update.getComponent().getText().trim().isEmpty()) {
+                                    throw new ChatBotConstructorException(
+                                            String.format(
+                                                    "Update(%s) has empty text(botSchemeId=%d)",
+                                                    update.getComponent(), botSchemeId
+                                            ),
+                                            Error.SCHEME_BUILDER_COMPONENT_TEXT_IS_EMPTY
+                                    );
+                                }
                                 buttonsGroupUpdate = updateButtonsGroup(update, botSchemeId);
                             case INPUT:
                                 componentValidators = updateValidators(update);
