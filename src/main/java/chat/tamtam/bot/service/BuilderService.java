@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -17,9 +18,11 @@ import chat.tamtam.bot.domain.builder.button.ButtonsGroupUpdate;
 import chat.tamtam.bot.domain.builder.component.ComponentType;
 import chat.tamtam.bot.domain.builder.component.ComponentUpdate;
 import chat.tamtam.bot.domain.builder.component.SchemeComponent;
+import chat.tamtam.bot.domain.builder.component.group.GroupType;
 import chat.tamtam.bot.domain.builder.component.group.SchemeComponentGroup;
 import chat.tamtam.bot.domain.builder.validator.ComponentValidator;
 import chat.tamtam.bot.domain.exception.ChatBotConstructorException;
+import chat.tamtam.bot.domain.exception.NotFoundEntityException;
 import chat.tamtam.bot.domain.response.SuccessResponse;
 import chat.tamtam.bot.domain.response.SuccessResponseWrapper;
 import chat.tamtam.bot.repository.BotSchemeRepository;
@@ -62,7 +65,7 @@ public class BuilderService {
         BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         List<ComponentUpdate> components = new ArrayList<>();
         componentRepository
-                .findAllBySchemeId(botScheme.getId())
+                .findAllBySchemeIdOrderBySequence(botScheme.getId())
                 .forEach(component -> {
                     ComponentUpdate update = new ComponentUpdate();
                     update.setComponent(component);
@@ -102,46 +105,55 @@ public class BuilderService {
             );
         }
 
+        AtomicInteger sequence = new AtomicInteger();
+        sequence.set(0/*Integer.MIN_VALUE*/);
+        final int sequenceDelta = 1;
+
         Object updatedComponents =
                 transactionalUtils.invokeCallable(() -> {
                     List<ComponentUpdate> updated = new ArrayList<>();
                     for (ComponentUpdate update
                             : components) {
-                        // @todo #CC-141 Enable reserved builderComponent check
-                        /*if(!componentRepository
-                                .existByIdAndSchemeId(
-                                        update.getBuilderComponent().getId(),
-                                        update.getBuilderComponent().getSchemeId()
+                        // Checks that component was reserved
+                        if (!componentRepository
+                                .existsByIdAndSchemeId(
+                                        update.getComponent().getId(),
+                                        update.getComponent().getSchemeId()
                                 )
                         ) {
                             throw new NotFoundEntityException(
                                     String.format(
                                             "Reserved builderComponent(id=%d, botSchemeId=%d) was not found",
-                                            update.getBuilderComponent().getId(),
-                                            update.getBuilderComponent().getSchemeId()
+                                            update.getComponent().getId(),
+                                            update.getComponent().getSchemeId()
                                     ),
                                     Error.SERVICE_NO_ENTITY
                             );
-                        }*/
-                        // @todo #CC-141 Enable check for next builderComponent existence
-                        /*if (update.getBuilderComponent().getNextState() != null) {
-                            if (!componentRepository.existsByIdAndAndSchemeId(
-                                    update.getBuilderComponent().getNextState(),
-                                    update.getBuilderComponent().getSchemeId()
+                        }
+                        // Checks that next component was reserved too
+                        if (update.getComponent().getNextState() != null) {
+                            if (!componentRepository.existsByIdAndSchemeId(
+                                    update.getComponent().getNextState(),
+                                    update.getComponent().getSchemeId()
                             )) {
                                 throw new NotFoundEntityException(
                                         String.format(
-                                                "Next builderComponent(id=%d, botSchemeId=%d) " +
-                                                        "for builderComponent(id=%d, botSchemeId=%d) was not found",
-                                                update.getBuilderComponent().getNextState(),
-                                                update.getBuilderComponent().getSchemeId(),
-                                                update.getBuilderComponent().getId(),
-                                                update.getBuilderComponent().getSchemeId()
+                                                "Next builderComponent(id=%d, botSchemeId=%d) "
+                                                        + "for builderComponent(id=%d, botSchemeId=%d) was not found",
+                                                update.getComponent().getNextState(),
+                                                update.getComponent().getSchemeId(),
+                                                update.getComponent().getId(),
+                                                update.getComponent().getSchemeId()
                                                 ),
                                         Error.SERVICE_NO_ENTITY
                                 );
                             }
-                        }*/
+                        }
+
+                        //Check if specified group belongs to this bot scheme
+                        if (update.getComponent().getGroupId() != null) {
+                            getGroup(botScheme, update.getComponent().getGroupId());
+                        }
 
                         SchemeComponent schemeComponent = null;
                         ButtonsGroupUpdate buttonsGroupUpdate = null;
@@ -154,6 +166,7 @@ public class BuilderService {
                                 componentValidators = updateValidators(update);
                             default:
                                 update.getComponent().setSchemeId(botScheme.getId());
+                                update.getComponent().setSequence(sequence.addAndGet(sequenceDelta));
                                 schemeComponent = componentRepository.save(update.getComponent());
                         }
 
@@ -316,10 +329,96 @@ public class BuilderService {
         return new ButtonsGroupUpdate(group);
     }
 
-    public SuccessResponse addComponentGroup(final String authToken, final int schemeId) {
-        BotScheme botScheme = botSchemeService.getBotScheme(authToken, schemeId);
-        SchemeComponentGroup group = new SchemeComponentGroup();
-        group.setSchemeId(botScheme.getId());
-        gr
+    public SuccessResponse addSchemeGroup(
+            final String authToken,
+            final int schemeId,
+            final SchemeComponentGroup group
+    ) {
+        botSchemeService.getBotScheme(authToken, schemeId);
+
+        group.setId(null);
+        group.setSchemeId(schemeId);
+
+        if (StringUtils.isEmpty(group.getTitle())) {
+            throw new ChatBotConstructorException(
+                    String.format("New component group(%s) has empty title", group),
+                    Error.SCHEME_BUILDER_COMPONENT_GROUP_HAS_EMPTY_TITLE
+            );
+        }
+
+        checkGroupType(group);
+
+        return new SuccessResponseWrapper<>(componentGroupRepository.save(group));
+    }
+
+    public SuccessResponse updateSchemeGroup(
+            final String authToken,
+            final int schemeId,
+            final SchemeComponentGroup group
+    ) {
+        getGroup(botSchemeService.getBotScheme(authToken, schemeId), group.getId());
+
+        if (StringUtils.isEmpty(group.getTitle())) {
+            throw new ChatBotConstructorException(
+                    String.format("New component group(%s) has empty title", group),
+                    Error.SCHEME_BUILDER_COMPONENT_GROUP_HAS_EMPTY_TITLE
+            );
+        }
+
+        checkGroupType(group);
+
+        return new SuccessResponseWrapper<>(componentGroupRepository.save(group));
+    }
+
+    private void checkGroupType(final SchemeComponentGroup group) {
+        if (GroupType.getById(group.getType()) == null) {
+            throw new ChatBotConstructorException(
+                    String.format(
+                            "Group(%s, botSchemeId=%d) has illegal type = %d",
+                            group, group.getSchemeId(), group.getType()
+                    ),
+                    Error.SCHEME_BUILDER_COMPONENT_GROUP_TYPE_IS_ILLEGAL
+            );
+        }
+    }
+
+    public SuccessResponse getSchemeGroup(final String authToken, final int schemeId, final long groupId) {
+        SchemeComponentGroup group = getGroup(
+                botSchemeService.getBotScheme(authToken, schemeId),
+                groupId
+        );
+        return new SuccessResponseWrapper<>(group);
+    }
+
+    public SuccessResponse getSchemeGroups(final String authToken, final int schemeId) {
+        botSchemeService.getBotScheme(authToken, schemeId);
+        Iterable<SchemeComponentGroup> groups =
+                componentGroupRepository
+                        .findAllBySchemeId(schemeId);
+        return new SuccessResponseWrapper<>(groups);
+    }
+
+    public SuccessResponse removeSchemeGroup(final String authToken, final int schemeId, final long groupId) {
+        SchemeComponentGroup group = getGroup(
+                botSchemeService.getBotScheme(authToken, schemeId),
+                groupId
+        );
+        group.setSchemeId(null);
+        componentGroupRepository.save(group);
+        return new SuccessResponse();
+    }
+
+    private SchemeComponentGroup getGroup(final BotScheme botScheme, final Long groupId) {
+        return componentGroupRepository
+                .findByIdAndSchemeId(groupId, botScheme.getId())
+                .orElseThrow(
+                        () -> new NotFoundEntityException(
+                                String.format(
+                                        "Component group(id=%d, botSchemeId=%d) is not found",
+                                        groupId, botScheme.getId()
+                                ),
+                                Error.SCHEME_BUILDER_COMPONENT_GROUP_IS_NOT_FOUND
+                        )
+                );
     }
 }

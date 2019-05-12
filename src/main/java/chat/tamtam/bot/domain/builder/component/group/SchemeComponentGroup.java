@@ -17,5 +17,7 @@ public class SchemeComponentGroup {
 
     private Integer schemeId;
 
+    private Byte type;
+
     private String title;
 }
