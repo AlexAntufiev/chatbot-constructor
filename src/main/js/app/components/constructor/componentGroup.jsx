@@ -71,7 +71,7 @@ class ComponentGroup extends Component {
                     }
                     break;
             }
-            if (icon !== "" && label !== "") {
+            if (icon !== "") {
                 renderedList.push(<Button icon={icon} label={label} className={"container-group-element"}
                                           onClick={() => {
                                               const url = makeTemplateStr(routes.botConstructorComponent(), {

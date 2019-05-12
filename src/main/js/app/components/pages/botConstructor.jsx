@@ -190,7 +190,7 @@ class BotConstructor extends Component {
     }
 
     changeComponent(componentObj, groupId) {
-        let components = Object.assign({}, this.state.components);
+        let components = this.state.components;
         const ind = this.findComponentInd(groupId, componentObj.component.id);
 
         components[groupId][ind].component.title = componentObj.component.title;
