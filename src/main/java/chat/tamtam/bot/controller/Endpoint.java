@@ -33,14 +33,16 @@ public interface Endpoint {
     String STATIC_INDEX = "/index.html";
     String STATIC_RESOURCES = "/assets/**";
 
-    String HEALTH = "/actuator/health";
+    String ACTUATOR = "/actuator/**";
 
     String TAM_CUSTOM_BOT_WEBHOOK = "/tam/custom/bot";
     String TAM_BOT = "/tam/bot";
 
     String BUILDER = "/builder";
     String SCHEME = "/scheme";
-    String COMPONENT = "/builderComponent";
+    String COMPONENT = "/component";
+    String GROUP = "/group";
+    String GROUP_ID = "/{groupId}";
 
     String RESOURCES = "/resources";
     String REGISTRATION_BOT_URL = "/registration/bot/url";

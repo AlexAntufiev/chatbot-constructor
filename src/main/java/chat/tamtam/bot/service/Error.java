@@ -50,6 +50,10 @@ public enum Error {
     SCHEME_BUILDER_COMPONENT_DUPLICATION("errors.bot.scheme.builder.component.duplication"),
     SCHEME_BUILDER_COMPONENT_DOES_NOT_EXIST("errors.bot.scheme.builder.component.is.absent"),
     SCHEME_BUILDER_COMPONENT_GRAPH_IS_CYCLIC("errors.bot.scheme.builder.component.graph.is.cyclic"),
+    SCHEME_BUILDER_COMPONENT_TEXT_IS_EMPTY("errors.bot.scheme.builder.component.text.is.empty"),
+    SCHEME_BUILDER_COMPONENT_GROUP_HAS_EMPTY_TITLE("errors.bot.scheme.component.group.has.empty.title"),
+    SCHEME_BUILDER_COMPONENT_GROUP_IS_NOT_FOUND("errors.bot.scheme.component.group.is.not.found"),
+    SCHEME_BUILDER_COMPONENT_GROUP_TYPE_IS_ILLEGAL("errors.bot.scheme.component.group.type.is.illegal"),
 
     SCHEME_BUILDER_INVALID_VALIDATOR("errors.bot.scheme.invalid.componentValidator"),
     SCHEME_BUILDER_BUTTONS_EMPTY_FIELDS("errors.bot.scheme.builder.buttons.empty.fields"),

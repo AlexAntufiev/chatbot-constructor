@@ -26,8 +26,8 @@ public class BotContext {
 
     private byte[] pendingMessage;
 
-    @Column(nullable = false)
-    private Long resetState;
+    /*@Column(nullable = false)
+    private Long resetState;*/
 
     @Data
     @NoArgsConstructor

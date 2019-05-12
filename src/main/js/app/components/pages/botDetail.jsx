@@ -28,6 +28,7 @@ class BotDetail extends React.Component {
                     <div className="box">
                         <Switch>
                             <Route path={routes.botSettings()} component={BotSettings}/>
+                            <Route path={routes.botConstructorComponent()} component={BotConstructor}/>
                             <Route path={routes.botSetup()} component={BotConstructor}/>
                             <Route path={routes.botStatistic()} component={BotStatistic}/>
                             <Route path={routes.botBroadcastingDetailMessage()} component={BotBroadcastingDetail}/>

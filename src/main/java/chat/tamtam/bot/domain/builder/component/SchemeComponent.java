@@ -30,7 +30,7 @@ public class SchemeComponent {
 
     private Long groupId;
 
-    private Long voteId;
+    private Integer sequence;
 
     @JsonIgnore
     private boolean hasCallbacks;

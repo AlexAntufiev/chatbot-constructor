@@ -44,6 +44,9 @@ export default {
     'app.dialog.append': 'Добавить',
     'app.dialog.refresh': 'Обновить',
     'app.dialog.attach': 'Прикрепить',
+    'app.dialog.remove.button': 'Удалить кнопку',
+    'app.dialog.remove.message': 'Удалить сообщение',
+    'app.dialog.add.message': 'Добавить сообщение',
 
     //Error messages
     'app.errormessage.errorsummary': 'Сообщение об ошибке',
@@ -94,6 +97,10 @@ export default {
     'errors.bot.scheme.builder.component.duplication': 'Повторяющийся id компонента',
     'errors.bot.scheme.builder.component.is.absent': 'Отсутствует компонент с таким id',
     'errors.bot.scheme.builder.component.graph.is.cyclic': 'Зацикленная схема бота',
+    'errors.bot.scheme.builder.component.text.is.empty': 'Текст не должен быть пустым',
+    'errors.bot.scheme.component.group.has.empty.title': 'Пустое название группы',
+    'errors.bot.scheme.component.group.is.not.found': 'Группа не найдена',
+    'errors.bot.scheme.component.group.type.is.illegal': 'Неверный тип группы',
 
     //Success messages
     'app.successmessage.successsumary': 'Успешно',
@@ -116,5 +123,18 @@ export default {
     'template.message.error': 'Произошла ошибка в сообщении :name',
 
     //Common
-    'app.common.sigin.message': 'Необходима авторизация'
+    'app.common.sigin.message': 'Необходима авторизация',
+
+    'app.constructor.intent.positive': 'зеленый',
+    'app.constructor.intent.negative': 'красный',
+    'app.constructor.intent.default': 'серый',
+    'app.constructor.intent.select': 'Выберите цвет',
+    'app.constructor.select.next.component': 'Выберите следующий компонент',
+    'app.constructor.component.buttongroup': 'Группа кнопок',
+    'app.constructor.component.button': 'Кнопка',
+    'app.constructor.message.text': 'Текст сообщения',
+    'app.constructor.scheme.saved': 'Схема сохранена',
+    'app.constructor.error.fill.text': 'Текст не может быть пустым',
+    'app.constructor.error.empty.buttons': 'Группа кнопок не может быть без кнопок',
+    'app.constructor.error.empty.title': 'Пустое название'
 };
