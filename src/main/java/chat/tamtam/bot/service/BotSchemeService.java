@@ -40,7 +40,7 @@ public class BotSchemeService {
         return ((BotScheme) transactionalUtils
                 .invokeCallable(() -> {
                     SchemeComponent resetComponent = componentRepository.save(new SchemeComponent());
-                    bot.setSchemeResetState(resetComponent.getId());
+//                    bot.setSchemeResetState(resetComponent.getId());
                     return botSchemeRepository.save(bot);
                 }));
     }
@@ -51,17 +51,14 @@ public class BotSchemeService {
             Long userId,
             Integer id
     ) throws NoSuchElementException {
-        if (!botSchemeRepository.existsByUserIdAndIdAndSchemeResetState(userId, id, bot.getSchemeResetState())) {
+        BotScheme botScheme = botSchemeRepository.findByUserIdAndId(userId, id);
+        if (botScheme == null) {
             throw new NoSuchElementException(
-                    String.format(
-                            "Does not exist bot with userId=%d, id=%d, resetState=%d",
-                            userId, id, bot.getSchemeResetState()
-                    )
+                    String.format("Does not exist bot with userId=%d, id=%d", userId, id)
             );
         }
-        bot.setUserId(userId);
-        bot.setId(id);
-        return botSchemeRepository.save(bot);
+        botScheme.setName(bot.getName());
+        return botSchemeRepository.save(botScheme);
     }
 
     @Loggable

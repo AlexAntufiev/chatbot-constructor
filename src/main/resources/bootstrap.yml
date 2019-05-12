@@ -7,7 +7,7 @@ spring:
   cloud:
     consul:
       enabled: false
-      host: 192.168.9.152
+      host: localhost
       port: 8500
       discovery:
         healthCheckInterval: 300s

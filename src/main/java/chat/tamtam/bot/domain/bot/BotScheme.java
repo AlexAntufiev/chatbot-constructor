@@ -1,6 +1,5 @@
 package chat.tamtam.bot.domain.bot;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,6 +28,6 @@ public class BotScheme {
     private @NonNull String name;
 
     private Long schemeEnterState;
-    @Column(nullable = false)
-    private Long schemeResetState;
+    /*@Column(nullable = false)
+    private Long schemeResetState;*/
 }

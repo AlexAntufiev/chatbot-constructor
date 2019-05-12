@@ -126,12 +126,14 @@ public class WebHookBotService {
                     break;
                 }
 
-                if (context.getState().equals(context.getResetState())) {
+
+                // Reset component ignored for a while
+                /*if (context.getState().equals(context.getResetState())) {
                     // In this case reset execution to start state and hang on for further update
                     componentProcessorService.updatePendingMessage(context, api);
                     initContext(context.getId().getUserId());
                     break;
-                }
+                }*/
 
                 schemeComponent =
                         componentRepository
@@ -256,7 +258,8 @@ public class WebHookBotService {
 
             context.setId(new BotContext.Id(userId, botSchemeId));
             context.setState(botScheme.getSchemeEnterState());
-            context.setState(botScheme.getSchemeResetState());
+//            For a while
+//            context.setResetState(botScheme.getSchemeResetState());
 
             return botContextRepository.save(context);
         }

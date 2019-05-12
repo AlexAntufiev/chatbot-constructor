@@ -1,0 +1,15 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://db:5432/prod
+    username: prod
+    password: QUFNRXNlY3JldDA0MDUyMDE5MzA4Cg==
+  servlet:
+    multipart:
+      max-file-size: 1000MB
+
+tamtam:
+  host: http://89.208.84.33

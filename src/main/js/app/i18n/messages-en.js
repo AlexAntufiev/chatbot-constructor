@@ -90,6 +90,10 @@ export default {
     'errors.bot.scheme.builder.buttons.id.not.exist': 'Wrong buttons id',
     'errors.bot.scheme.builder.buttons.group.is.empty': 'Please, provide at least one button',
     'errors.bot.scheme.builder.buttons.group.intent.malformed': 'Malformed button intent',
+    'errors.bot.scheme.builder.component.id.is.null': 'Component has empty id',
+    'errors.bot.scheme.builder.component.duplication': 'Duplicated component id',
+    'errors.bot.scheme.builder.component.is.absent': 'No component with this id',
+    'errors.bot.scheme.builder.component.graph.is.cyclic': 'Bot scheme is cyclic',
 
 
 //Success messages
