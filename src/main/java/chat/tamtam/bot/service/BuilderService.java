@@ -2,6 +2,7 @@ package chat.tamtam.bot.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -55,6 +56,7 @@ public class BuilderService {
     public SuccessResponse getNewComponentId(final String authToken, final int botSchemeId) {
         BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
         SchemeComponent newSchemeComponent = new SchemeComponent();
+        newSchemeComponent.setSchemeId(botSchemeId);
         return new SuccessResponseWrapper<>(new Object() {
             @Getter
             private final Long componentId = componentRepository.save(newSchemeComponent).getId();
@@ -91,8 +93,16 @@ public class BuilderService {
             final int botSchemeId,
             final List<ComponentUpdate> components
     ) {
-        // @todo #CC-163 Split logic by builderComponent type(e.g. if type is INPUT then ignore buttonsGroup)
         BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
+
+        // Removes entry point of scheme in case of update is empty
+        // aka disable further graph execution until next update
+        if (components.isEmpty()) {
+            botScheme.setSchemeEnterState(null);
+            // @todo #CC-250 Update scheme timestamp
+            botSchemeRepository.save(botScheme);
+            return new SuccessResponseWrapper<>(Collections.emptyList());
+        }
 
         /*
          * Check that graph is non-cyclicality.
@@ -123,7 +133,7 @@ public class BuilderService {
                         ) {
                             throw new NotFoundEntityException(
                                     String.format(
-                                            "Reserved builderComponent(id=%d, botSchemeId=%d) was not found",
+                                            "Reserved component(id=%d, botSchemeId=%d) was not found",
                                             update.getComponent().getId(),
                                             update.getComponent().getSchemeId()
                                     ),
@@ -138,7 +148,7 @@ public class BuilderService {
                             )) {
                                 throw new NotFoundEntityException(
                                         String.format(
-                                                "Next builderComponent(id=%d, botSchemeId=%d) "
+                                                "Next component(id=%d, botSchemeId=%d) "
                                                         + "for builderComponent(id=%d, botSchemeId=%d) was not found",
                                                 update.getComponent().getNextState(),
                                                 update.getComponent().getSchemeId(),
@@ -152,7 +162,8 @@ public class BuilderService {
 
                         //Check if specified group belongs to this bot scheme
                         if (update.getComponent().getGroupId() != null) {
-                            getGroup(botScheme, update.getComponent().getGroupId());
+                            // @todo #CC-250 Enable groupId check
+                            //                            getGroup(botScheme, update.getComponent().getGroupId());
                         }
 
                         SchemeComponent schemeComponent = null;
@@ -183,6 +194,7 @@ public class BuilderService {
 
                         updated.add(new ComponentUpdate(schemeComponent, componentValidators, buttonsGroupUpdate));
                     }
+
                     botScheme.setSchemeEnterState(
                             components
                                     .stream()
@@ -191,6 +203,9 @@ public class BuilderService {
                                     .getComponent()
                                     .getId()
                     );
+
+                    // @todo #CC-250 Update scheme timestamp
+
                     botSchemeRepository.save(botScheme);
                     return updated;
                 });
@@ -372,7 +387,7 @@ public class BuilderService {
             final int schemeId,
             final SchemeComponentGroup group
     ) {
-        getGroup(botSchemeService.getBotScheme(authToken, schemeId), group.getId());
+        getGroup(botSchemeService.getBotScheme(authToken, group.getSchemeId()), group.getId());
 
         if (StringUtils.isEmpty(group.getTitle())) {
             throw new ChatBotConstructorException(
@@ -387,7 +402,7 @@ public class BuilderService {
     }
 
     private void checkGroupType(final SchemeComponentGroup group) {
-        if (GroupType.getById(group.getType()) == null) {
+        if (group.getType() == null || GroupType.getById(group.getType()) == null) {
             throw new ChatBotConstructorException(
                     String.format(
                             "Group(%s, botSchemeId=%d) has illegal type = %d",
