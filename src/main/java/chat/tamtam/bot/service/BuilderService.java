@@ -1,6 +1,7 @@
 package chat.tamtam.bot.service;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -99,7 +100,7 @@ public class BuilderService {
         // aka disable further graph execution until next update
         if (components.isEmpty()) {
             botScheme.setSchemeEnterState(null);
-            // @todo #CC-250 Update scheme timestamp
+            botScheme.setUpdate(Instant.now());
             botSchemeRepository.save(botScheme);
             return new SuccessResponseWrapper<>(Collections.emptyList());
         }
@@ -116,7 +117,7 @@ public class BuilderService {
         }
 
         AtomicInteger sequence = new AtomicInteger();
-        sequence.set(0/*Integer.MIN_VALUE*/);
+        sequence.set(Integer.MIN_VALUE);
         final int sequenceDelta = 1;
 
         Object updatedComponents =
@@ -203,9 +204,7 @@ public class BuilderService {
                                     .getComponent()
                                     .getId()
                     );
-
-                    // @todo #CC-250 Update scheme timestamp
-
+                    botScheme.setUpdate(Instant.now());
                     botSchemeRepository.save(botScheme);
                     return updated;
                 });
