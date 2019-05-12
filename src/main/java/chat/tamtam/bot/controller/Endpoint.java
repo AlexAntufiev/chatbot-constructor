@@ -33,7 +33,7 @@ public interface Endpoint {
     String STATIC_INDEX = "/index.html";
     String STATIC_RESOURCES = "/assets/**";
 
-    String HEALTH = "/actuator/health";
+    String ACTUATOR = "/actuator/**";
 
     String TAM_CUSTOM_BOT_WEBHOOK = "/tam/custom/bot";
     String TAM_BOT = "/tam/bot";
