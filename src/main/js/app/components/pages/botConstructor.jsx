@@ -203,6 +203,17 @@ class BotConstructor extends Component {
         let components = [];
         for (let groupId in this.state.components) {
             for (let i = 0; i < this.state.components[groupId].length; i++) {
+                if (this.state.components[groupId][i].component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO) {
+                    const {intl} = this.props;
+                    if (this.state.components[groupId][i].buttonsGroup && this.state.components[groupId][i].buttonsGroup.buttons.length === 0) {
+                        AxiosMessages.customError(this, intl.formatMessage({id: 'app.constructor.error.empty.buttons'}));
+                        return;
+                    }
+                    if (this.state.components[groupId][i].component.text.trim() === '') {
+                        AxiosMessages.customError(this, intl.formatMessage({id: 'app.constructor.error.fill.text'}));
+                        return;
+                    }
+                }
                 components.push(this.state.components[groupId][i]);
             }
         }

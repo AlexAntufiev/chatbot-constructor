@@ -9,6 +9,7 @@ import {Dropdown} from "primereact/dropdown";
 import {InputTextarea} from "primereact/inputtextarea";
 import * as BuilderService from "app/service/builder";
 import BotConstructor from "app/components/pages/botConstructor";
+import * as AxiosMessages from 'app/utils/axiosMessages';
 
 class ButtonSettingsDialog extends BaseDialog {
     constructor(props) {
@@ -16,7 +17,7 @@ class ButtonSettingsDialog extends BaseDialog {
 
         this.state = {
             text: "text",
-            value: "default",
+            value: "text",
             intent: "default",
             nextState: null,
             message: null,
@@ -68,6 +69,15 @@ class ButtonSettingsDialog extends BaseDialog {
     }
 
     onSave() {
+        const {intl} = this.props;
+        if (this.state.message && this.state.message.component.text === '') {
+            AxiosMessages.customError(this, intl.formatMessage({id: 'app.constructor.error.fill.text'}));
+            return;
+        }
+        if (this.state.text.trim() === '') {
+            AxiosMessages.customError(this, intl.formatMessage({id: 'app.constructor.error.empty.title'}));
+            return;
+        }
         const btn = {
             text: this.state.text,
             value: this.state.value,
@@ -95,7 +105,7 @@ class ButtonSettingsDialog extends BaseDialog {
         ];
         return (
             <div>
-                <Growl ref={(el) => this.growl = el}/>
+                <Growl ref={(el) => this.growl = el} baseZIndex={2000}/>
                 <Dialog closable={false} footer={footer} visible={this.state.visible} className="dialog"
                         appendTo={document.body}
                         modal={true} onHide={this.onHide}>
