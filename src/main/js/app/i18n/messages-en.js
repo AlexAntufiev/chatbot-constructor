@@ -131,6 +131,9 @@ export default {
     'app.constructor.component.buttongroup': 'Button group',
     'app.constructor.component.button': 'Button',
     'app.constructor.message.text': 'Message text',
-    'app.constructor.scheme.saved': 'Scheme was saved'
+    'app.constructor.scheme.saved': 'Scheme was saved',
+    'app.constructor.error.fill.text': 'Text cannot be empty',
+    'app.constructor.error.empty.buttons': 'Button group can not be without buttons',
+    'app.constructor.error.empty.title': 'Empty title'
 };
 

@@ -17,15 +17,12 @@ class ComponentSettings extends Component {
             text: '',
             nextState: 0,
             buttonsGroup: null,
-            editedButton: {},
-
         };
 
         this.createNextStatesList = this.createNextStatesList.bind(this);
         this.createButtonsList = this.createButtonsList.bind(this);
         this.renderButton = this.renderButton.bind(this);
         this.createButton = this.createButton.bind(this);
-        this.findButtonMessage = this.findButtonMessage.bind(this);
         this.saveButton = this.saveButton.bind(this);
         this.removeButton = this.removeButton.bind(this);
         this.checkEmptyRows = this.checkEmptyRows.bind(this);
@@ -64,7 +61,6 @@ class ComponentSettings extends Component {
                 nextState: this.props.component.component.nextState,
                 buttonsGroup: this.props.component.buttonsGroup
             });
-            this.findButtonMessage();
         }
 
         if (!prevState ||
@@ -95,7 +91,7 @@ class ComponentSettings extends Component {
         const {intl} = this.props;
         let buttons = this.state.buttonsGroup.buttons.slice();
         const buttonObj = {
-            intent: null,
+            intent: "default",
             nextState: null,
             text: intl.formatMessage({id: 'app.constructor.component.button'}),
             value: intl.formatMessage({id: 'app.constructor.component.button'})
@@ -143,18 +139,6 @@ class ComponentSettings extends Component {
         renderedMatrix.push(<div><Button icon='pi pi-plus' className={"button-elem"}
                                          onClick={() => this.createButton(-1)}/></div>);
         return renderedMatrix;
-    }
-
-    findButtonMessage() {
-        const componentId = Number(this.props.match.params.componentId);
-        const ind = this.props.findComponentInd(0, componentId);
-        const messageId = this.props.components[0][ind];
-        const messageInd = this.props.findComponentInd(0, messageId);
-        if (messageInd === -1) {
-            this.setState({editedButton: null});
-        } else {
-            this.setState({editedButton: this.props.components[0][messageInd]});
-        }
     }
 
     checkEmptyRows() {
@@ -229,7 +213,6 @@ class ComponentSettings extends Component {
                                       ref={(obj) => this.settingsButtonDialog = obj}
                                       id={this.props.component.component.id}
                                       appendComponent={this.props.appendComponent}
-                                      button={this.state.editedButton}
                                       saveButton={this.saveButton}
                                       removeButton={this.removeButton}/>
             </div>

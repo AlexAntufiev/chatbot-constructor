@@ -130,5 +130,8 @@ export default {
     'app.constructor.component.buttongroup': 'Группа кнопок',
     'app.constructor.component.button': 'Кнопка',
     'app.constructor.message.text': 'Текст сообщения',
-    'app.constructor.scheme.saved': 'Схема сохранена'
+    'app.constructor.scheme.saved': 'Схема сохранена',
+    'app.constructor.error.fill.text': 'Текст не может быть пустым',
+    'app.constructor.error.empty.buttons': 'Группа кнопок не может быть без кнопок',
+    'app.constructor.error.empty.title': 'Пустое название'
 };
