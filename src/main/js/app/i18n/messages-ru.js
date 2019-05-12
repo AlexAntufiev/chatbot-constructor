@@ -128,5 +128,6 @@ export default {
     'app.constructor.select.next.component': 'Выберите следующий компонент',
     'app.constructor.component.buttongroup': 'Группа кнопок',
     'app.constructor.component.button': 'Кнопка',
-    'app.constructor.message.text': 'Текст сообщения'
+    'app.constructor.message.text': 'Текст сообщения',
+    'app.constructor.scheme.saved': 'Схема сохранена'
 };

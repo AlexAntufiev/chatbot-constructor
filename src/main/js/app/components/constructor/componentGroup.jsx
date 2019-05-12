@@ -15,10 +15,10 @@ import makeTemplateStr from "app/utils/makeTemplateStr";
 class ComponentGroup extends Component {
     constructor(props) {
         super(props);
-
+        const {intl} = this.props;
         this.items = [
             {
-                label: "Button group",
+                label: intl.formatMessage({id: "app.constructor.component.buttongroup"}),
                 icon: "pi pi-th-large",
                 command: () => {
                     BuilderService.newComponent(this.props.botSchemeId, (res) => {

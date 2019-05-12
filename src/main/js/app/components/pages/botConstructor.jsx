@@ -115,7 +115,7 @@ class BotConstructor extends Component {
 
     refreshScheme() {
         BuilderService.getBotScheme(this.props.match.params.id, (res) => {
-            let components = Object.assign({}, this.state.components);
+            let components = {0: []};
             res.data.payload.forEach((component, ind) => {
                 //hardcode for one group
                 components[0].push(component);
@@ -206,7 +206,7 @@ class BotConstructor extends Component {
                 components.push(this.state.components[groupId][i]);
             }
         }
-        BuilderService.saveBotScheme(this.props.match.params.id, components, () => AxiosMessages.successOperation(this), null, this);
+        BuilderService.saveBotScheme(this.props.match.params.id, components, () => AxiosMessages.successOperation(this, 'app.constructor.scheme.saved'), null, this);
     }
 
     render() {
