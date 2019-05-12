@@ -160,11 +160,11 @@ public class BuilderService {
                             }
                         }
 
+                        // @todo #CC-250 Enable groupId check
                         //Check if specified group belongs to this bot scheme
-                        if (update.getComponent().getGroupId() != null) {
-                            // @todo #CC-250 Enable groupId check
-                            //                            getGroup(botScheme, update.getComponent().getGroupId());
-                        }
+                        /*if (update.getComponent().getGroupId() != null) {
+                            getGroup(botScheme, update.getComponent().getGroupId());
+                        }*/
 
                         SchemeComponent schemeComponent = null;
                         ButtonsGroupUpdate buttonsGroupUpdate = null;
