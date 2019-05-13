@@ -40,7 +40,9 @@ public interface Endpoint {
 
     String BUILDER = "/builder";
     String SCHEME = "/scheme";
-    String COMPONENT = "/builderComponent";
+    String COMPONENT = "/component";
+    String GROUP = "/group";
+    String GROUP_ID = "/{groupId}";
 
     String RESOURCES = "/resources";
     String REGISTRATION_BOT_URL = "/registration/bot/url";
