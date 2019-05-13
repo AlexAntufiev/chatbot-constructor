@@ -28,11 +28,20 @@ class BotConstructor extends Component {
         };
     }
 
+    static get GROUP_TYPE() {
+        return {
+            DEFAULT: 0,
+            VOTE: 1
+        };
+    }
+
     constructor(props) {
         super(props);
 
         this.state = {
-            components: {0: []}
+            components: {},
+            groups: {},
+            removedGroups: []
         };
         this.createComponent = this.createComponent.bind(this);
         this.refreshScheme = this.refreshScheme.bind(this);
@@ -41,14 +50,18 @@ class BotConstructor extends Component {
         this.saveScheme = this.saveScheme.bind(this);
         this.findComponentInd = this.findComponentInd.bind(this);
         this.appendComponent = this.appendComponent.bind(this);
+        this.createGroupsList = this.createGroupsList.bind(this);
+        this.addGroup = this.addGroup.bind(this);
+        this.removeGroup = this.removeGroup.bind(this);
+        this.updateGroup = this.updateGroup.bind(this);
     }
 
-    createComponent(id, type) {
+    createComponent(id, type, groupId) {
         let componentObj = {
             buttonsGroup: null,
             component: {
                 id: Number(id),
-                groupId: 0,
+                groupId: groupId,
                 nextState: Number(id),
                 schemeId: Number(this.props.match.params.id),
                 text: "",
@@ -73,14 +86,13 @@ class BotConstructor extends Component {
         }
 
         const appendFunc = (shadowInput) => {
-            //hardcode for one group
             let components = Object.assign({}, this.state.components);
-            components[0].push(componentObj);
-            shadowInput && components[0].push(shadowInput);
+            components[groupId].push(componentObj);
+            shadowInput && components[groupId].push(shadowInput);
             this.setState({components: components});
             const url = makeTemplateStr(routes.botConstructorComponent(), {
                 id: this.props.match.params.id,
-                groupId: 0,
+                groupId: groupId,
                 componentId: componentObj.component.id
             });
             this.props.history.push(url);
@@ -92,7 +104,7 @@ class BotConstructor extends Component {
                     buttonsGroup: null,
                     component: {
                         id: res.data.payload.componentId,
-                        groupId: 0,
+                        groupId: groupId,
                         nextState: null,
                         schemeId: Number(this.props.match.params.id),
                         text: null,
@@ -109,18 +121,31 @@ class BotConstructor extends Component {
     }
 
     appendComponent(component) {
-        this.state.components[0].push(component);
+        this.state.components[component.component.groupId].push(component);
         this.setState({components: this.state.components});
     }
 
     refreshScheme() {
-        BuilderService.getBotScheme(this.props.match.params.id, (res) => {
-            let components = {0: []};
-            res.data.payload.forEach((component, ind) => {
-                //hardcode for one group
-                components[0].push(component);
+        BuilderService.getGroups(this.props.match.params.id, (res) => {
+            let components = {};
+            let groups = {};
+            res.data.payload.forEach((group) => {
+                groups[group.id] = group;
+                components[group.id] = [];
             });
-            this.setState({components: components});
+            BuilderService.getBotScheme(this.props.match.params.id, (res) => {
+
+                res.data.payload.forEach((component) => {
+                    components[component.component.groupId].push(component);
+                });
+
+                this.setState({
+                    removedGroups: [],
+                    components: components,
+                    groups: groups
+                });
+            }, null, this);
+
         }, null, this);
     }
 
@@ -129,11 +154,14 @@ class BotConstructor extends Component {
     }
 
     findComponentInd(groupId, componentId) {
-        if (!componentId) {
+        if (!componentId || !groupId) {
             return -1;
         }
         groupId = Number(groupId);
         componentId = Number(componentId);
+        if (!Array.isArray(this.state.components[groupId])) {
+            return -1;
+        }
         for (let i = 0; i < this.state.components[groupId].length; i++) {
             const componentObj = this.state.components[groupId][i];
             if (componentObj.component.id === componentId) {
@@ -143,7 +171,8 @@ class BotConstructor extends Component {
         return -1;
     }
 
-    removeComponent(componentObj, groupId) {
+    removeComponent(componentObj) {
+        const groupId = componentObj.component.groupId;
         const ind = this.findComponentInd(groupId, componentObj.component.id);
         if (ind !== -1) {
             this.state.components[groupId].splice(ind, 1);
@@ -161,7 +190,7 @@ class BotConstructor extends Component {
                     const nextElemInd = this.findComponentInd(groupId, btn.nextState);
                     if (nextElemInd !== -1) {
                         const nextElem = this.state.components[groupId][nextElemInd];
-                        if (nextElem.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INPUT && !nextElem.buttonsGroup) {
+                        if (nextElem.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO && !nextElem.buttonsGroup) {
                             this.state.components[groupId].splice(nextElemInd, 1);
                         }
                     }
@@ -189,7 +218,8 @@ class BotConstructor extends Component {
         this.setState({components: this.state.components});
     }
 
-    changeComponent(componentObj, groupId) {
+    changeComponent(componentObj) {
+        const groupId = componentObj.component.groupId;
         let components = this.state.components;
         const ind = this.findComponentInd(groupId, componentObj.component.id);
 
@@ -217,32 +247,84 @@ class BotConstructor extends Component {
                 components.push(this.state.components[groupId][i]);
             }
         }
-        BuilderService.saveBotScheme(this.props.match.params.id, components, () => AxiosMessages.successOperation(this, 'app.constructor.scheme.saved'), null, this);
+        BuilderService.saveBotScheme(this.props.match.params.id, components, () => {
+            AxiosMessages.successOperation(this, 'app.constructor.scheme.saved');
+
+            this.state.removedGroups.forEach((groupId) => {
+                BuilderService.removeGroup(this.props.match.params.id, groupId, null, null, this);
+            });
+        }, null, this);
+    }
+
+    removeGroup(groupId) {
+        while (this.state.components[groupId].length > 0) {
+            this.removeComponent(this.state.components[groupId][0]);
+        }
+        delete this.state.components[groupId];
+        delete this.state.groups[groupId];
+        this.state.removedGroups.push(groupId);
+        this.setState({
+            components: this.state.components,
+            groups: this.state.groups,
+            removedGroups: this.state.removedGroups
+        });
+    }
+
+    createGroupsList() {
+        let groups = [];
+        for (let groupId in this.state.groups) {
+            groups.push(<ComponentGroup group={this.state.groups[groupId]} onCreateComponent={this.createComponent}
+                                        botSchemeId={Number(this.props.match.params.id)}
+                                        components={this.state.components[groupId]} removeGroup={this.removeGroup}
+                                        updateGroup={this.updateGroup}/>);
+        }
+        return groups;
+    }
+
+    addGroup() {
+        BuilderService.addGroup(this.props.match.params.id, 'New group', BotConstructor.GROUP_TYPE.DEFAULT, (res) => {
+            this.state.groups[res.data.payload.id] = res.data.payload;
+            this.state.components[res.data.payload.id] = [];
+            this.setState({
+                groups: this.state.groups,
+                components: this.state.components
+            });
+        }, null, this);
+    }
+
+    updateGroup(group) {
+        this.state.groups[group.id] = group;
+        this.setState({groups: this.state.groups});
     }
 
     render() {
-        const groupId = 0;
-        const idComponent = this.findComponentInd(groupId, Number(this.props.match.params.componentId));
+        const groupId = Number(this.props.match.params.groupId);
+        const componentId = Number(this.props.match.params.componentId);
+
+        const idComponent = this.findComponentInd(groupId, componentId);
         const component = idComponent === -1 ? null : this.state.components[groupId][idComponent];
+        const groupsList = this.createGroupsList();
         const {intl} = this.props;
 
         return (<div>
             <Growl ref={(el) => this.growl = el}/>
             <div className={"constructor-page p-grid"}>
                 <div className={"constructor-container p-col-7"}>
-                    <ComponentGroup title={"Group1"} onCreateComponent={this.createComponent}
-                                    botSchemeId={Number(this.props.match.params.id)}
-                                    components={this.state.components[groupId]}
-                                    groupId={groupId}/>
-                    {/*<Button label={"Append group"} icon='pi pi-plus' onClick={this.refreshScheme}/>*/}
-                    <Button label={intl.formatMessage({id: "app.dialog.save"})} icon='pi pi-plus'
-                            onClick={this.saveScheme}/>
+                    {groupsList}
+                    <div className={'button-list-elem'}>
+                        <Button label={intl.formatMessage({id: 'app.constructor.scheme.add.group'})} icon='pi pi-plus'
+                                onClick={this.addGroup}/>
+                    </div>
+                    <div className={'button-list-elem'}>
+                        <Button label={intl.formatMessage({id: "app.dialog.save"})} icon='pi pi-plus'
+                                onClick={this.saveScheme}/>
+                    </div>
                 </div>
                 <div className={"constructor-component-settings p-col-5"}>
                     <ComponentSettings components={this.state.components}
-                                       onRemove={this.removeComponent} onChange={this.changeComponent} groupId={groupId}
+                                       onRemove={this.removeComponent} onChange={this.changeComponent}
                                        component={component} appendComponent={this.appendComponent}
-                                       findComponentInd={this.findComponentInd}/>
+                                       findComponentInd={this.findComponentInd} groups={this.state.groups}/>
                 </div>
             </div>
         </div>);

@@ -98,8 +98,6 @@ export default {
     'errors.bot.scheme.builder.component.is.absent': 'No component with this id',
     'errors.bot.scheme.builder.component.graph.is.cyclic': 'Bot scheme is cyclic',
     'errors.bot.scheme.builder.component.text.is.empty': 'Text should not be empty',
-    'errors.bot.scheme.builder.component.action.is.not.found': 'Action is not found',
-    'errors.bot.scheme.builder.component.action.has.illegal.type': 'Action has illegal type',
     'errors.bot.scheme.component.group.has.empty.title': 'Group has empty title',
     'errors.bot.scheme.component.group.is.not.found': 'Group is not found',
     'errors.bot.scheme.component.group.type.is.illegal': 'Illegal type of group',
@@ -137,6 +135,7 @@ export default {
     'app.constructor.component.button': 'Button',
     'app.constructor.message.text': 'Message text',
     'app.constructor.scheme.saved': 'Scheme was saved',
+    'app.constructor.scheme.add.group': 'Add group',
     'app.constructor.error.fill.text': 'Text cannot be empty',
     'app.constructor.error.empty.buttons': 'Button group can not be without buttons',
     'app.constructor.error.empty.title': 'Empty title'

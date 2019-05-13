@@ -44,7 +44,7 @@ class ComponentSettings extends Component {
                     continue;
                 }
                 nextComponents.push({
-                    label: componentObj.component.title,
+                    label: this.props.groups[componentObj.component.groupId].title + ' - ' + componentObj.component.title,
                     value: componentObj.component.id
                 });
             }
@@ -73,7 +73,7 @@ class ComponentSettings extends Component {
             componentObj.component.text = this.state.text;
             componentObj.component.nextState = this.state.nextState;
 
-            this.props.onChange(componentObj, this.props.groupId);
+            this.props.onChange(componentObj);
         }
     }
 
@@ -109,7 +109,7 @@ class ComponentSettings extends Component {
     renderButton(elem, row, col) {
         return (
             <Button label={elem.text} className={"button-elem"} onClick={() => {
-                this.settingsButtonDialog.getWrappedInstance().onShow(elem, row, col, this.findMessage(elem.nextState))
+                this.settingsButtonDialog.getWrappedInstance().onShow(elem, row, col, this.findMessage(elem.nextState), Number(this.props.match.params.groupId))
             }}/>
         );
     }
@@ -202,7 +202,7 @@ class ComponentSettings extends Component {
                 </div>*/}
                 <div className="text-card_button-panel">
                     <Button label={intl.formatMessage({id: "app.bot.remove"})}
-                            onClick={() => this.props.onRemove(this.props.component, this.props.groupId)}/>
+                            onClick={() => this.props.onRemove(this.props.component)}/>
                 </div>
                 <div className={"button-panel"}>
                     {buttonsList}

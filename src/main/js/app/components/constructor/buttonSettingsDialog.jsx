@@ -29,7 +29,7 @@ class ButtonSettingsDialog extends BaseDialog {
         this.removeButton = this.removeButton.bind(this);
     }
 
-    onShow(button, row, col, message) {
+    onShow(button, row, col, message, groupId) {
         super.onShow();
         this.setState({
             text: button.text,
@@ -38,7 +38,8 @@ class ButtonSettingsDialog extends BaseDialog {
             nextState: button.nextState,
             row: row,
             col: col,
-            message: message
+            message: message,
+            groupId: groupId
         });
     }
 
@@ -47,7 +48,7 @@ class ButtonSettingsDialog extends BaseDialog {
             let messageObj = {};
             messageObj.buttonsGroup = null;
             messageObj.component = {
-                groupId: null,
+                groupId: this.state.groupId,
                 id: res.data.payload.componentId,
                 nextState: this.state.nextState,
                 schemeId: this.props.botSchemeId,
@@ -156,7 +157,7 @@ class ButtonSettingsDialog extends BaseDialog {
                                                                    nextState: this.state.message.component.nextState,
                                                                    message: null
                                                                });
-                                                               this.props.removeComponent(this.state.message, 0);
+                                                               this.props.removeComponent(this.state.message);
                                                            }}/>}
                         </div>
                         <div className={"form_detail-element"}>
