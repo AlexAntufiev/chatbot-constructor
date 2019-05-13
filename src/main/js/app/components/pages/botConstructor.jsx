@@ -222,11 +222,12 @@ class BotConstructor extends Component {
         const groupId = componentObj.component.groupId;
         let components = this.state.components;
         const ind = this.findComponentInd(groupId, componentObj.component.id);
-
-        components[groupId][ind].component.title = componentObj.component.title;
-        components[groupId][ind].component.text = componentObj.component.text;
-        components[groupId][ind].component.nextState = componentObj.component.nextState;
-        this.setState({components: components});
+        if (ind !== -1) {
+            components[groupId][ind].component.title = componentObj.component.title;
+            components[groupId][ind].component.text = componentObj.component.text;
+            components[groupId][ind].component.nextState = componentObj.component.nextState;
+            this.setState({components: components});
+        }
     }
 
     saveScheme() {

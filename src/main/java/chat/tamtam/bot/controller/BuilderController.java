@@ -104,7 +104,8 @@ public class BuilderController {
         return ResponseEntity.ok(builderService.getSchemeGroups(authToken, botSchemeId));
     }
 
-    @PostMapping(path = Endpoint.SCHEME + Endpoint.GROUP + Endpoint.GROUP_ID + Endpoint.DELETE, consumes = MediaType.ALL_VALUE)
+    @PostMapping(path = Endpoint.SCHEME + Endpoint.GROUP + Endpoint.GROUP_ID + Endpoint.DELETE,
+            consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> removeSchemeGroup(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final int botSchemeId,

@@ -164,9 +164,9 @@ class ComponentSettings extends Component {
         if (!idBtn) {
             return null;
         }
-        const ind = this.props.findComponentInd(0, idBtn);
+        const ind = this.props.findComponentInd(Number(this.props.match.params.groupId), idBtn);
         if (ind !== -1) {
-            const component = this.props.components[0][ind];
+            const component = this.props.components[Number(this.props.match.params.groupId)][ind];
             if (component.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO && !component.buttonsGroup) {
                 return component;
             }
@@ -214,7 +214,8 @@ class ComponentSettings extends Component {
                                       id={this.props.component.component.id}
                                       appendComponent={this.props.appendComponent}
                                       saveButton={this.saveButton}
-                                      removeButton={this.removeButton}/>
+                                      removeButton={this.removeButton}
+                                      onChange={this.props.onChange}/>
             </div>
         );
     }
