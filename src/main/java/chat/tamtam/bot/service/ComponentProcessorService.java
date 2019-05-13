@@ -9,9 +9,6 @@ import org.springframework.stereotype.Service;
 import chat.tamtam.bot.domain.builder.button.ButtonPayload;
 import chat.tamtam.bot.domain.builder.component.ComponentType;
 import chat.tamtam.bot.domain.builder.component.SchemeComponent;
-import chat.tamtam.bot.domain.builder.validator.ComponentValidator;
-import chat.tamtam.bot.domain.builder.validator.ValidatorType;
-import chat.tamtam.bot.domain.builder.validator.wrapper.EqualTextValidatorWrapper;
 import chat.tamtam.bot.domain.webhook.BotContext;
 import chat.tamtam.bot.repository.ButtonsGroupRepository;
 import chat.tamtam.bot.repository.ComponentRepository;
@@ -38,39 +35,43 @@ public class ComponentProcessorService {
     private final ComponentValidatorRepository validatorRepository;
     private final ButtonsGroupRepository buttonsRepository;
     private final ComponentRepository componentRepository;
+    private final ActionProcessorService actionProcessor;
 
     /*
      * Process сomponent with type INFO
      * */
     public void process(
             final BotContext context,
-            final SchemeComponent schemeComponent,
+            final SchemeComponent component,
             final TamTamBotAPI api
     ) {
         try {
             SendMessageResult result =
                     api.sendMessage(
                             new NewMessageBody(
-                                    schemeComponent.getText(),
-                                    getAttachments(schemeComponent.getId(), true)
+                                    component.getText(),
+                                    getAttachments(component.getId(), true)
                             )
                     ).userId(context.getId().getUserId())
                             .execute();
-            if (schemeComponent.isHasCallbacks()) {
+            if (component.isHasCallbacks()) {
                 final String mid = result.getMessage().getBody().getMid();
                 context.setPendingMessage(
                         ByteBuffer.allocate(Long.BYTES + mid.length())
-                                .putLong(schemeComponent.getId())
+                                .putLong(component.getId())
                                 .put(mid.getBytes())
                                 .array()
                 );
             }
-            context.setState(schemeComponent.getNextState());
+            context.setState(component.getNextState());
+
+            actionProcessor.perform(component, context, null);
+
         } catch (APIException | ClientException e) {
             log.error(
                     String.format(
                             "Message sending produced exception(%s, %s, %s)",
-                            context, schemeComponent, api
+                            context, component, api
                     ),
                     e
             );
@@ -100,13 +101,13 @@ public class ComponentProcessorService {
     public void process(
             final MessageCreatedUpdate update,
             final BotContext context,
-            final SchemeComponent schemeComponent,
+            final SchemeComponent component,
             final TamTamBotAPI api
     ) {
         // update pending message
         updatePendingMessage(context, api);
 
-        Iterable<ComponentValidator> validators = validatorRepository.findAllByComponentId(schemeComponent.getId());
+        /*Iterable<ComponentValidator> validators = validatorRepository.findAllByComponentId(component.getId());
         for (ComponentValidator componentValidator
                 : validators) {
             switch (ValidatorType.getById(componentValidator.getType())) {
@@ -119,8 +120,11 @@ public class ComponentProcessorService {
                 default:
                     break;
             }
-        }
-        context.setState(schemeComponent.getNextState());
+        }*/
+
+        context.setState(component.getNextState());
+
+        actionProcessor.perform(component, context, update);
     }
 
     /*
@@ -129,10 +133,12 @@ public class ComponentProcessorService {
     public void process(
             final MessageCallbackUpdate update,
             final BotContext context,
-            final SchemeComponent schemeComponent,
+            final SchemeComponent component,
             final TamTamBotAPI api
     ) {
         try {
+            actionProcessor.perform(component, context, update);
+
             ButtonPayload payload = new ButtonPayload(update.getCallback().getPayload());
             componentRepository.findById(payload.getNextState())
                     .ifPresentOrElse(
@@ -158,6 +164,9 @@ public class ComponentProcessorService {
 
                                     }
                                     context.setState(foundComponent.getNextState());
+
+                                    actionProcessor.perform(foundComponent, context, null);
+
                                     if (foundComponent.isHasCallbacks()) {
                                         context.setPendingMessage(
                                                 ByteBuffer
@@ -171,13 +180,11 @@ public class ComponentProcessorService {
 
                                 } else {
                                     // just notification
-                                    final ButtonPayload buttonPayload
-                                            = new ButtonPayload(update.getCallback().getPayload());
                                     final boolean success =
                                             answerOnCallback(
                                                     new CallbackAnswer()
                                                             .userId(context.getId().getUserId())
-                                                            .notification(buttonPayload.getValue()),
+                                                            .notification(payload.getValue()),
                                                     update.getCallback().getCallbackId(),
                                                     context,
                                                     api
@@ -193,7 +200,7 @@ public class ComponentProcessorService {
             log.error(
                     String.format(
                             "MessageCallback processing produced exception(%s, %s, %s, %s)",
-                            update, context, schemeComponent, api
+                            update, context, component, api
                     ),
                     e
             );

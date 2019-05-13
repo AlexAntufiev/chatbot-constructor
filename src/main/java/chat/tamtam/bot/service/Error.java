@@ -52,6 +52,10 @@ public enum Error {
     SCHEME_BUILDER_COMPONENT_GRAPH_IS_CYCLIC("errors.bot.scheme.builder.component.graph.is.cyclic"),
     SCHEME_BUILDER_COMPONENT_TEXT_IS_EMPTY("errors.bot.scheme.builder.component.text.is.empty"),
 
+    SCHEME_BUILDER_COMPONENT_ACTION_IS_NOT_FOUND("errors.bot.scheme.builder.component.action.is.not.found"),
+    SCHEME_BUILDER_COMPONENT_ACTION_HAS_ILLEGAL_TYPE("errors.bot.scheme.builder.component"
+            + ".action.has.illegal.type"),
+
     SCHEME_BUILDER_INVALID_VALIDATOR("errors.bot.scheme.invalid.componentValidator"),
     SCHEME_BUILDER_BUTTONS_EMPTY_FIELDS("errors.bot.scheme.builder.buttons.empty.fields"),
     SCHEME_BUILDER_BUTTONS_UPDATE_BY_ID("errors.bot.scheme.builder.buttons.id.not.exist"),
