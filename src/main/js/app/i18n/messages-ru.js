@@ -98,6 +98,8 @@ export default {
     'errors.bot.scheme.builder.component.is.absent': 'Отсутствует компонент с таким id',
     'errors.bot.scheme.builder.component.graph.is.cyclic': 'Зацикленная схема бота',
     'errors.bot.scheme.builder.component.text.is.empty': 'Текст не должен быть пустым',
+    'errors.bot.scheme.builder.component.action.is.not.found': 'Дейтсвие не найдено',
+    'errors.bot.scheme.builder.component.action.has.illegal.type': 'Неверный тип действия',
     'errors.bot.scheme.component.group.has.empty.title': 'Пустое название группы',
     'errors.bot.scheme.component.group.is.not.found': 'Группа не найдена',
     'errors.bot.scheme.component.group.type.is.illegal': 'Неверный тип группы',
