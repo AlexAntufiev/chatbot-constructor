@@ -46,4 +46,6 @@ public interface Endpoint {
 
     String RESOURCES = "/resources";
     String REGISTRATION_BOT_URL = "/registration/bot/url";
+
+    String VOTE = "/vote";
 }

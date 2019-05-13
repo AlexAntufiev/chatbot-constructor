@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -13,6 +15,8 @@ import org.springframework.util.StringUtils;
 import com.google.common.collect.Lists;
 
 import chat.tamtam.bot.domain.bot.BotScheme;
+import chat.tamtam.bot.domain.builder.action.SchemeAction;
+import chat.tamtam.bot.domain.builder.action.SchemeActionType;
 import chat.tamtam.bot.domain.builder.button.Button;
 import chat.tamtam.bot.domain.builder.button.ButtonsGroup;
 import chat.tamtam.bot.domain.builder.button.ButtonsGroupUpdate;
@@ -31,6 +35,7 @@ import chat.tamtam.bot.repository.ButtonsGroupRepository;
 import chat.tamtam.bot.repository.ComponentGroupRepository;
 import chat.tamtam.bot.repository.ComponentRepository;
 import chat.tamtam.bot.repository.ComponentValidatorRepository;
+import chat.tamtam.bot.repository.SchemeActionRepository;
 import chat.tamtam.bot.utils.SchemeComponentUtils;
 import chat.tamtam.bot.utils.TransactionalUtils;
 import chat.tamtam.botapi.model.Intent;
@@ -52,6 +57,7 @@ public class BuilderService {
     private final ComponentGroupRepository componentGroupRepository;
 
     private final TransactionalUtils transactionalUtils;
+    private final SchemeActionRepository actionRepository;
 
     public SuccessResponse getNewComponentId(final String authToken, final int botSchemeId) {
         BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
@@ -65,7 +71,9 @@ public class BuilderService {
 
     public SuccessResponse getBotScheme(final String authToken, final int botSchemeId) {
         BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
-        List<ComponentUpdate> components = new ArrayList<>();
+
+        List<ComponentUpdate> updates = new ArrayList<>();
+
         componentRepository
                 .findAllBySchemeIdOrderBySequence(botScheme.getId())
                 .forEach(component -> {
@@ -78,14 +86,22 @@ public class BuilderService {
                                     .findByComponentId(component.getId())
                                     .ifPresent(group -> update.setButtonsGroup(new ButtonsGroupUpdate(group)));
                             // @todo #CC-185 Fetch and add other attachments
+
                         case INPUT:
                             // @todo #CC-185 Fetch and add validators, actions etc.
+
                         default:
-                            break;
+                            List<SchemeAction> actions =
+                                    Lists.newArrayList(
+                                            actionRepository.findAllByComponentIdOrderBySequence(component.getId())
+                                    );
+                            update.setActions(actions);
                     }
-                    components.add(update);
+
+                    updates.add(update);
                 });
-        return new SuccessResponseWrapper<>(components);
+
+        return new SuccessResponseWrapper<>(updates);
     }
 
     public SuccessResponse saveBotScheme(
@@ -168,6 +184,7 @@ public class BuilderService {
                         SchemeComponent schemeComponent = null;
                         ButtonsGroupUpdate buttonsGroupUpdate = null;
                         List<ComponentValidator> componentValidators = null;
+                        List<SchemeAction> actions = null;
 
                         switch (ComponentType.getById(update.getComponent().getType())) {
                             case INFO:
@@ -183,15 +200,24 @@ public class BuilderService {
                                     );
                                 }
                                 buttonsGroupUpdate = updateButtonsGroup(update, botSchemeId);
+
                             case INPUT:
                                 componentValidators = updateValidators(update);
+
                             default:
+                                actions = updateActions(update, botScheme.getId());
+
                                 update.getComponent().setSchemeId(botScheme.getId());
                                 update.getComponent().setSequence(sequence.addAndGet(sequenceDelta));
                                 schemeComponent = componentRepository.save(update.getComponent());
                         }
 
-                        updated.add(new ComponentUpdate(schemeComponent, componentValidators, buttonsGroupUpdate));
+                        updated.add(new ComponentUpdate(
+                                schemeComponent,
+                                componentValidators,
+                                actions,
+                                buttonsGroupUpdate
+                        ));
                     }
 
                     botScheme.setSchemeEnterState(
@@ -232,6 +258,68 @@ public class BuilderService {
         }
 
         return Lists.newArrayList(validatorRepository.saveAll(update.getValidators()));
+    }
+
+    private List<SchemeAction> updateActions(
+            final ComponentUpdate update,
+            final int botSchemeId
+    ) {
+        // Removes all actions in case of empty update
+        if (update.getActions() == null || update.getActions().isEmpty()) {
+            List<SchemeAction> actions =
+                    StreamSupport
+                            .stream(
+                                    actionRepository
+                                            .findAllByComponentId(update.getComponent().getId())
+                                            .spliterator(),
+                                    false
+                            )
+                            .peek(action -> action.setComponentId(null))
+                            .collect(Collectors.toList());
+            actionRepository.saveAll(actions);
+            return null;
+        }
+
+        SchemeComponent component = update.getComponent();
+
+        AtomicInteger sequence = new AtomicInteger(Integer.MIN_VALUE);
+        final int sequenceDelta = 1;
+
+        // Prepare actions to store
+        update.getActions().forEach(action -> {
+
+            action.setComponentId(component.getId());
+
+            if (action.getId() != null) {
+                actionRepository
+                        .findByIdAndComponentId(action.getId(), action.getComponentId())
+                        .orElseThrow(
+                                () -> new ChatBotConstructorException(
+                                        String.format(
+                                                "Cant't find action(%s) belongs to component(%s)",
+                                                action, component
+                                        ),
+                                        Error.SCHEME_BUILDER_COMPONENT_ACTION_IS_NOT_FOUND
+                                )
+                        );
+            }
+
+            SchemeActionType type = SchemeActionType.getById(action.getType());
+
+            if (type == null) {
+                throw new ChatBotConstructorException(
+                        String.format(
+                                "Action(%s) belongs to component(%s) has illegal type",
+                                action, component
+                        ),
+                        Error.SCHEME_BUILDER_COMPONENT_ACTION_HAS_ILLEGAL_TYPE
+                );
+            }
+
+            action.setSequence(sequence.addAndGet(sequenceDelta));
+        });
+
+        return Lists.newArrayList(actionRepository.saveAll(update.getActions()));
     }
 
     private ButtonsGroupUpdate updateButtonsGroup(
