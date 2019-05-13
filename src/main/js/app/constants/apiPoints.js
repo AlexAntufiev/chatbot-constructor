@@ -36,5 +36,5 @@ export const GET_REGISTRATION_LINK = RESOURCES + "registration/bot/url";
 
 
 const BUILDER =  API_POINT + "bot/:id/builder/";
-export const BUILDER_NEW_COMPONENT = BUILDER + "builderComponent";
+export const BUILDER_NEW_COMPONENT = BUILDER + "component";
 export const BUILDER_SCHEME = BUILDER + "scheme";

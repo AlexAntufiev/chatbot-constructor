@@ -15,5 +15,9 @@ public class SchemeComponentGroup {
     @GeneratedValue
     private Long id;
 
+    private Integer schemeId;
+
+    private Byte type;
+
     private String title;
 }
