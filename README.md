@@ -45,7 +45,7 @@ Add inspections:
 
 ## Swagger
 
-Set development profile in application.yml: `spring.profiles.active=development`
+Set development profile in application.yml: `spring.profiles.active=dev`
 
 [Access to swagger]
 
@@ -53,7 +53,7 @@ Set development profile in application.yml: `spring.profiles.active=development`
 
 Download [ngrok]
 
-Start application in `development` profile
+Start application in `dev` profile
 
 `./ngrok http 8090`
 
