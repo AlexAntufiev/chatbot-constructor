@@ -17,7 +17,6 @@ import chat.tamtam.bot.domain.bot.hockey.Team;
 import chat.tamtam.bot.service.hockey.Hockey2019Service;
 import chat.tamtam.botapi.exceptions.APIException;
 import chat.tamtam.botapi.exceptions.ClientException;
-import chat.tamtam.botapi.model.AttachmentRequest;
 import chat.tamtam.botapi.model.BotAddedToChatUpdate;
 import chat.tamtam.botapi.model.BotRemovedFromChatUpdate;
 import chat.tamtam.botapi.model.BotStartedUpdate;
@@ -62,7 +61,7 @@ public class Hockey2019Bot extends AbstractCustomBot {
 
     static {
         // CHECKSTYLE_OFF: ALMOST_ALL
-        INFO_MESSAGE = messageOf("83-ий Чемпионат мира\uD83C\uDFC6\uD83C\uDF0D по хоккею\uD83C\uDFD2 с шайбой "
+        INFO_MESSAGE = messageOf("83-ий Чемпионат мира\uD83C\uDFC6\uD83C\uDF0D по хоккею с шайбой\uD83C\uDFD2 "
                 + "проходит в Словакии\uD83C\uDDF8\uD83C\uDDF0 в городах Братислава и Кошица"
                 + " с 10 по 26 мая 2019\uD83D\uDCC5.\n"
                 + "В этом году чемпионский титул защищает сборная Швеции\uD83C\uDDF8\uD83C\uDDEA.\n"
@@ -215,27 +214,19 @@ public class Hockey2019Bot extends AbstractCustomBot {
     }
 
     private NewMessageBody matches() {
-        return hockey2019Service
-                .getCalendar()
-                .getAvailableMatches()
-                .map(entity -> new CallbackButton(
-                            SELECTED_MATCH + " " + entity.getId(),
-                            entity.getMatchInfo(),
-                            Intent.POSITIVE
-                    )
-                )
-                .map(button -> Stream.of((Button) button)
-                .map(List::of)
-                .map(buttons -> new ArrayList<List<Button>>() {{
-                    add(buttons);
-                }})
-                .map(InlineKeyboardAttachmentRequestPayload::new)
-                .map(InlineKeyboardAttachmentRequest::new)
-                .map(payload -> (AttachmentRequest) payload)
-                .collect(Collectors.toList()))
-                .map(attachments -> messageOf("Выбери матч", attachments))
-                .findAny()
-                .orElse(HELP_MESSAGE_BUTTONS);
+
+        return messageOf("Выбери матч",
+                List.of(new InlineKeyboardAttachmentRequest(new InlineKeyboardAttachmentRequestPayload(
+                        hockey2019Service
+                                .getCalendar()
+                                .getAvailableMatches()
+                                .map(entity -> new ArrayList<Button>() {{
+                                    add(new CallbackButton(SELECTED_MATCH + " " + entity.getId(),
+                                            entity.getMatchInfo(),
+                                            Intent.POSITIVE
+                                    ));
+                                }})
+                                .collect(Collectors.toList())))));
     }
 
     private NewMessageBody news() {

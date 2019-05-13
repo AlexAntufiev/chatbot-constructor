@@ -29,7 +29,8 @@ public class Calendar {
     }
 
     public Stream<Entity> getAvailableMatches() {
-        return matches.stream();
+        return matches.stream()
+                .filter(entity -> entity.active == 1);
     }
 
     @Setter
@@ -56,9 +57,8 @@ public class Calendar {
 
         public String getMatchInfo() {
             return String.format(
-                    "%s %s %s",
+                    "%s - %s",
                     Team.getById(Integer.parseInt(team1Id)).getName(),
-                    score,
                     Team.getById(Integer.parseInt(team2Id)).getName()
             );
         }
