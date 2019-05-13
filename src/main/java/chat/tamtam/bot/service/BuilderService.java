@@ -95,7 +95,6 @@ public class BuilderService {
             final List<ComponentUpdate> components
     ) {
         BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
-
         // Removes entry point of scheme in case of update is empty
         // aka disable further graph execution until next update
         if (components.isEmpty()) {
@@ -208,7 +207,6 @@ public class BuilderService {
                     botSchemeRepository.save(botScheme);
                     return updated;
                 });
-
         return new SuccessResponseWrapper<>(updatedComponents);
     }
 
