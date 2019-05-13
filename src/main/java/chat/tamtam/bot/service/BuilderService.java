@@ -202,7 +202,7 @@ public class BuilderService {
                                     .getComponent()
                                     .getId()
                     );
-                  
+
                     botScheme.setUpdate(Instant.now());
                     botSchemeRepository.save(botScheme);
                     return updated;
