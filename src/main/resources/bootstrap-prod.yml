@@ -6,7 +6,11 @@ spring:
       port: 8500
       discovery:
         healthCheckInterval: 300s
+        preferIpAddress: true
       config:
         watch:
           enabled: true
           delay: 1000 #ms
+    inetutils:
+      ignored-interfaces:
+        - docker0

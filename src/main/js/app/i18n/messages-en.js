@@ -44,6 +44,9 @@ export default {
     'app.dialog.append': 'Append',
     'app.dialog.refresh': 'Refresh',
     'app.dialog.attach': 'Attach',
+    'app.dialog.remove.button': 'Remove button',
+    'app.dialog.remove.message': 'Remove message',
+    'app.dialog.add.message': 'Add message',
 
     //Error messages
     'app.errormessage.errorsummary': 'Error Message',
@@ -94,6 +97,12 @@ export default {
     'errors.bot.scheme.builder.component.duplication': 'Duplicated component id',
     'errors.bot.scheme.builder.component.is.absent': 'No component with this id',
     'errors.bot.scheme.builder.component.graph.is.cyclic': 'Bot scheme is cyclic',
+    'errors.bot.scheme.builder.component.text.is.empty': 'Text should not be empty',
+    'errors.bot.scheme.builder.component.action.is.not.found': 'Action is not found',
+    'errors.bot.scheme.builder.component.action.has.illegal.type': 'Action has illegal type',
+    'errors.bot.scheme.component.group.has.empty.title': 'Group has empty title',
+    'errors.bot.scheme.component.group.is.not.found': 'Group is not found',
+    'errors.bot.scheme.component.group.type.is.illegal': 'Illegal type of group',
 
 
 //Success messages
@@ -117,6 +126,19 @@ export default {
     'template.message.error': 'Error when process message :name',
 
     //Common
-    'app.common.sigin.message': 'Please, sign in'
+    'app.common.sigin.message': 'Please, sign in',
+
+    'app.constructor.intent.positive': 'green',
+    'app.constructor.intent.negative': 'red',
+    'app.constructor.intent.default': 'gray',
+    'app.constructor.intent.select': 'Select color',
+    'app.constructor.select.next.component': 'Select next component',
+    'app.constructor.component.buttongroup': 'Button group',
+    'app.constructor.component.button': 'Button',
+    'app.constructor.message.text': 'Message text',
+    'app.constructor.scheme.saved': 'Scheme was saved',
+    'app.constructor.error.fill.text': 'Text cannot be empty',
+    'app.constructor.error.empty.buttons': 'Button group can not be without buttons',
+    'app.constructor.error.empty.title': 'Empty title'
 };
 

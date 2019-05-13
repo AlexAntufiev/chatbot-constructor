@@ -164,7 +164,8 @@ public class TamBotService {
                                 + id
                                 + " cause "
                                 + e.getLocalizedMessage(),
-                        Error.TAM_BOT_TOKEN_INCORRECT
+                        Error.TAM_BOT_TOKEN_INCORRECT,
+                        e
                 );
             }
             throw new ChatBotConstructorException(
@@ -225,7 +226,8 @@ public class TamBotService {
                             + id
                             + " cause "
                             + e.getLocalizedMessage(),
-                    Error.TAM_SERVICE_ERROR
+                    Error.TAM_SERVICE_ERROR,
+                    e
             );
         }
     }

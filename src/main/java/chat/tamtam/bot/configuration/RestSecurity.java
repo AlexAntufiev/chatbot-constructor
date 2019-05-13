@@ -44,7 +44,7 @@ public class RestSecurity extends WebSecurityConfigurerAdapter {
                         Endpoint.TAM_BOT + Endpoint.ID
                 )
                 .permitAll()
-                .antMatchers(HttpMethod.GET, Endpoint.STATIC_INDEX, Endpoint.STATIC_RESOURCES, Endpoint.HEALTH)
+                .antMatchers(HttpMethod.GET, Endpoint.STATIC_INDEX, Endpoint.STATIC_RESOURCES, Endpoint.ACTUATOR)
                 .permitAll()
                 .antMatchers(SwaggerConfig.SWAGGER_URLS)
                 .permitAll()
