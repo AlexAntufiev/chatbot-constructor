@@ -112,7 +112,7 @@ public class SchemeComponentUtilsTest {
         component.setId(id);
         component.setType(((byte) type));
         component.setNextState(nextState);
-        return new ComponentUpdate(component, null, null);
+        return new ComponentUpdate(component, null, null, null);
     }
 
     // CHECKSTYLE_ON: ALMOST_ALL
