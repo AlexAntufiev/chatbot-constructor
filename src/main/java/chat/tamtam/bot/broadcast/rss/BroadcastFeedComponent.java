@@ -113,7 +113,10 @@ public class BroadcastFeedComponent {
                         feed -> futureList.add(broadcastFeedExecutor.submit(() -> submit(feed)))
                 );
 
-        log.info(String.format("RSS: refreshing %d feeds on executor %s", futureList.size(), broadcastFeedExecutor));
+        log.info(String.format(
+                "RSS: refreshing %d feeds (core pool size=%d, max pool size=%d)",
+                futureList.size(), broadcastFeedExecutor.getCorePoolSize(), broadcastFeedExecutor.getMaxPoolSize()
+        ));
 
         // @todo #CC-212 Change execution flow - let's store tasks in database with markers
         futureList.forEach(this::get);
