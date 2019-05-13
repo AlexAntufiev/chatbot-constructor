@@ -7,51 +7,72 @@ import makeTemplateStr from 'app/utils/makeTemplateStr';
 import {withRouter} from "react-router";
 
 class LeftMenu extends Component {
+
+    static get MENU_ELEM() {
+        return {
+            SETTINGS: 0,
+            CONSTRUCTOR: 1,
+            BROADCASTING: 2,
+            STATISTIC: 3
+        };
+    };
+
     constructor(props) {
         super(props);
+
+        this.state = {
+            selected: LeftMenu.MENU_ELEM.SETTINGS,
+            items: []
+        };
+    }
+
+    render() {
         const {intl} = this.props;
         const settingsUrl = makeTemplateStr(routers.botSettings(), {id: this.props.id});
         const constructorUrl = makeTemplateStr(routers.botSetup(), {id: this.props.id});
         const statisticUrl = makeTemplateStr(routers.botStatistic(), {id: this.props.id});
         const broadcastingUrl = makeTemplateStr(routers.botBroadcasting(), {id: this.props.id});
-        this.state = {
-            items: [
-                {
-                    label: intl.formatMessage({id: 'app.menu.settings'}),
-                    icon: 'pi pi-fw pi-cog',
-                    command: () => {
-                        this.props.history.push(settingsUrl)
-                    }
-                },
-                {
-                    label: intl.formatMessage({id: 'app.menu.constructor'}),
-                    icon: 'pi pi-table',
-                    command: () => {
-                        this.props.history.push(constructorUrl)
-                    }
-                },
-                {
-                    label: intl.formatMessage({id: 'app.menu.broadcasting'}),
-                    icon: 'pi pi-envelope',
-                    command: () => {
-                        this.props.history.push(broadcastingUrl)
-                    }
-                },
-                {
-                    label: intl.formatMessage({id: 'app.menu.statistic'}),
-                    icon: 'pi pi-chart-bar',
-                    command: () => {
-                        this.props.history.push(statisticUrl)
-                    }
-                },
-            ]
-        }
-    }
-
-    render() {
+        const items = [
+            {
+                label: intl.formatMessage({id: 'app.menu.settings'}),
+                icon: 'pi pi-fw pi-cog',
+                className: this.state.selected === LeftMenu.MENU_ELEM.SETTINGS ? "menu-item active" : 'menu-item',
+                command: () => {
+                    this.props.history.push(settingsUrl);
+                    this.setState({selected: LeftMenu.MENU_ELEM.SETTINGS});
+                }
+            },
+            {
+                label: intl.formatMessage({id: 'app.menu.constructor'}),
+                icon: 'pi pi-table',
+                className: this.state.selected === LeftMenu.MENU_ELEM.CONSTRUCTOR ? "menu-item active" : 'menu-item',
+                command: () => {
+                    this.props.history.push(constructorUrl);
+                    this.setState({selected: LeftMenu.MENU_ELEM.CONSTRUCTOR});
+                }
+            },
+            {
+                label: intl.formatMessage({id: 'app.menu.broadcasting'}),
+                icon: 'pi pi-envelope',
+                className: this.state.selected === LeftMenu.MENU_ELEM.BROADCASTING ? "menu-item active" : 'menu-item',
+                command: () => {
+                    this.props.history.push(broadcastingUrl);
+                    this.setState({selected: LeftMenu.MENU_ELEM.BROADCASTING});
+                }
+            },
+            {
+                label: intl.formatMessage({id: 'app.menu.statistic'}),
+                icon: 'pi pi-chart-bar',
+                className: this.state.selected === LeftMenu.MENU_ELEM.STATISTIC ? "menu-item active" : 'menu-item',
+                command: () => {
+                    this.props.history.push(statisticUrl);
+                    this.setState({selected: LeftMenu.MENU_ELEM.STATISTIC});
+                }
+            },
+        ];
 
         return (
-            <Menu model={this.state.items} className="left-menu"/>
+            <Menu model={items} className="left-menu"/>
         );
     }
 }

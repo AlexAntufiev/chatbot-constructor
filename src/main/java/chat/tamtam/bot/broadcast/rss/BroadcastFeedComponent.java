@@ -63,7 +63,12 @@ public class BroadcastFeedComponent {
             final RssFeedRepository rssFeedRepository,
             final TransactionalUtils transactionalUtils
     ) {
-        log.info(String.format("BroadcastRssFeedComponent(token=%s) initializing...", token));
+        log.info(
+                String.format(
+                        "BroadcastRssFeedComponent(token=%s, core pool size=%d, max pool size=%d) initializing...",
+                        token, broadcastFeedExecutor.getCorePoolSize(), broadcastFeedExecutor.getMaxPoolSize()
+                )
+        );
         this.broadcastFeedExecutor = broadcastFeedExecutor;
         this.rssFeedRepository = rssFeedRepository;
         this.transactionalUtils = transactionalUtils;
@@ -107,6 +112,11 @@ public class BroadcastFeedComponent {
                 .forEach(
                         feed -> futureList.add(broadcastFeedExecutor.submit(() -> submit(feed)))
                 );
+
+        log.info(String.format(
+                "RSS: refreshing %d feeds (core pool size=%d, max pool size=%d)",
+                futureList.size(), broadcastFeedExecutor.getCorePoolSize(), broadcastFeedExecutor.getMaxPoolSize()
+        ));
 
         // @todo #CC-212 Change execution flow - let's store tasks in database with markers
         futureList.forEach(this::get);
