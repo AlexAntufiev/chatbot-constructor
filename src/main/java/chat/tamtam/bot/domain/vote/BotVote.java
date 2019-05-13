@@ -45,7 +45,7 @@ public class BotVote {
 
     public Object getDataAsList() {
         try {
-            return new ObjectMapper().readValue(data, new TypeReference<List<VoteEntry>>() {});
+            return new ObjectMapper().readValue(data, new TypeReference<List<VoteEntry>>() { });
         } catch (IOException e) {
             throw new ChatBotConstructorException(
                     String.format("Can't parse vote(id=%d, schemeId=%d, time=%s) data", id, schemeId, time),

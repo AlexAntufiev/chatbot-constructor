@@ -99,7 +99,7 @@ public class ActionProcessorService {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
-            List<VoteEntry> entries = mapper.readValue(context.getVoteData(), new TypeReference<List<VoteEntry>>() {});
+            List<VoteEntry> entries = mapper.readValue(context.getVoteData(), new TypeReference<List<VoteEntry>>() { });
 
             VoteEntry voteEntry = new VoteEntry(VoteEntry.AUTHOR_BOT, component.getText());
             entries.add(voteEntry);
@@ -114,7 +114,7 @@ public class ActionProcessorService {
     private void innerInputStore(final Update update, final BotContext context) {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            List<VoteEntry> entries = mapper.readValue(context.getVoteData(), new TypeReference<List<VoteEntry>>() {});
+            List<VoteEntry> entries = mapper.readValue(context.getVoteData(), new TypeReference<List<VoteEntry>>() { });
 
             VoteEntry voteEntry = null;
 
