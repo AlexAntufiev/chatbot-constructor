@@ -49,12 +49,12 @@ public class Hockey2019Bot extends AbstractCustomBot {
     private static final String HELLO_MESSAGE = "Чемпионат мира по хоккею 2019";
     private static final String INFO = "Инфо";
     private static final String NEWS = "Новости";
-    private static final String TEAM_NEWS = "Новости_команды";
-    private static final String SELECTED_TEAM_NEWS = "Команда";
+    private static final String TEAM_NEWS = "Новости_команд";
+    private static final String SELECTED_TEAM_NEWS = "Команды";
     private static final String CALENDAR = "Календарь";
     private static final String RESULTS = "Результаты";
-    private static final String MATCH = "Трансляция";
-    private static final String SELECTED_MATCH = "Матч";
+    private static final String MATCH = "Онлайн-трансляция";
+    private static final String SELECTED_MATCH = "Матчи";
 
     private static final NewMessageBody INFO_MESSAGE;
     private static final NewMessageBody HELP_MESSAGE_BUTTONS;
@@ -62,11 +62,12 @@ public class Hockey2019Bot extends AbstractCustomBot {
 
     static {
         // CHECKSTYLE_OFF: ALMOST_ALL
-        INFO_MESSAGE = messageOf("Чемпионат мира\uD83C\uDFC6\uD83C\uDF0D по хоккею\uD83C\uDFD2 стартует в 83 раз.\n"
-                + "Местом его проведения была выбрана Словакия\uD83C\uDDF8\uD83C\uDDF0 (города Братислава и Кошица).\n"
-                + "Соревнование начнется 10 мая и продлиться до 26 мая\uD83D\uDCC5.\n"
-                + "В этом году чемпионский титул будет защищать сборная Швеции\uD83C\uDDF8\uD83C\uDDEA.\n"
-                + "Впервые с 1994 года на чемпионате мира выступит сборная Великобритании\uD83C\uDDEC\uD83C\uDDE7.");
+        INFO_MESSAGE = messageOf("83-ий Чемпионат мира\uD83C\uDFC6\uD83C\uDF0D по хоккею\uD83C\uDFD2 с шайбой "
+                + "проходит в Словакии\uD83C\uDDF8\uD83C\uDDF0 в городах Братислава и Кошица"
+                + " с 10 по 26 мая 2019\uD83D\uDCC5.\n"
+                + "В этом году чемпионский титул защищает сборная Швеции\uD83C\uDDF8\uD83C\uDDEA.\n"
+                + "Впервые с 1994 года на Чемпионате мира по хоккею с шайбой "
+                + "выступит сборная Великобритании\uD83C\uDDEC\uD83C\uDDE7.");
         // CHECKSTYLE_OFF: ALMOST_ALL
 
         HELP_MESSAGE_BUTTONS = messageOf(
