@@ -63,7 +63,12 @@ public class BroadcastFeedComponent {
             final RssFeedRepository rssFeedRepository,
             final TransactionalUtils transactionalUtils
     ) {
-        log.info(String.format("BroadcastRssFeedComponent(token=%s) initializing...", token));
+        log.info(
+                String.format(
+                        "BroadcastRssFeedComponent(token=%s, core pool size=%d, max pool size=%d) initializing...",
+                        token, broadcastFeedExecutor.getCorePoolSize(), broadcastFeedExecutor.getMaxPoolSize()
+                )
+        );
         this.broadcastFeedExecutor = broadcastFeedExecutor;
         this.rssFeedRepository = rssFeedRepository;
         this.transactionalUtils = transactionalUtils;
