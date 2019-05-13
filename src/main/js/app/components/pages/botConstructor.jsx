@@ -219,6 +219,9 @@ class BotConstructor extends Component {
     }
 
     changeComponent(componentObj) {
+        if (!componentObj) {
+            return;
+        }
         const groupId = componentObj.component.groupId;
         let components = this.state.components;
         const ind = this.findComponentInd(groupId, componentObj.component.id);
