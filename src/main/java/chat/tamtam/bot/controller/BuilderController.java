@@ -87,7 +87,7 @@ public class BuilderController {
         return ResponseEntity.ok(builderService.updateSchemeGroup(authToken, botSchemeId, group));
     }
 
-    @GetMapping(path = Endpoint.SCHEME + Endpoint.GROUP + Endpoint.GROUP_ID)
+    @GetMapping(path = Endpoint.SCHEME + Endpoint.GROUP + Endpoint.GROUP_ID, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> getSchemeGroup(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final int botSchemeId,
@@ -96,7 +96,7 @@ public class BuilderController {
         return ResponseEntity.ok(builderService.getSchemeGroup(authToken, botSchemeId, groupId));
     }
 
-    @GetMapping(path = Endpoint.SCHEME + Endpoint.GROUP + Endpoint.LIST)
+    @GetMapping(path = Endpoint.SCHEME + Endpoint.GROUP + Endpoint.LIST, consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> getSchemeGroups(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final int botSchemeId
