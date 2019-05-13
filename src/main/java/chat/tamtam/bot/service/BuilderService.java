@@ -116,8 +116,7 @@ public class BuilderService {
             );
         }
 
-        AtomicInteger sequence = new AtomicInteger();
-        sequence.set(Integer.MIN_VALUE);
+        AtomicInteger sequence = new AtomicInteger(Integer.MIN_VALUE);
         final int sequenceDelta = 1;
 
         Object updatedComponents =
