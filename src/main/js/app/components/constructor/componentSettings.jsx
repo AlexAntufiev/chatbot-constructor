@@ -92,7 +92,7 @@ class ComponentSettings extends Component {
         let buttons = this.state.buttonsGroup.buttons.slice();
         const buttonObj = {
             intent: "default",
-            nextState: null,
+            nextState: this.props.component.component.id,
             text: intl.formatMessage({id: 'app.constructor.component.button'}),
             value: intl.formatMessage({id: 'app.constructor.component.button'})
         };
