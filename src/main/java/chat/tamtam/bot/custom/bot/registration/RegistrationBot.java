@@ -54,11 +54,11 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 @RefreshScope
 public class RegistrationBot extends AbstractCustomBot {
     private static final String HELP_MESSAGE =
-            "Available commands:\n\n"
-                    + "/reg - create user\n"
-                    + "/del - delete user\n"
-                    + "/upd {new password} - change password on specified one\n"
-                    + "/login - receive auto-login button";
+            "Команды:\n\n"
+                    + "/создать_аккаунт - создать аккаунт\n"
+                    + "/удалить_аккаунт - удалить аккаунт\n"
+                    + "/изменить_пароль - изменить пароль\n"
+                    + "/войти_в_аккаунт - ссылка для входа";
 
     private final @NonNull UserRepository userRepository;
     private final @NonNull SessionRepository sessionRepository;
@@ -70,7 +70,6 @@ public class RegistrationBot extends AbstractCustomBot {
 
     private final RegistrationBotVisitor visitor;
 
-    // @todo #CC-91 dont create reg bot with nullable id and token
     public RegistrationBot(
             @Value("${tamtam.bot.registration.id}") final String id,
             @Value("${tamtam.bot.registration.token}") final String token,
@@ -160,17 +159,17 @@ public class RegistrationBot extends AbstractCustomBot {
                 .orElse("")
                 .split(" ");
         switch (cmd[0]) {
-            case "/reg":
+            case "/создать_аккаунт":
                 return registrate(message.getSender().getUserId().toString());
-            case "/del":
+            case "/удалить_аккаунт":
                 return delete(message.getSender().getUserId().toString());
-            case "/upd":
+            case "/изменить_пароль":
                 if (cmd.length < 2) {
-                    return messageOf("Please provide new password");
+                    return messageOf("Отправьте пароль");
                 } else {
                     return updatePassword(message.getSender().getUserId().toString(), cmd[1]);
                 }
-            case "/login":
+            case "/войти_в_аккаунт":
                 return login(message.getSender().getUserId().toString());
             default:
                 return messageOf(HELP_MESSAGE);
@@ -180,9 +179,9 @@ public class RegistrationBot extends AbstractCustomBot {
     private NewMessageBody login(final String userId) {
         UserEntity user = userRepository.findByLogin(userId);
         if (user != null) {
-            return messageOf("Press to sign in", List.of(getAutoLoginButton(userId)));
+            return messageOf("Нажмите, чтобы войти в сервис", List.of(getAutoLoginButton(userId)));
         } else {
-            return messageOf("Login: " + userId + " not found\nTry '/reg' to create user");
+            return messageOf("Пользователь с id: " + userId + " не найден\nЧтобы создать аккаунт: /создать_аккаунт");
         }
     }
 
@@ -196,10 +195,10 @@ public class RegistrationBot extends AbstractCustomBot {
                     bCryptPasswordEncoder.encode(password)
             );
             userRepository.save(user);
-            String response = "Login: " + userId + "\nPassword: " + password;
+            String response = "Id пользователя: " + userId + "\nПароль: " + password;
             return messageOf(response, List.of(getAutoLoginButton(userId)));
         }
-        String response = "Login: " + userId + "\nTry '/upd' to change password";
+        String response = "Id пользователя: " + userId + "\nЧтобы изменить пароль: /изменить_пароль ";
         return messageOf(response, List.of(getAutoLoginButton(userId)));
     }
 
@@ -208,24 +207,25 @@ public class RegistrationBot extends AbstractCustomBot {
         if (user != null) {
             userRepository.removeByLogin(userId);
             sessionRepository.removeAllByLogin(userId);
-            return messageOf("User with login: " + userId + " deleted");
+            return messageOf("Пользователь с id: " + userId + " удален");
         }
-        return messageOf("User with login: " + userId + " not found\nTry '/reg' to create user");
+        return messageOf("Пользователь с id: " + userId + " не найден\nЧтобы зарегистрироваться: /создать_аккаунт");
     }
 
     private NewMessageBody updatePassword(final String userId, final String newPassword) {
         UserEntity user = userRepository.findByLogin(userId);
         if (user != null) {
             if (newPassword.isEmpty()) {
-                return messageOf("Try another password");
+                return messageOf("Попробуйте другой пароль");
             }
             user.setPasswordHash(bCryptPasswordEncoder.encode(newPassword));
             userRepository.save(user);
-            String response = "Login: " + userId + "\nPassword: " + newPassword;
+            String response = "Id пользователя: " + userId + "\nПароль: " + newPassword;
             sessionRepository.removeAllByLogin(userId);
             return messageOf(response, List.of(getAutoLoginButton(userId)));
         }
-        return messageOf("Login: " + userId + " not found\nTry '/reg' to create user");
+        return messageOf("Пользователь с id: " + userId
+                + " не найден\nЧтобы зарегистрироваться: /создать_аккаунт");
     }
 
     private InlineKeyboardAttachmentRequest getAutoLoginButton(final String userId) {
@@ -243,7 +243,7 @@ public class RegistrationBot extends AbstractCustomBot {
                 );
         sessionRepository.save(session);
         String tempAccessUrl = host + "/?" + SecurityConstants.AUTO_LOGIN_TEMP_ACCESS_TOKEN + "=" + tempAccessToken;
-        LinkButton button = new LinkButton(tempAccessUrl, "sign in", Intent.DEFAULT);
+        LinkButton button = new LinkButton(tempAccessUrl, "войти", Intent.DEFAULT);
         return new InlineKeyboardAttachmentRequest(
                         new InlineKeyboardAttachmentRequestPayload(List.of(List.of(button))));
     }
