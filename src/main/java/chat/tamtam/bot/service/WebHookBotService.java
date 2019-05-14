@@ -174,8 +174,14 @@ public class WebHookBotService {
         }
 
         private BotContext getContext(final long userId) {
+            BotScheme botScheme = botSchemeRepository
+                    .findById(botSchemeId)
+                    .orElseThrow(
+                            () -> new NoSuchElementException("Can't find bot scheme with id=" + botSchemeId)
+                    );
             return botContextRepository
                     .findByIdUserIdAndIdBotSchemeId(userId, botSchemeId)
+                    .filter(context -> botScheme.getUpdate().equals(context.getSchemeUpdate()))
                     .orElseGet(() -> initContext(userId));
         }
 
@@ -269,6 +275,7 @@ public class WebHookBotService {
 
             context.setId(new BotContext.Id(userId, botSchemeId));
             context.setState(botScheme.getSchemeEnterState());
+            context.setSchemeUpdate(botScheme.getUpdate());
 //            For a while
 //            context.setResetState(botScheme.getSchemeResetState());
 

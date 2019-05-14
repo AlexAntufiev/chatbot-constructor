@@ -1,6 +1,7 @@
 package chat.tamtam.bot.domain.webhook;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -27,6 +28,8 @@ public class BotContext {
     private Long state;
 
     private String variables;
+
+    private Instant schemeUpdate;
 
     private byte[] pendingMessage;
 

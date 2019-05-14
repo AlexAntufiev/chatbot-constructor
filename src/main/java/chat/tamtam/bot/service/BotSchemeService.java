@@ -1,5 +1,6 @@
 package chat.tamtam.bot.service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -10,7 +11,6 @@ import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.controller.Endpoint;
 import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
-import chat.tamtam.bot.domain.builder.component.SchemeComponent;
 import chat.tamtam.bot.domain.exception.ChatBotConstructorException;
 import chat.tamtam.bot.domain.exception.NotFoundEntityException;
 import chat.tamtam.bot.domain.response.SuccessResponse;
@@ -47,12 +47,12 @@ public class BotSchemeService {
         if (bot.getName().isEmpty() || bot.getId() != null) {
             throw new IllegalArgumentException("Invalid bot entity " + bot);
         }
-
         bot.setUserId(userId);
+        bot.setUpdate(Instant.now());
         return ((BotScheme) transactionalUtils
                 .invokeCallable(() -> {
-                    SchemeComponent resetComponent = componentRepository.save(new SchemeComponent());
-//                    bot.setSchemeResetState(resetComponent.getId());
+                    //SchemeComponent resetComponent = componentRepository.save(new SchemeComponent());
+                    //bot.setSchemeResetState(resetComponent.getId());
                     return botSchemeRepository.save(bot);
                 }));
     }

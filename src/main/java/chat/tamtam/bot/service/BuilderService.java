@@ -1,6 +1,7 @@
 package chat.tamtam.bot.service;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -112,12 +113,11 @@ public class BuilderService {
             final List<ComponentUpdate> components
     ) {
         BotScheme botScheme = botSchemeService.getBotScheme(authToken, botSchemeId);
-
         // Removes entry point of scheme in case of update is empty
         // aka disable further graph execution until next update
         if (components.isEmpty()) {
             botScheme.setSchemeEnterState(null);
-            // @todo #CC-250 Update scheme timestamp
+            botScheme.setUpdate(Instant.now());
             botSchemeRepository.save(botScheme);
             return new SuccessResponseWrapper<>(Collections.emptyList());
         }
@@ -232,13 +232,11 @@ public class BuilderService {
                                     .getComponent()
                                     .getId()
                     );
-
-                    // @todo #CC-250 Update scheme timestamp
                     removeComponentsByAbsentIds(ids, botScheme.getId());
+                    botScheme.setUpdate(Instant.now());
                     botSchemeRepository.save(botScheme);
                     return updated;
                 });
-
         return new SuccessResponseWrapper<>(updatedComponents);
     }
 
