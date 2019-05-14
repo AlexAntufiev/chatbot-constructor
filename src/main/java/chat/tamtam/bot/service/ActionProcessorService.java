@@ -145,5 +145,6 @@ public class ActionProcessorService {
                 context.getVoteData()
         );
         voteRepository.save(botVote);
+        context.setVoteData("[]".getBytes());
     }
 }
