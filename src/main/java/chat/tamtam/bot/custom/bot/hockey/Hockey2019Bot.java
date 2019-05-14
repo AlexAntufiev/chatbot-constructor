@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import chat.tamtam.bot.custom.bot.AbstractCustomBot;
 import chat.tamtam.bot.custom.bot.BotType;
+import chat.tamtam.bot.domain.bot.hockey.Calendar;
 import chat.tamtam.bot.domain.bot.hockey.Match;
 import chat.tamtam.bot.domain.bot.hockey.Team;
 import chat.tamtam.bot.service.hockey.Hockey2019Service;
@@ -176,7 +177,12 @@ public class Hockey2019Bot extends AbstractCustomBot {
                 sendCallbackMessage(callback, message, results());
                 break;
             case MATCH:
-                sendCallbackMessage(callback, message, matches());
+                NewMessageBody matches = matches();
+                if(matches == null){
+                    sendCallbackMessage(callback, message, messageOf("Нет активных матчей."));
+                    break;
+                }
+                sendCallbackMessage(callback, message, matches);
                 return;
             case SELECTED_MATCH:
                 Match match = match(Integer.parseInt(payload[1]));
@@ -190,7 +196,7 @@ public class Hockey2019Bot extends AbstractCustomBot {
                             message.getRecipient().getChatId(),
                             newMessageBody
                         )
-                );;
+                );
                 break;
         }
         sendMessage(userId, message.getRecipient().getChatId(), HELP_MESSAGE_BUTTONS);
@@ -215,11 +221,14 @@ public class Hockey2019Bot extends AbstractCustomBot {
 
     private NewMessageBody matches() {
 
+        List<Calendar.Entity> availableMatches = hockey2019Service.getCalendar().getAvailableMatches();
+        if(availableMatches.isEmpty()){
+            return null;
+        }
+
         return messageOf("Выбери матч",
                 List.of(new InlineKeyboardAttachmentRequest(new InlineKeyboardAttachmentRequestPayload(
-                        hockey2019Service
-                                .getCalendar()
-                                .getAvailableMatches()
+                        availableMatches.stream()
                                 .map(entity -> new ArrayList<Button>() {{
                                     add(new CallbackButton(SELECTED_MATCH + " " + entity.getId(),
                                             entity.getMatchInfo(),

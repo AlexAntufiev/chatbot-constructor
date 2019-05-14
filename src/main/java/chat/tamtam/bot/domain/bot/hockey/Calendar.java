@@ -3,7 +3,7 @@ package chat.tamtam.bot.domain.bot.hockey;
 import java.net.URL;
 import java.time.Instant;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -28,9 +28,10 @@ public class Calendar {
         return stringBuilder.toString();
     }
 
-    public Stream<Entity> getAvailableMatches() {
+    public List<Entity> getAvailableMatches() {
         return matches.stream()
-                .filter(entity -> entity.active == 1);
+                .filter(entity -> entity.active == 1)
+                .collect(Collectors.toList());
     }
 
     @Setter
