@@ -253,10 +253,9 @@ class BotConstructor extends Component {
         }
         BuilderService.saveBotScheme(this.props.match.params.id, components, () => {
             AxiosMessages.successOperation(this, 'app.constructor.scheme.saved');
-
-            this.state.removedGroups.forEach((groupId) => {
-                BuilderService.removeGroup(this.props.match.params.id, groupId, null, null, this);
-            });
+            BuilderService.removeGroups(this.props.match.params.id, this.state.removedGroups,
+                () => this.setState({removedGroups: []}),
+                null, this);
         }, null, this);
     }
 
