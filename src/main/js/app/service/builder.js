@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as ApiPoints from 'app/constants/apiPoints';
 import makeTemplateStr from 'app/utils/makeTemplateStr';
-import {handleRequest} from 'app/service/handleRequest';
+import {handleRequest, handleMultiplyRequests} from 'app/service/handleRequest';
 
 export function newComponent(botSchemeId, callbackSuccess, callbackFail, context) {
     const url = makeTemplateStr(ApiPoints.BUILDER_NEW_COMPONENT, {id: botSchemeId});
@@ -42,7 +42,16 @@ export function updateGroup(id, botSchemeId, title, type, callbackSuccess, callb
     }), callbackSuccess, callbackFail, context);
 }
 
-export function removeGroup(botSchemeId, groupId, callbackSuccess, callbackFail, context) {
-    const url = makeTemplateStr(ApiPoints.BUILDER_SCHEME_GROUP_REMOVE, {id: botSchemeId, groupId: groupId});
-    handleRequest(axios.post(url), callbackSuccess, callbackFail, context);
+export function removeGroups(botSchemeId, groups, callbackSuccess, callbackFail, context) {
+    let removeReq = [];
+    groups.forEach((groupId) => {
+        const url = makeTemplateStr(ApiPoints.BUILDER_SCHEME_GROUP_REMOVE, {id: botSchemeId, groupId: groupId});
+        removeReq.push(axios.post(url));
+    });
+    if (groups.length === 0) {
+        callbackSuccess();
+    } else {
+        handleMultiplyRequests(axios.all(removeReq), callbackSuccess, callbackFail, context);
+    }
 }
+
