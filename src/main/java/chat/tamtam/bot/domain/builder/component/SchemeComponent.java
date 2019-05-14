@@ -1,5 +1,6 @@
 package chat.tamtam.bot.domain.builder.component;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -24,6 +25,7 @@ public class SchemeComponent {
 
     private Byte type;
 
+    @Column(columnDefinition = "text")
     private String text;
 
     private Long nextState;

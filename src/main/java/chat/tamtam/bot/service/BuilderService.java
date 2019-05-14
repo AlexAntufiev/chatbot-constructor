@@ -83,23 +83,37 @@ public class BuilderService {
                     ComponentUpdate update = new ComponentUpdate();
                     update.setComponent(component);
 
+                    if (component.getType() == null) {
+                        throw new ChatBotConstructorException(
+                                String.format("Component(%s) has null in type", component),
+                                Error.SCHEME_BUILDER_COMPONENT_TYPE_IS_NULL
+                        );
+                    }
+
                     switch (ComponentType.getById(component.getType())) {
                         case INFO:
                             buttonsGroupRepository
                                     .findByComponentId(component.getId())
                                     .ifPresent(group -> update.setButtonsGroup(new ButtonsGroupUpdate(group)));
                             // @todo #CC-185 Fetch and add other attachments
+                            break;
 
                         case INPUT:
                             // @todo #CC-185 Fetch and add validators, actions etc.
+                            break;
 
                         default:
-                            List<SchemeAction> actions =
-                                    Lists.newArrayList(
-                                            actionRepository.findAllByComponentIdOrderBySequence(component.getId())
-                                    );
-                            update.setActions(actions);
+                            throw new ChatBotConstructorException(
+                                    String.format("Component(%s) has illegal type", update.getComponent()),
+                                    Error.SCHEME_BUILDER_COMPONENT_TYPE_IS_ILLEGAL
+                            );
                     }
+
+                    List<SchemeAction> actions =
+                            Lists.newArrayList(
+                                    actionRepository.findAllByComponentIdOrderBySequence(component.getId())
+                            );
+                    update.setActions(actions);
 
                     updates.add(update);
                 });
@@ -189,6 +203,14 @@ public class BuilderService {
                         List<ComponentValidator> componentValidators = null;
                         List<SchemeAction> actions = null;
 
+                        //Check that component has type
+                        if (update.getComponent().getType() == null) {
+                            throw new ChatBotConstructorException(
+                                    String.format("Component(%s) has null in type", update.getComponent()),
+                                    Error.SCHEME_BUILDER_COMPONENT_TYPE_IS_NULL
+                            );
+                        }
+
                         switch (ComponentType.getById(update.getComponent().getType())) {
                             case INFO:
                                 String text = update.getComponent().getText();
@@ -203,18 +225,25 @@ public class BuilderService {
                                     );
                                 }
                                 buttonsGroupUpdate = updateButtonsGroup(update, botSchemeId);
+                                break;
 
                             case INPUT:
                                 componentValidators = updateValidators(update);
+                                break;
 
                             default:
-                                actions = updateActions(update, botScheme.getId());
-
-                                update.getComponent().setSchemeId(botScheme.getId());
-                                update.getComponent().setSequence(sequence.addAndGet(sequenceDelta));
-                                schemeComponent = componentRepository.save(update.getComponent());
-                                ids.add(update.getComponent().getId());
+                                throw new ChatBotConstructorException(
+                                        String.format("Component(%s) has illegal type", update.getComponent()),
+                                        Error.SCHEME_BUILDER_COMPONENT_TYPE_IS_ILLEGAL
+                                );
                         }
+
+                        actions = updateActions(update, botScheme.getId());
+
+                        update.getComponent().setSchemeId(botScheme.getId());
+                        update.getComponent().setSequence(sequence.addAndGet(sequenceDelta));
+                        schemeComponent = componentRepository.save(update.getComponent());
+                        ids.add(update.getComponent().getId());
 
                         updated.add(new ComponentUpdate(
                                 schemeComponent,
