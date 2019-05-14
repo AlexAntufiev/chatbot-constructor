@@ -84,10 +84,8 @@ public class BuilderService {
                     update.setComponent(component);
 
                     if (component.getType() == null) {
-                        throw new ChatBotConstructorException(
-                                String.format("Component(%s) has null in type", component),
-                                Error.SCHEME_BUILDER_COMPONENT_TYPE_IS_NULL
-                        );
+                        updates.add(update);
+                        return;
                     }
 
                     switch (ComponentType.getById(component.getType())) {
