@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -134,6 +136,8 @@ public class BuilderService {
         AtomicInteger sequence = new AtomicInteger(Integer.MIN_VALUE);
         final int sequenceDelta = 1;
 
+        Set<Long> ids = new HashSet<>();
+
         Object updatedComponents =
                 transactionalUtils.invokeCallable(() -> {
                     List<ComponentUpdate> updated = new ArrayList<>();
@@ -175,11 +179,10 @@ public class BuilderService {
                             }
                         }
 
-                        // @todo #CC-250 Enable groupId check
                         //Check if specified group belongs to this bot scheme
-                        /*if (update.getComponent().getGroupId() != null) {
+                        if (update.getComponent().getGroupId() != null) {
                             getGroup(botScheme, update.getComponent().getGroupId());
-                        }*/
+                        }
 
                         SchemeComponent schemeComponent = null;
                         ButtonsGroupUpdate buttonsGroupUpdate = null;
@@ -210,6 +213,7 @@ public class BuilderService {
                                 update.getComponent().setSchemeId(botScheme.getId());
                                 update.getComponent().setSequence(sequence.addAndGet(sequenceDelta));
                                 schemeComponent = componentRepository.save(update.getComponent());
+                                ids.add(update.getComponent().getId());
                         }
 
                         updated.add(new ComponentUpdate(
@@ -228,12 +232,21 @@ public class BuilderService {
                                     .getComponent()
                                     .getId()
                     );
-
+                    removeComponentsByAbsentIds(ids, botScheme.getId());
                     botScheme.setUpdate(Instant.now());
                     botSchemeRepository.save(botScheme);
                     return updated;
                 });
         return new SuccessResponseWrapper<>(updatedComponents);
+    }
+
+    private void removeComponentsByAbsentIds(final Set<Long> ids, final int schemeId) {
+        List<SchemeComponent> list =
+                StreamSupport.stream(componentRepository.findAllBySchemeId(schemeId).spliterator(), false)
+                        .filter(component -> !ids.contains(component.getId()))
+                        .peek(component -> component.setSchemeId(null))
+                        .collect(Collectors.toList());
+        componentRepository.saveAll(list);
     }
 
     private List<ComponentValidator> updateValidators(final ComponentUpdate update) {

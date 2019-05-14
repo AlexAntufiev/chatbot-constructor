@@ -38,3 +38,7 @@ export const GET_REGISTRATION_LINK = RESOURCES + "registration/bot/url";
 const BUILDER =  API_POINT + "bot/:id/builder/";
 export const BUILDER_NEW_COMPONENT = BUILDER + "component";
 export const BUILDER_SCHEME = BUILDER + "scheme";
+export const BUILDER_SCHEME_GROUPS_LIST = BUILDER_SCHEME + "/group/list";
+export const BUILDER_SCHEME_GROUP_ADD = BUILDER_SCHEME + "/group/add";
+export const BUILDER_SCHEME_GROUP = BUILDER_SCHEME + "/group";
+export const BUILDER_SCHEME_GROUP_REMOVE = BUILDER_SCHEME + "/group/:groupId/delete";

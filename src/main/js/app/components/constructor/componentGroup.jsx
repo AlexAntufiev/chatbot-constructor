@@ -22,7 +22,7 @@ class ComponentGroup extends Component {
                 icon: "pi pi-th-large",
                 command: () => {
                     BuilderService.newComponent(this.props.botSchemeId, (res) => {
-                        this.props.onCreateComponent(res.data.payload.componentId, BotConstructor.COMPONENT_TYPES.BUTTON_GROUP);
+                        this.props.onCreateComponent(res.data.payload.componentId, BotConstructor.COMPONENT_TYPES.BUTTON_GROUP, this.props.group.id);
                         this.menu.hide();
                     }, null, this);
                 }
@@ -49,7 +49,22 @@ class ComponentGroup extends Component {
              }*/
         ];
 
+        this.state = {
+            title: ""
+        };
+
         this.createComponentList = this.createComponentList.bind(this);
+        this.updateGroup = this.updateGroup.bind(this);
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.group.title !== this.props.group.title) {
+            this.setState({title: this.props.group.title});
+        }
+    }
+
+    componentDidMount() {
+        this.setState({title: this.props.group.title});
     }
 
     createComponentList() {
@@ -76,7 +91,7 @@ class ComponentGroup extends Component {
                                           onClick={() => {
                                               const url = makeTemplateStr(routes.botConstructorComponent(), {
                                                   id: this.props.botSchemeId,
-                                                  groupId: this.props.groupId,
+                                                  groupId: this.props.group.id,
                                                   componentId: componentObj.component.id
                                               });
                                               this.props.history.push(url);
@@ -87,6 +102,14 @@ class ComponentGroup extends Component {
         return renderedList;
     }
 
+    updateGroup() {
+        BuilderService.updateGroup(this.props.group.id, this.props.group.schemeId, this.state.title, this.props.group.type, () => {
+            const updatedGroup = Object.assign({}, this.props.group);
+            updatedGroup.title = this.state.title;
+            this.props.updateGroup(updatedGroup);
+        }, null, this);
+    }
+
     render() {
         const componentList = this.createComponentList();
 
@@ -94,14 +117,22 @@ class ComponentGroup extends Component {
             <Fieldset legend={<div className={"p-grid p-align-baseline"}><Inplace ref={el => this.panel = el}>
                 <Growl ref={(el) => this.growl = el}/>
                 <InplaceDisplay>
-                    {this.props.title}
+                    {this.state.title}
                 </InplaceDisplay>
                 <InplaceContent>
-                    <InputText autoFocus value={this.props.title} onBlur={event => this.panel.close()}/>
+                    <InputText autoFocus value={this.state.title} onBlur={(event) => {
+                        this.updateGroup();
+                        this.panel.close();
+                    }
+                    } onChange={(e) => {
+                        this.setState({title: e.target.value})
+                    }}/>
                 </InplaceContent>
             </Inplace>
                 <TieredMenu model={this.items} popup={true} ref={el => this.menu = el}/>
                 <Button icon="pi pi-plus" onClick={(event) => this.menu.toggle(event)}/>
+                <Button icon="pi pi-times" className={'remove-button'}
+                        onClick={() => this.props.removeGroup(this.props.group.id)}/>
             </div>}>
                 <div className={"p-grid"}>
                     {componentList}
