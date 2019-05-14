@@ -3,7 +3,7 @@ import {Button} from "primereact/button";
 import React from "react";
 import {Growl} from "primereact/growl";
 import {Dialog} from "primereact/dialog";
-import {injectIntl} from "react-intl";
+import {FormattedMessage, injectIntl} from "react-intl";
 import {InputText} from "primereact/inputtext";
 import {Dropdown} from "primereact/dropdown";
 import {InputTextarea} from "primereact/inputtextarea";
@@ -113,7 +113,8 @@ class ButtonSettingsDialog extends BaseDialog {
                         modal={true} onHide={this.onHide}>
                     <div className={"form"}>
                         <div className={"form_detail-element"}>
-                            <InputText value={this.state.text}
+                            <div className={"element-label"}><FormattedMessage id={'app.dialog.name'}/></div>
+                            <InputText className={'full-width'} value={this.state.text}
                                        onChange={(e) => {
                                            this.setState({
                                                text: e.target.value,
@@ -123,13 +124,14 @@ class ButtonSettingsDialog extends BaseDialog {
                                        placeholder={intl.formatMessage({id: 'app.dialog.name'})}/>
                         </div>
                         <div className={"form_detail-element"}>
-                            <Dropdown style={{width: '170px'}} value={this.state.intent} options={intents}
-                                      onChange={(e) => this.setState({intent: e.value})}
-                                      editable={true}
-                                      placeholder={intl.formatMessage({id: 'app.constructor.intent.select'})}/>
+                            <div className={"element-label"}><FormattedMessage id={'app.constructor.intent'}/></div>
+                            <Dropdown className={'full-width'} value={this.state.intent} options={intents}
+                                      onChange={(e) => this.setState({intent: e.value})}/>
                         </div>
                         <div className={"form_detail-element"}>
-                            <Dropdown style={{width: '170px'}}
+                            <div className={"element-label"}><FormattedMessage id={'app.constructor.next.component'}/>
+                            </div>
+                            <Dropdown className={'full-width'}
                                       value={this.state.message ? this.state.message.component.nextState : this.state.nextState}
                                       options={this.props.nextComponentList}
                                       onChange={(e) => {
@@ -140,9 +142,7 @@ class ButtonSettingsDialog extends BaseDialog {
                                               this.setState({nextState: e.value})
                                           }
                                       }
-                                      }
-                                      editable={true}
-                                      placeholder={intl.formatMessage({id: 'app.constructor.select.next.component'})}/>
+                                      }/>
                         </div>
                         <div className={"form_detail-element"}>
                             <Button label={intl.formatMessage({id: 'app.dialog.remove.button'})}
