@@ -49,7 +49,7 @@ export function removeGroups(botSchemeId, groups, callbackSuccess, callbackFail,
         removeReq.push(axios.post(url));
     });
     if (groups.length === 0) {
-        callbackSuccess();
+        callbackSuccess && callbackSuccess();
     } else {
         handleMultiplyRequests(axios.all(removeReq), callbackSuccess, callbackFail, context);
     }
