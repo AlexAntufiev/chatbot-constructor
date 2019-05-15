@@ -18,7 +18,3 @@ echo "Vpn installed "
 echo "Consul installing..."
 ./consul/install.sh ${mode}
 echo "Consul installed"
-
-echo "Postgres installing..."
-./postgres/install.sh ${mode}
-echo "Postgres installed"
