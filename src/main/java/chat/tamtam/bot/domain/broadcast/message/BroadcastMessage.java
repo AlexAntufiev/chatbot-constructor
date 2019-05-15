@@ -42,7 +42,7 @@ public class BroadcastMessage {
     private Instant erasingTime;
     @Column(name = "mid")
     private String messageId;
-    @Column(name = "text")
+    @Column(name = "text", columnDefinition = "text")
     private String text;
     @Column(name = "state")
     private Byte state;
