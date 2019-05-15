@@ -22,4 +22,4 @@ else
     exit
 fi
 
-rsync -avz --progress -e "ssh -i ${ssh_path}" scripts/ ${user}@${server}:/home/${user}/${app_name}
+rsync -avz -e "ssh -i ${ssh_path}" scripts/ ${user}@${server}:/home/${user}/${app_name}
