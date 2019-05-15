@@ -9,8 +9,14 @@ services:
       - 80:8090
     networks:
       - default
+    volumes:
+      - ~/chatbot-constructor/logs:/logs
     depends_on:
       - db
+    logging:
+      options:
+        max-size: "100m"
+        max-file: "3"
   db:
     container_name: db
     image: postgres

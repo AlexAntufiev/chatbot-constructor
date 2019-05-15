@@ -12,4 +12,4 @@ spring:
       max-file-size: 1000MB
 
 tamtam:
-  host: http://89.208.84.33
+  host: http://89.208.85.185

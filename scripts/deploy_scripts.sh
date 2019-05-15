@@ -8,8 +8,7 @@ ssh_test="keys/TEST-1.pem"
 ip_test="89.208.84.173"
 
 ssh_prod="keys/PROD-1.pem"
-ip_prod="89.208.84.33"
-
+ip_prod="89.208.85.185"
 
 if [ "$server_type" == "test" ]; then
     ssh_path=${ssh_test}
@@ -22,4 +21,4 @@ else
     exit
 fi
 
-rsync -avz --progress -e "ssh -i ${ssh_path}" scripts/ ${user}@${server}:/home/${user}/${app_name}
+rsync -avz -e "ssh -i ${ssh_path}" scripts/ ${user}@${server}:/home/${user}/${app_name}
