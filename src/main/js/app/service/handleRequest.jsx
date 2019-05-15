@@ -27,6 +27,7 @@ export function handleRequest(request, callbackSuccess, callbackFail, context) {
         }
 
     }).catch((error) => {
+        console.log(error);
         callbackFail && callbackFail(error);
         context && AxiosMessages.serverNotResponse(context);
     });
@@ -66,6 +67,7 @@ export function handleMultiplyRequests(request, callbackSuccess, callbackFail, c
             context && AxiosMessages.serverErrorResponse(context, "app.errormessage.serverwrongresponse");
         }
     }).catch((error) => {
+        console.log(error);
         callbackFail && callbackFail(error);
         context && AxiosMessages.serverNotResponse(context);
     });
