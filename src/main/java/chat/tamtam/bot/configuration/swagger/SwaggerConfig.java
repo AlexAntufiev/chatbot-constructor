@@ -11,9 +11,9 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@Profile(AppProfiles.DEVELOPMENT)
 @Configuration
 @EnableSwagger2
+@Profile({AppProfiles.DEVELOPMENT, AppProfiles.TEST})
 public class SwaggerConfig {
 
     public static final String[] SWAGGER_URLS = {
