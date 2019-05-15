@@ -105,7 +105,7 @@ class BotConstructor extends Component {
                     component: {
                         id: res.data.payload.componentId,
                         groupId: groupId,
-                        nextState: null,
+                        nextState: componentObj.component.id,
                         schemeId: Number(this.props.match.params.id),
                         text: null,
                         title: "Shadow input",
