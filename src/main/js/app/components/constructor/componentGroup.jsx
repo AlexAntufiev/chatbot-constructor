@@ -15,40 +15,6 @@ import makeTemplateStr from "app/utils/makeTemplateStr";
 class ComponentGroup extends Component {
     constructor(props) {
         super(props);
-        const {intl} = this.props;
-        this.items = [
-            {
-                label: intl.formatMessage({id: "app.constructor.component.buttongroup"}),
-                icon: "pi pi-th-large",
-                command: () => {
-                    BuilderService.newComponent(this.props.botSchemeId, (res) => {
-                        this.props.onCreateComponent(res.data.payload.componentId, BotConstructor.COMPONENT_TYPES.BUTTON_GROUP, this.props.group.id);
-                        this.menu.hide();
-                    }, null, this);
-                }
-            },
-            /* {
-                 label: "Vote list",
-                 icon: "pi pi-list",
-                 command: () => {
-                     BuilderService.newComponent(this.props.botSchemeId, (res) => {
-                         this.props.onCreateComponent(res.data.payload.componentId, BotConstructor.COMPONENT_TYPES.VOTE_LIST);
-                         this.menu.hide();
-                     }, null, this);
-                 }
-             },
-             {
-                 label: "User input",
-                 icon: "pi pi-ellipsis-h",
-                 command: () => {
-                     BuilderService.newComponent(this.props.botSchemeId, (res) => {
-                         this.props.onCreateComponent(res.data.payload.componentId, BotConstructor.COMPONENT_TYPES.USER_INPUT);
-                         this.menu.hide();
-                     }, null, this);
-                 }
-             }*/
-        ];
-
         this.state = {
             title: ""
         };
@@ -77,9 +43,9 @@ class ComponentGroup extends Component {
             let icon = "";
             let label = componentObj.component.title;
             switch (componentObj.component.type) {
-                /*case BotConstructor.COMPONENT_SCHEME_TYPES.INPUT:
+                case BotConstructor.COMPONENT_SCHEME_TYPES.INPUT:
                     icon = "pi pi-ellipsis-h";
-                    break;*/
+                    break;
                 case BotConstructor.COMPONENT_SCHEME_TYPES.INFO:
                     if (componentObj.buttonsGroup) {
                         icon = "pi pi-th-large";
@@ -112,6 +78,33 @@ class ComponentGroup extends Component {
 
     render() {
         const componentList = this.createComponentList();
+        const {intl} = this.props;
+
+        let items = [
+            {
+                label: intl.formatMessage({id: "app.constructor.component.buttongroup"}),
+                icon: "pi pi-th-large",
+                command: () => {
+                    BuilderService.newComponent(this.props.botSchemeId, (res) => {
+                        this.props.onCreateComponent(res.data.payload.componentId, BotConstructor.COMPONENT_TYPES.BUTTON_GROUP, this.props.group.id);
+                        this.menu.hide();
+                    }, null, this);
+                }
+            }
+        ];
+
+        if (this.props.group.type === BotConstructor.GROUP_TYPE.VOTE) {
+            items.push({
+                label: "User input",
+                icon: "pi pi-ellipsis-h",
+                command: () => {
+                    BuilderService.newComponent(this.props.botSchemeId, (res) => {
+                        this.props.onCreateComponent(res.data.payload.componentId, BotConstructor.COMPONENT_TYPES.USER_INPUT, this.props.group.id);
+                        this.menu.hide();
+                    }, null, this);
+                }
+            });
+        }
 
         return (
             <Fieldset legend={<div className={"p-grid p-align-baseline"}><Inplace ref={el => this.panel = el}>
@@ -129,7 +122,7 @@ class ComponentGroup extends Component {
                     }}/>
                 </InplaceContent>
             </Inplace>
-                <TieredMenu model={this.items} popup={true} ref={el => this.menu = el}/>
+                <TieredMenu model={items} popup={true} ref={el => this.menu = el}/>
                 <Button icon="pi pi-plus" onClick={(event) => this.menu.toggle(event)}/>
                 <Button icon="pi pi-times" className={'remove-button'}
                         onClick={() => this.props.removeGroup(this.props.group.id)}/>

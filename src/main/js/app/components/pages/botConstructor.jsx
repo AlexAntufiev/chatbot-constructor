@@ -9,6 +9,7 @@ import {injectIntl} from "react-intl";
 import ComponentSettings from "app/components/constructor/componentSettings";
 import {Growl} from "primereact/growl";
 import * as AxiosMessages from 'app/utils/axiosMessages';
+import {TieredMenu} from "primereact/tieredmenu";
 
 class BotConstructor extends Component {
 
@@ -35,6 +36,13 @@ class BotConstructor extends Component {
         };
     }
 
+    static get SCHEME_ACTION_TYPE() {
+        return {
+            STORE_VOTE_ENTRY: 0,
+            PERSIST_VOTE_TO_TABLE: 1
+        };
+    }
+
     constructor(props) {
         super(props);
 
@@ -43,6 +51,23 @@ class BotConstructor extends Component {
             groups: {},
             removedGroups: []
         };
+
+        this.groupTypeMenuItems = [
+            {
+                label: 'Обычная',
+                command: () => {
+                    this.addGroup(BotConstructor.GROUP_TYPE.DEFAULT);
+                    this.menu.hide();
+                }
+            },
+            {
+                label: 'Опрос',
+                command: () => {
+                    this.addGroup(BotConstructor.GROUP_TYPE.VOTE);
+                    this.menu.hide();
+                }
+            },
+        ];
         this.createComponent = this.createComponent.bind(this);
         this.refreshScheme = this.refreshScheme.bind(this);
         this.removeComponent = this.removeComponent.bind(this);
@@ -54,6 +79,7 @@ class BotConstructor extends Component {
         this.addGroup = this.addGroup.bind(this);
         this.removeGroup = this.removeGroup.bind(this);
         this.updateGroup = this.updateGroup.bind(this);
+        this.isShadowInput = this.isShadowInput.bind(this);
     }
 
     createComponent(id, type, groupId) {
@@ -86,7 +112,7 @@ class BotConstructor extends Component {
         }
 
         const appendFunc = (shadowInput) => {
-            let components = Object.assign({}, this.state.components);
+            let components = this.state.components;
             components[groupId].push(componentObj);
             shadowInput && components[groupId].push(shadowInput);
             this.setState({components: components});
@@ -174,8 +200,12 @@ class BotConstructor extends Component {
     removeComponent(componentObj) {
         const groupId = componentObj.component.groupId;
         const ind = this.findComponentInd(groupId, componentObj.component.id);
-        if (ind !== -1) {
-            this.state.components[groupId].splice(ind, 1);
+        if (ind === -1) {
+            return;
+        }
+
+        this.state.components[groupId].splice(ind, 1);
+        if (componentObj.buttonsGroup) {
             const shadowInpInd = this.findComponentInd(groupId, componentObj.component.nextState);
             if (shadowInpInd !== -1) {
                 if (this.state.components[groupId][shadowInpInd].component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INPUT) {
@@ -183,6 +213,7 @@ class BotConstructor extends Component {
                 }
             }
         }
+
         if (componentObj.buttonsGroup) {
             for (let i = 0; i < componentObj.buttonsGroup.buttons.length; i++) {
                 for (let j = 0; j < componentObj.buttonsGroup.buttons[i].length; j++) {
@@ -202,13 +233,13 @@ class BotConstructor extends Component {
             for (let i = 0; i < this.state.components[groupId].length; i++) {
                 const elem = this.state.components[groupId][i];
                 if (elem.component.nextState === componentObj.component.id) {
-                    elem.component.nextState = null;
+                    elem.component.nextState = elem.component.id;
                 }
                 if (elem.buttonsGroup) {
                     for (let row = 0; row < elem.buttonsGroup.buttons.length; row++) {
                         for (let col = 0; col < elem.buttonsGroup.buttons[row].length; col++) {
                             if (elem.buttonsGroup.buttons[row][col].nextState === componentObj.component.id) {
-                                elem.buttonsGroup.buttons[row][col].nextState = null;
+                                elem.buttonsGroup.buttons[row][col].nextState = elem.component.id;
                             }
                         }
                     }
@@ -288,8 +319,8 @@ class BotConstructor extends Component {
         return groups;
     }
 
-    addGroup() {
-        BuilderService.addGroup(this.props.match.params.id, 'New group', BotConstructor.GROUP_TYPE.DEFAULT, (res) => {
+    addGroup(type) {
+        BuilderService.addGroup(this.props.match.params.id, 'New group', type, (res) => {
             this.state.groups[res.data.payload.id] = res.data.payload;
             this.state.components[res.data.payload.id] = [];
             this.setState({
@@ -302,6 +333,23 @@ class BotConstructor extends Component {
     updateGroup(group) {
         this.state.groups[group.id] = group;
         this.setState({groups: this.state.groups});
+    }
+
+    isShadowInput(component) {
+        if (!component) {
+            return false;
+        }
+
+        if (component.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO) {
+            return false;
+        }
+        for (let i = 0; i < this.state.components[component.component.groupId].length; i++) {
+            const tmpComp = this.state.components[component.component.groupId][i];
+            if (tmpComp.component.nextState === component.component.id && tmpComp.buttonsGroup) {
+                return true;
+            }
+        }
+        return false;
     }
 
     render() {
@@ -319,8 +367,9 @@ class BotConstructor extends Component {
                 <div className={"constructor-container p-col-7"}>
                     {groupsList}
                     <div className={'button-list-elem'}>
+                        <TieredMenu model={this.groupTypeMenuItems} popup={true} ref={el => this.menu = el}/>
                         <Button label={intl.formatMessage({id: 'app.constructor.scheme.add.group'})} icon='pi pi-plus'
-                                onClick={this.addGroup}/>
+                                onClick={(e) => this.menu.toggle(e)}/>
                     </div>
                     <div className={'button-list-elem'}>
                         <Button label={intl.formatMessage({id: "app.dialog.save"})} icon='pi pi-plus'
@@ -331,7 +380,8 @@ class BotConstructor extends Component {
                     <ComponentSettings components={this.state.components}
                                        onRemove={this.removeComponent} onChange={this.changeComponent}
                                        component={component} appendComponent={this.appendComponent}
-                                       findComponentInd={this.findComponentInd} groups={this.state.groups}/>
+                                       findComponentInd={this.findComponentInd} groups={this.state.groups}
+                                       isShadowInput={this.isShadowInput}/>
                 </div>
             </div>
         </div>);

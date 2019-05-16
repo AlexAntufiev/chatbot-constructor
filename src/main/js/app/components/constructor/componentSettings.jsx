@@ -7,6 +7,7 @@ import {injectIntl} from "react-intl";
 import BotConstructor from "app/components/pages/botConstructor";
 import ButtonSettingsDialog from "app/components/constructor/buttonSettingsDialog";
 import {Growl} from "primereact/growl";
+import {Dropdown} from "primereact/dropdown";
 
 class ComponentSettings extends Component {
     constructor(props) {
@@ -35,18 +36,13 @@ class ComponentSettings extends Component {
             const group = this.props.components[groupId];
             for (let i = 0; i < group.length; i++) {
                 const componentObj = group[i];
-                //continue, if text message
-                if (componentObj.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO && !componentObj.buttonsGroup) {
-                    continue;
-                }
-                //continue, if not info
-                if (componentObj.component.type !== BotConstructor.COMPONENT_SCHEME_TYPES.INFO) {
-                    continue;
-                }
-                nextComponents.push({
-                    label: this.props.groups[componentObj.component.groupId].title + ' - ' + componentObj.component.title,
-                    value: componentObj.component.id
-                });
+                if ((componentObj.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO && componentObj.buttonsGroup ||
+                    componentObj.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INPUT && this.props.groups[componentObj.component.groupId].type === BotConstructor.GROUP_TYPE.VOTE)
+                    && !this.props.isShadowInput(componentObj))
+                    nextComponents.push({
+                        label: this.props.groups[componentObj.component.groupId].title + ' - ' + componentObj.component.title,
+                        value: componentObj.component.id
+                    });
             }
         }
         return nextComponents;
@@ -87,7 +83,7 @@ class ComponentSettings extends Component {
         this.setState({buttonsGroup: this.state.buttonsGroup});
     }
 
-    createButton(row, toBegin = false) {
+    createButton(row) {
         const {intl} = this.props;
         let buttons = this.state.buttonsGroup.buttons.slice();
         const buttonObj = {
@@ -96,16 +92,11 @@ class ComponentSettings extends Component {
             text: intl.formatMessage({id: 'app.constructor.component.button'}),
             value: intl.formatMessage({id: 'app.constructor.component.button'})
         };
-        if (row === buttons.length) {
+
+        if (row === -1) {
             buttons.push([buttonObj]);
-        } else if (row === -1) {
-            buttons.unshift([buttonObj]);
         } else {
-            if (toBegin) {
-                buttons[row].unshift(buttonObj);
-            } else {
-                buttons[row].push(buttonObj);
-            }
+            buttons[row].push(buttonObj);
         }
         this.state.buttonsGroup.buttons = buttons;
         this.setState({buttonsGroup: this.state.buttonsGroup});
@@ -123,26 +114,26 @@ class ComponentSettings extends Component {
         if (!this.state.buttonsGroup) {
             return null;
         }
-
+        if (this.state.buttonsGroup.buttons.length === 0) {
+            return (
+                <div>
+                    <Button icon='pi pi-plus' className={"button-elem"} onClick={() => this.createButton(-1)}/>
+                </div>
+            );
+        }
         let renderedMatrix = [];
         for (let i = 0; i < this.state.buttonsGroup.buttons.length; i++) {
             let renderedRow = [];
-            if (this.state.buttonsGroup.buttons[i].length < 5) {
-                renderedRow.push(<Button icon='pi pi-plus' onClick={() => this.createButton(i, true)}/>);
-            }
             for (let j = 0; j < this.state.buttonsGroup.buttons[i].length; j++) {
                 renderedRow.push(this.renderButton(this.state.buttonsGroup.buttons[i][j], i, j));
             }
-            if (this.state.buttonsGroup.buttons[i].length < 5) {
+            if (renderedRow.length < 5) {
                 renderedRow.push(<Button icon='pi pi-plus' onClick={() => this.createButton(i)}/>);
             }
             renderedMatrix.push(<div>{renderedRow}</div>);
         }
-        if (this.state.buttonsGroup.buttons.length > 0) {
-            renderedMatrix.push(<div><Button icon='pi pi-plus' className={"button-elem"}
-                                             onClick={() => this.createButton(this.state.buttonsGroup.buttons.length)}/>
-            </div>);
-        }
+        renderedMatrix.push(<div><Button icon='pi pi-plus' className={"button-elem"}
+                                         onClick={() => this.createButton(-1)}/></div>);
         return renderedMatrix;
     }
 
@@ -200,30 +191,34 @@ class ComponentSettings extends Component {
                                    onChange={(e) => this.setState({text: e.target.value})}
                                    placeholder={intl.formatMessage({id: 'app.constructor.message.text'})}/>
                 </div>
-                {/*<div className={"text-card_detail-element"}>
+                <div className={"text-card_detail-element"}>
+                    {this.props.component.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INPUT &&
                     <Dropdown value={this.state.nextState} options={nextComponentList}
                               onChange={(e) => this.setState({nextState: e.value})}
-                              editable={true} placeholder="Select next component"/>
-                </div>*/}
-                <div className="text-card_button-panel">
-                    <Button label={intl.formatMessage({id: "app.bot.remove"})}
-                            onClick={() => this.props.onRemove(this.props.component)}/>
+                              placeholder="Select next component"/>}
                 </div>
-                <div className={"button-panel"}>
-                    <div>
-                        <Button icon='pi pi-plus' className={"button-elem"} onClick={() => this.createButton(-1)}/>
+
+                {this.props.component.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO &&
+                this.props.component.buttonsGroup &&
+                <div>
+                    <div className="text-card_button-panel">
+                        <Button label={intl.formatMessage({id: "app.bot.remove"})}
+                                onClick={() => this.props.onRemove(this.props.component)}/>
                     </div>
-                    {buttonsList}
-                </div>
-                <ButtonSettingsDialog nextComponentList={nextComponentList}
-                                      botSchemeId={Number(this.props.match.params.id)}
-                                      removeComponent={this.props.onRemove}
-                                      ref={(obj) => this.settingsButtonDialog = obj}
-                                      id={this.props.component.component.id}
-                                      appendComponent={this.props.appendComponent}
-                                      saveButton={this.saveButton}
-                                      removeButton={this.removeButton}
-                                      onChange={this.props.onChange}/>
+
+                    <div className={"button-panel"}>
+                        {buttonsList}
+                    </div>
+                    <ButtonSettingsDialog nextComponentList={nextComponentList}
+                                          botSchemeId={Number(this.props.match.params.id)}
+                                          removeComponent={this.props.onRemove}
+                                          ref={(obj) => this.settingsButtonDialog = obj}
+                                          id={this.props.component.component.id}
+                                          appendComponent={this.props.appendComponent}
+                                          saveButton={this.saveButton}
+                                          removeButton={this.removeButton}
+                                          onChange={this.props.onChange}/>
+                </div>}
             </div>
         );
     }
