@@ -160,18 +160,24 @@ public class RegistrationBot extends AbstractCustomBot {
                 .split(" ");
         switch (cmd[0]) {
             case "/создать_аккаунт":
+                log.info("REGISTRATION_BOT CREATE {}", message.getRecipient().getUserId());
                 return registrate(message.getSender().getUserId().toString());
             case "/удалить_аккаунт":
+                log.info("REGISTRATION_BOT DELETE {}", message.getRecipient().getUserId());
                 return delete(message.getSender().getUserId().toString());
             case "/изменить_пароль":
                 if (cmd.length < 2) {
+                    log.info("REGISTRATION_BOT CHANGE_PASSWORD_WRONG {}", message.getRecipient().getUserId());
                     return messageOf("Отправьте пароль");
                 } else {
+                    log.info("REGISTRATION_BOT CHANGE_PASSWORD {}", message.getRecipient().getUserId());
                     return updatePassword(message.getSender().getUserId().toString(), cmd[1]);
                 }
             case "/войти_в_аккаунт":
+                log.info("REGISTRATION_BOT ENTER_ACCOUNT {}", message.getRecipient().getUserId());
                 return login(message.getSender().getUserId().toString());
             default:
+                log.info("REGISTRATION_BOT HELP_MESSAGE {}", message.getRecipient().getUserId());
                 return messageOf(HELP_MESSAGE);
         }
     }
@@ -257,6 +263,7 @@ public class RegistrationBot extends AbstractCustomBot {
 
         @Override
         public void visit(MessageCreatedUpdate model) {
+            log.info("REGISTRATION_BOT MESSAGE {}", model.getMessage().getRecipient().getUserId());
             response(model);
         }
 
@@ -302,6 +309,7 @@ public class RegistrationBot extends AbstractCustomBot {
 
         @Override
         public void visit(BotStartedUpdate model) {
+            log.info("REGISTRATION_BOT START_MESSAGE {}", model.getUserId());
             response(model);
         }
 
