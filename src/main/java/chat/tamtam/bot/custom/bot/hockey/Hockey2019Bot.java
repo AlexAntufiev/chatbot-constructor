@@ -159,24 +159,35 @@ public class Hockey2019Bot extends AbstractCustomBot {
 
         switch (payload[0]) {
             case INFO:
+                log.info("HOCKEY_BOT_2019 INFO {}", userId);
                 sendCallbackMessage(callback, message, INFO_MESSAGE);
                 break;
             case NEWS:
+                log.info("HOCKEY_BOT_2019 NEWS {}", userId);
                 sendCallbackMessage(callback, message, news());
                 break;
             case TEAM_NEWS:
+                log.info("HOCKEY_BOT_2019 TEAM_NEWS {}", userId);
                 sendCallbackMessage(callback, message, TEAMS);
                 return;
             case SELECTED_TEAM_NEWS:
+                log.info(
+                        "HOCKEY_BOT_2019 SELECTED_TEAM_NEWS {} {}",
+                        userId,
+                        Team.getById(Integer.parseInt(payload[1])).getName()
+                );
                 sendCallbackMessage(callback, message, news(Integer.parseInt(payload[1])));
                 break;
             case CALENDAR:
+                log.info("HOCKEY_BOT_2019 CALENDAR {}", userId);
                 sendCallbackMessage(callback, message, calendar());
                 break;
             case RESULTS:
+                log.info("HOCKEY_BOT_2019 RESULTS {}", userId);
                 sendCallbackMessage(callback, message, results());
                 break;
             case MATCH:
+                log.info("HOCKEY_BOT_2019 MATCH {}", userId);
                 NewMessageBody matches = matches();
                 if(matches == null){
                     sendCallbackMessage(callback, message, messageOf("Нет активных матчей."));
@@ -185,6 +196,7 @@ public class Hockey2019Bot extends AbstractCustomBot {
                 sendCallbackMessage(callback, message, matches);
                 return;
             case SELECTED_MATCH:
+                log.info("HOCKEY_BOT_2019 SELECTED_MATCH {}", userId);
                 Match match = match(Integer.parseInt(payload[1]));
 
                 sendCallbackMessage(callback, message, messageOf(match.getMatchInfo()));
@@ -253,11 +265,13 @@ public class Hockey2019Bot extends AbstractCustomBot {
     private class Hockey2019BotVisitor implements Update.Visitor {
         @Override
         public void visit(MessageCreatedUpdate model) {
+            log.info("HOCKEY_BOT_2019 MESSAGE {}", model.getMessage().getRecipient().getUserId());
             createdUpdate(model);
         }
 
         @Override
         public void visit(MessageCallbackUpdate model) {
+            log.info("HOCKEY_BOT_2019 CALLBACK {}", model.getMessage().getRecipient().getUserId());
             callbackUpdate(model);
         }
 
@@ -298,6 +312,7 @@ public class Hockey2019Bot extends AbstractCustomBot {
 
         @Override
         public void visit(BotStartedUpdate model) {
+            log.info("HOCKEY_BOT_2019 START_MESSAGE {}", model.getUserId());
             sendMessage(model.getUserId(), model.getChatId(), HELP_MESSAGE_BUTTONS);
         }
 
