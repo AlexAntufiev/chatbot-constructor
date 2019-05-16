@@ -87,7 +87,7 @@ class ComponentSettings extends Component {
         this.setState({buttonsGroup: this.state.buttonsGroup});
     }
 
-    createButton(row) {
+    createButton(row, toBegin = false) {
         const {intl} = this.props;
         let buttons = this.state.buttonsGroup.buttons.slice();
         const buttonObj = {
@@ -96,11 +96,16 @@ class ComponentSettings extends Component {
             text: intl.formatMessage({id: 'app.constructor.component.button'}),
             value: intl.formatMessage({id: 'app.constructor.component.button'})
         };
-
-        if (row === -1) {
+        if (row === buttons.length) {
             buttons.push([buttonObj]);
+        } else if (row === -1) {
+            buttons.unshift([buttonObj]);
         } else {
-            buttons[row].push(buttonObj);
+            if (toBegin) {
+                buttons[row].unshift(buttonObj);
+            } else {
+                buttons[row].push(buttonObj);
+            }
         }
         this.state.buttonsGroup.buttons = buttons;
         this.setState({buttonsGroup: this.state.buttonsGroup});
@@ -118,26 +123,26 @@ class ComponentSettings extends Component {
         if (!this.state.buttonsGroup) {
             return null;
         }
-        if (this.state.buttonsGroup.buttons.length === 0) {
-            return (
-                <div>
-                    <Button icon='pi pi-plus' className={"button-elem"} onClick={() => this.createButton(-1)}/>
-                </div>
-            );
-        }
+
         let renderedMatrix = [];
         for (let i = 0; i < this.state.buttonsGroup.buttons.length; i++) {
             let renderedRow = [];
+            if (this.state.buttonsGroup.buttons[i].length < 5) {
+                renderedRow.push(<Button icon='pi pi-plus' onClick={() => this.createButton(i, true)}/>);
+            }
             for (let j = 0; j < this.state.buttonsGroup.buttons[i].length; j++) {
                 renderedRow.push(this.renderButton(this.state.buttonsGroup.buttons[i][j], i, j));
             }
-            if (renderedRow.length < 5) {
+            if (this.state.buttonsGroup.buttons[i].length < 5) {
                 renderedRow.push(<Button icon='pi pi-plus' onClick={() => this.createButton(i)}/>);
             }
             renderedMatrix.push(<div>{renderedRow}</div>);
         }
-        renderedMatrix.push(<div><Button icon='pi pi-plus' className={"button-elem"}
-                                         onClick={() => this.createButton(-1)}/></div>);
+        if (this.state.buttonsGroup.buttons.length > 0) {
+            renderedMatrix.push(<div><Button icon='pi pi-plus' className={"button-elem"}
+                                             onClick={() => this.createButton(this.state.buttonsGroup.buttons.length)}/>
+            </div>);
+        }
         return renderedMatrix;
     }
 
@@ -205,6 +210,9 @@ class ComponentSettings extends Component {
                             onClick={() => this.props.onRemove(this.props.component)}/>
                 </div>
                 <div className={"button-panel"}>
+                    <div>
+                        <Button icon='pi pi-plus' className={"button-elem"} onClick={() => this.createButton(-1)}/>
+                    </div>
                     {buttonsList}
                 </div>
                 <ButtonSettingsDialog nextComponentList={nextComponentList}

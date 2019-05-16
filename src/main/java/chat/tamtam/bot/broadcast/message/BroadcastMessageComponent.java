@@ -53,9 +53,6 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 @RefreshScope
 public class BroadcastMessageComponent {
-    private static final long DEFAULT_SENDING_RATE = 10_000L;
-    private static final long DEFAULT_ERASING_RATE = 10_000L;
-
     private final BroadcastMessageRepository broadcastMessageRepository;
     private final BotSchemeRepository botSchemeRepository;
     private final TamBotRepository tamBotRepository;
@@ -66,7 +63,7 @@ public class BroadcastMessageComponent {
 
     private final Executor scheduledMessagesExecutor;
 
-    @Scheduled(fixedRate = DEFAULT_SENDING_RATE)
+    @Scheduled(fixedDelayString = "${tamtam.broadcast.delay.send}")
     public void fireScheduledMessages() {
         Instant currentInstant = Instant.now();
         List<BroadcastMessage> scheduledMessages =
@@ -138,7 +135,7 @@ public class BroadcastMessageComponent {
         }
     }
 
-    @Scheduled(fixedRate = DEFAULT_ERASING_RATE)
+    @Scheduled(fixedDelayString = "${tamtam.broadcast.delay.delete}")
     public void eraseScheduledMessages() {
         Instant currentInstant = Instant.now();
         List<BroadcastMessage> scheduledMessages =
