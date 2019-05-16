@@ -43,12 +43,11 @@ class ComponentGroup extends Component {
             let icon = "";
             let label = componentObj.component.title;
             switch (componentObj.component.type) {
-                case BotConstructor.COMPONENT_SCHEME_TYPES.INPUT:
-                    icon = "pi pi-ellipsis-h";
-                    break;
                 case BotConstructor.COMPONENT_SCHEME_TYPES.INFO:
                     if (componentObj.buttonsGroup) {
                         icon = "pi pi-th-large";
+                    } else if (this.props.group.type === BotConstructor.GROUP_TYPE.VOTE) {
+                        icon = "pi pi-ellipsis-h";
                     }
                     break;
             }
@@ -80,18 +79,7 @@ class ComponentGroup extends Component {
         const componentList = this.createComponentList();
         const {intl} = this.props;
 
-        let items = [
-            {
-                label: intl.formatMessage({id: "app.constructor.component.buttongroup"}),
-                icon: "pi pi-th-large",
-                command: () => {
-                    BuilderService.newComponent(this.props.botSchemeId, (res) => {
-                        this.props.onCreateComponent(res.data.payload.componentId, BotConstructor.COMPONENT_TYPES.BUTTON_GROUP, this.props.group.id);
-                        this.menu.hide();
-                    }, null, this);
-                }
-            }
-        ];
+        let items = [];
 
         if (this.props.group.type === BotConstructor.GROUP_TYPE.VOTE) {
             items.push({
@@ -100,6 +88,17 @@ class ComponentGroup extends Component {
                 command: () => {
                     BuilderService.newComponent(this.props.botSchemeId, (res) => {
                         this.props.onCreateComponent(res.data.payload.componentId, BotConstructor.COMPONENT_TYPES.USER_INPUT, this.props.group.id);
+                        this.menu.hide();
+                    }, null, this);
+                }
+            });
+        } else {
+            items.push({
+                label: intl.formatMessage({id: "app.constructor.component.buttongroup"}),
+                icon: "pi pi-th-large",
+                command: () => {
+                    BuilderService.newComponent(this.props.botSchemeId, (res) => {
+                        this.props.onCreateComponent(res.data.payload.componentId, BotConstructor.COMPONENT_TYPES.BUTTON_GROUP, this.props.group.id);
                         this.menu.hide();
                     }, null, this);
                 }

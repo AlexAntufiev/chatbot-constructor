@@ -134,6 +134,7 @@ export default {
     'app.constructor.intent': 'Select color',
     'app.constructor.next.component': 'Select next component',
     'app.constructor.component.buttongroup': 'Button group',
+    'app.constructor.component.userinput': 'User input',
     'app.constructor.component.button': 'Button',
     'app.constructor.message.text': 'Message text',
     'app.constructor.scheme.saved': 'Scheme was saved',

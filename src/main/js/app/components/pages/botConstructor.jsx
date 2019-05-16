@@ -80,6 +80,75 @@ class BotConstructor extends Component {
         this.removeGroup = this.removeGroup.bind(this);
         this.updateGroup = this.updateGroup.bind(this);
         this.isShadowInput = this.isShadowInput.bind(this);
+        this.createButtonGroup = this.createButtonGroup.bind(this);
+        this.createUserInput = this.createUserInput.bind(this);
+    }
+
+    createButtonGroup(componentObj) {
+        BuilderService.newComponent(Number(this.props.match.params.id), (res) => {
+            const groupId = componentObj.component.groupId;
+            let shadowInput = {
+                buttonsGroup: null,
+                component: {
+                    id: res.data.payload.componentId,
+                    groupId: groupId,
+                    nextState: componentObj.component.id,
+                    schemeId: Number(this.props.match.params.id),
+                    text: null,
+                    title: "Shadow input",
+                    type: BotConstructor.COMPONENT_SCHEME_TYPES.INPUT
+                }
+            };
+            componentObj.component.nextState = res.data.payload.componentId;
+            let components = this.state.components;
+            components[groupId].push(componentObj);
+            components[groupId].push(shadowInput);
+            this.setState({components: components});
+            const url = makeTemplateStr(routes.botConstructorComponent(), {
+                id: this.props.match.params.id,
+                groupId: groupId,
+                componentId: componentObj.component.id
+            });
+            this.props.history.push(url);
+        }, null, this);
+    }
+
+
+    //applicable for votes only
+    createUserInput(componentObj) {
+        BuilderService.newComponent(Number(this.props.match.params.id), (res) => {
+            const groupId = componentObj.component.groupId;
+            let inputElem = {
+                buttonsGroup: null,
+                component: {
+                    id: Number(res.data.payload.componentId),
+                    type: BotConstructor.COMPONENT_SCHEME_TYPES.INPUT,
+                    groupId: groupId,
+                    nextState: null,
+                    title: "Shadow user input",
+                    schemeId: Number(this.props.match.params.id),
+                },
+                actions: [
+                    {
+                        type: BotConstructor.SCHEME_ACTION_TYPE.STORE_VOTE_ENTRY
+                    },
+                    {
+                        type: BotConstructor.SCHEME_ACTION_TYPE.PERSIST_VOTE_TO_TABLE
+                    }
+                ]
+
+            };
+            componentObj.component.nextState = inputElem.component.id;
+
+            if (this.state.components[groupId].length > 0) {
+                let lastComponent = this.state.components[groupId][this.state.components[groupId].length - 1];
+                lastComponent.actions = [{type: BotConstructor.SCHEME_ACTION_TYPE.STORE_VOTE_ENTRY}];
+                lastComponent.component.nextState = componentObj.component.id;
+            }
+            this.state.components[groupId].push(componentObj);
+            this.state.components[groupId].push(inputElem);
+            this.setState({components: this.state.components});
+        }, null, this);
     }
 
     createComponent(id, type, groupId) {
@@ -101,48 +170,14 @@ class BotConstructor extends Component {
                 componentObj.buttonsGroup = {buttons: []};
                 componentObj.component.type = BotConstructor.COMPONENT_SCHEME_TYPES.INFO;
                 componentObj.component.title = intl.formatMessage({id: 'app.constructor.component.buttongroup'});
+                this.createButtonGroup(componentObj);
                 break;
             case BotConstructor.COMPONENT_TYPES.USER_INPUT:
-                componentObj.component.type = BotConstructor.COMPONENT_SCHEME_TYPES.INPUT;
-                componentObj.component.title = "User input";
+                //Text message for user input
+                componentObj.component.type = BotConstructor.COMPONENT_SCHEME_TYPES.INFO;
+                componentObj.component.title = intl.formatMessage({id: 'app.constructor.component.userinput'});
+                this.createUserInput(componentObj);
                 break;
-            case BotConstructor.COMPONENT_TYPES.VOTE_LIST:
-                //process vote list
-                break;
-        }
-
-        const appendFunc = (shadowInput) => {
-            let components = this.state.components;
-            components[groupId].push(componentObj);
-            shadowInput && components[groupId].push(shadowInput);
-            this.setState({components: components});
-            const url = makeTemplateStr(routes.botConstructorComponent(), {
-                id: this.props.match.params.id,
-                groupId: groupId,
-                componentId: componentObj.component.id
-            });
-            this.props.history.push(url);
-        };
-
-        if (componentObj.buttonsGroup) {
-            BuilderService.newComponent(Number(this.props.match.params.id), (res) => {
-                let shadowInput = {
-                    buttonsGroup: null,
-                    component: {
-                        id: res.data.payload.componentId,
-                        groupId: groupId,
-                        nextState: componentObj.component.id,
-                        schemeId: Number(this.props.match.params.id),
-                        text: null,
-                        title: "Shadow input",
-                        type: BotConstructor.COMPONENT_SCHEME_TYPES.INPUT
-                    }
-                };
-                componentObj.component.nextState = res.data.payload.componentId;
-                appendFunc(shadowInput);
-            }, null, this);
-        } else {
-            appendFunc();
         }
     }
 
@@ -204,31 +239,53 @@ class BotConstructor extends Component {
             return;
         }
 
-        this.state.components[groupId].splice(ind, 1);
-        if (componentObj.buttonsGroup) {
-            const shadowInpInd = this.findComponentInd(groupId, componentObj.component.nextState);
-            if (shadowInpInd !== -1) {
-                if (this.state.components[groupId][shadowInpInd].component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INPUT) {
-                    this.state.components[groupId].splice(shadowInpInd, 1);
+        if (this.state.groups[groupId].type === BotConstructor.GROUP_TYPE.VOTE) {
+
+            //if last in vote list
+            if (ind === this.state.components[groupId].length - 2) {
+                if (this.state.components[groupId].length > 2) {
+                    this.state.components[groupId][ind - 3].actions = [{
+                            type: BotConstructor.SCHEME_ACTION_TYPE.STORE_VOTE_ENTRY
+                        },
+                        {
+                            type: BotConstructor.SCHEME_ACTION_TYPE.PERSIST_VOTE_TO_TABLE
+                        }];
                 }
             }
-        }
+            if (ind - 1 > 0) {
+                if (ind + 2 < this.state.components[groupId].length) {
+                    this.state.components[groupId][ind - 1].component.nextState = this.state.components[groupId][ind + 2].component.id;
+                }
+            }
+            this.state.components[groupId].splice(ind, 1); //remove text
+            this.state.components[groupId].splice(ind, 1); //remove input
+        } else {
+            this.state.components[groupId].splice(ind, 1);
 
-        if (componentObj.buttonsGroup) {
-            for (let i = 0; i < componentObj.buttonsGroup.buttons.length; i++) {
-                for (let j = 0; j < componentObj.buttonsGroup.buttons[i].length; j++) {
-                    const btn = componentObj.buttonsGroup.buttons[i][j];
-                    const nextElemInd = this.findComponentInd(groupId, btn.nextState);
-                    if (nextElemInd !== -1) {
-                        const nextElem = this.state.components[groupId][nextElemInd];
-                        if (nextElem.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO && !nextElem.buttonsGroup) {
-                            this.state.components[groupId].splice(nextElemInd, 1);
+            if (componentObj.buttonsGroup) {
+                const shadowInpInd = this.findComponentInd(groupId, componentObj.component.nextState);
+                if (shadowInpInd !== -1) {
+                    if (this.state.components[groupId][shadowInpInd].component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INPUT) {
+                        this.state.components[groupId].splice(shadowInpInd, 1);
+                    }
+                }
+            }
+
+            if (componentObj.buttonsGroup) {
+                for (let i = 0; i < componentObj.buttonsGroup.buttons.length; i++) {
+                    for (let j = 0; j < componentObj.buttonsGroup.buttons[i].length; j++) {
+                        const btn = componentObj.buttonsGroup.buttons[i][j];
+                        const nextElemInd = this.findComponentInd(groupId, btn.nextState);
+                        if (nextElemInd !== -1) {
+                            const nextElem = this.state.components[groupId][nextElemInd];
+                            if (nextElem.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO && !nextElem.buttonsGroup) {
+                                this.state.components[groupId].splice(nextElemInd, 1);
+                            }
                         }
                     }
                 }
             }
         }
-
         for (let groupId in this.state.components) {
             for (let i = 0; i < this.state.components[groupId].length; i++) {
                 const elem = this.state.components[groupId][i];
@@ -239,7 +296,11 @@ class BotConstructor extends Component {
                     for (let row = 0; row < elem.buttonsGroup.buttons.length; row++) {
                         for (let col = 0; col < elem.buttonsGroup.buttons[row].length; col++) {
                             if (elem.buttonsGroup.buttons[row][col].nextState === componentObj.component.id) {
-                                elem.buttonsGroup.buttons[row][col].nextState = elem.component.id;
+                                if (this.state.groups[groupId].type === BotConstructor.GROUP_TYPE.VOTE && this.state.components[groupId].length > 0) {
+                                    elem.buttonsGroup.buttons[row][col].nextState =  this.state.components[groupId][0].component.id;
+                                } else {
+                                    elem.buttonsGroup.buttons[row][col].nextState = elem.component.id;
+                                }
                             }
                         }
                     }
@@ -320,7 +381,7 @@ class BotConstructor extends Component {
     }
 
     addGroup(type) {
-        BuilderService.addGroup(this.props.match.params.id, 'New group', type, (res) => {
+        BuilderService.addGroup(this.props.match.params.id, type === BotConstructor.GROUP_TYPE.DEFAULT ? 'New group' : 'New vote', type, (res) => {
             this.state.groups[res.data.payload.id] = res.data.payload;
             this.state.components[res.data.payload.id] = [];
             this.setState({

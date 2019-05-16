@@ -36,13 +36,18 @@ class ComponentSettings extends Component {
             const group = this.props.components[groupId];
             for (let i = 0; i < group.length; i++) {
                 const componentObj = group[i];
-                if ((componentObj.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO && componentObj.buttonsGroup ||
-                    componentObj.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INPUT && this.props.groups[componentObj.component.groupId].type === BotConstructor.GROUP_TYPE.VOTE)
-                    && !this.props.isShadowInput(componentObj))
-                    nextComponents.push({
-                        label: this.props.groups[componentObj.component.groupId].title + ' - ' + componentObj.component.title,
-                        value: componentObj.component.id
-                    });
+                if (componentObj.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO) {
+                    const firstInVote = !componentObj.buttonsGroup
+                        && this.props.groups[componentObj.component.groupId].type === BotConstructor.GROUP_TYPE.VOTE && i === 0;
+
+                    if (componentObj.buttonsGroup || firstInVote)
+                        nextComponents.push({
+                            label: firstInVote ?
+                                "Опрос " + this.props.groups[componentObj.component.groupId].title :
+                                this.props.groups[componentObj.component.groupId].title + ' - ' + componentObj.component.title,
+                            value: componentObj.component.id
+                        });
+                }
             }
         }
         return nextComponents;
@@ -64,9 +69,15 @@ class ComponentSettings extends Component {
                 (prevState.title !== this.state.title ||
                     prevState.text !== this.state.text ||
                     prevState.nextState !== this.state.nextState))) {
-            let componentObj = Object.assign({}, this.props.component);
+            const groupId = Number(this.props.match.params.groupId);
+
+            let componentObj = this.props.component;
             componentObj.component.title = this.state.title;
             componentObj.component.text = this.state.text;
+            if (this.props.groups[groupId].type === BotConstructor.GROUP_TYPE.VOTE) {
+                const ind = this.props.findComponentInd(groupId, this.props.component.component.nextState);
+                componentObj = this.props.components[groupId][ind];
+            }
             componentObj.component.nextState = this.state.nextState;
 
             this.props.onChange(componentObj);
@@ -83,7 +94,7 @@ class ComponentSettings extends Component {
         this.setState({buttonsGroup: this.state.buttonsGroup});
     }
 
-    createButton(row) {
+    createButton(row, toBegin = false) {
         const {intl} = this.props;
         let buttons = this.state.buttonsGroup.buttons.slice();
         const buttonObj = {
@@ -92,11 +103,16 @@ class ComponentSettings extends Component {
             text: intl.formatMessage({id: 'app.constructor.component.button'}),
             value: intl.formatMessage({id: 'app.constructor.component.button'})
         };
-
-        if (row === -1) {
+        if (row === buttons.length) {
             buttons.push([buttonObj]);
+        } else if (row === -1) {
+            buttons.unshift([buttonObj]);
         } else {
-            buttons[row].push(buttonObj);
+            if (toBegin) {
+                buttons[row].unshift(buttonObj);
+            } else {
+                buttons[row].push(buttonObj);
+            }
         }
         this.state.buttonsGroup.buttons = buttons;
         this.setState({buttonsGroup: this.state.buttonsGroup});
@@ -114,26 +130,26 @@ class ComponentSettings extends Component {
         if (!this.state.buttonsGroup) {
             return null;
         }
-        if (this.state.buttonsGroup.buttons.length === 0) {
-            return (
-                <div>
-                    <Button icon='pi pi-plus' className={"button-elem"} onClick={() => this.createButton(-1)}/>
-                </div>
-            );
-        }
+
         let renderedMatrix = [];
         for (let i = 0; i < this.state.buttonsGroup.buttons.length; i++) {
             let renderedRow = [];
+            if (this.state.buttonsGroup.buttons[i].length < 5) {
+                renderedRow.push(<Button icon='pi pi-plus' onClick={() => this.createButton(i, true)}/>);
+            }
             for (let j = 0; j < this.state.buttonsGroup.buttons[i].length; j++) {
                 renderedRow.push(this.renderButton(this.state.buttonsGroup.buttons[i][j], i, j));
             }
-            if (renderedRow.length < 5) {
+            if (this.state.buttonsGroup.buttons[i].length < 5) {
                 renderedRow.push(<Button icon='pi pi-plus' onClick={() => this.createButton(i)}/>);
             }
             renderedMatrix.push(<div>{renderedRow}</div>);
         }
-        renderedMatrix.push(<div><Button icon='pi pi-plus' className={"button-elem"}
-                                         onClick={() => this.createButton(-1)}/></div>);
+        if (this.state.buttonsGroup.buttons.length > 0) {
+            renderedMatrix.push(<div><Button icon='pi pi-plus' className={"button-elem"}
+                                             onClick={() => this.createButton(this.state.buttonsGroup.buttons.length)}/>
+            </div>);
+        }
         return renderedMatrix;
     }
 
@@ -179,6 +195,13 @@ class ComponentSettings extends Component {
         const buttonsList = this.createButtonsList();
         const {intl} = this.props;
 
+        const groupId = Number(this.props.match.params.groupId);
+        const componentId = Number(this.props.match.params.componentId);
+
+        const lastInVote = this.props.groups[groupId].type === BotConstructor.GROUP_TYPE.VOTE &&
+            this.props.components[groupId].length > 0 &&
+            this.props.components[groupId][this.props.components[groupId].length - 2].component.id === componentId;
+
         return (
             <div className={"text-card"}>
                 <Growl ref={(el) => this.growl = el}/>
@@ -192,21 +215,22 @@ class ComponentSettings extends Component {
                                    placeholder={intl.formatMessage({id: 'app.constructor.message.text'})}/>
                 </div>
                 <div className={"text-card_detail-element"}>
-                    {this.props.component.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INPUT &&
+                    {lastInVote &&
                     <Dropdown value={this.state.nextState} options={nextComponentList}
                               onChange={(e) => this.setState({nextState: e.value})}
                               placeholder="Select next component"/>}
                 </div>
-
+                <div className="text-card_button-panel">
+                    <Button label={intl.formatMessage({id: "app.bot.remove"})}
+                            onClick={() => this.props.onRemove(this.props.component)}/>
+                </div>
                 {this.props.component.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO &&
                 this.props.component.buttonsGroup &&
                 <div>
-                    <div className="text-card_button-panel">
-                        <Button label={intl.formatMessage({id: "app.bot.remove"})}
-                                onClick={() => this.props.onRemove(this.props.component)}/>
-                    </div>
-
                     <div className={"button-panel"}>
+                        <div>
+                            <Button icon='pi pi-plus' className={"button-elem"} onClick={() => this.createButton(-1)}/>
+                        </div>
                         {buttonsList}
                     </div>
                     <ButtonSettingsDialog nextComponentList={nextComponentList}
