@@ -66,7 +66,7 @@ public class BroadcastMessageComponent {
 
     private final Executor scheduledMessagesExecutor;
 
-    @Scheduled(fixedRate = DEFAULT_SENDING_RATE)
+    @Scheduled(fixedDelay = DEFAULT_SENDING_RATE)
     public void fireScheduledMessages() {
         Instant currentInstant = Instant.now();
         List<BroadcastMessage> scheduledMessages =
@@ -138,7 +138,7 @@ public class BroadcastMessageComponent {
         }
     }
 
-    @Scheduled(fixedRate = DEFAULT_ERASING_RATE)
+    @Scheduled(fixedDelay = DEFAULT_ERASING_RATE)
     public void eraseScheduledMessages() {
         Instant currentInstant = Instant.now();
         List<BroadcastMessage> scheduledMessages =
