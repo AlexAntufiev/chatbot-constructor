@@ -30,6 +30,9 @@ public class SchemeComponent {
 
     private Long nextState;
 
+    @Column(nullable = false)
+    private boolean persistVoteContext = false;
+
     private Long groupId;
 
     private Integer sequence;
