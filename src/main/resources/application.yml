@@ -82,12 +82,17 @@ tamtam:
         match: https://sport.mail.ru/inf/json_vk_bot_competition/hockey2019/match/{id}
   broadcast:
     enabled: true
+    delay:
+      send: 10000
+      delete: 10000
     executor:
       corePoolSize: 2
       maxPoolSize: 4
   rss:
     enabled: true
     token: Iu9O0wVu2dtllKK8MV-Sw9gbFMkM8Z5cLYCTnl8PMGg
+    delay:
+      refresh: 10000
     executor:
       corePoolSize: 2
       maxPoolSize: 4

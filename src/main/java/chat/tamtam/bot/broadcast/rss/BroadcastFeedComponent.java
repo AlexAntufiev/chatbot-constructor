@@ -104,7 +104,7 @@ public class BroadcastFeedComponent {
         }
     }
 
-    @Scheduled(fixedRate = DEFAULT_REFRESH_RATE)
+    @Scheduled(fixedDelayString = "${tamtam.rss.delay.refresh}")
     public void refresh() {
         List<Future> futureList = new ArrayList<>();
         StreamSupport.stream(rssFeedRepository.findAllByEnabled(true).spliterator(), false)
