@@ -140,6 +140,7 @@ class BotConstructor extends Component {
             };
             componentObj.component.nextState = inputElem.component.id;
 
+
             if (this.state.components[groupId].length > 0) {
                 let lastComponent = this.state.components[groupId][this.state.components[groupId].length - 1];
                 lastComponent.actions = [{type: BotConstructor.SCHEME_ACTION_TYPE.STORE_VOTE_ENTRY}];
@@ -148,6 +149,13 @@ class BotConstructor extends Component {
             this.state.components[groupId].push(componentObj);
             this.state.components[groupId].push(inputElem);
             this.setState({components: this.state.components});
+
+            const url = makeTemplateStr(routes.botConstructorComponent(), {
+                id: this.props.match.params.id,
+                groupId: groupId,
+                componentId: componentObj.component.id
+            });
+            this.props.history.push(url);
         }, null, this);
     }
 
@@ -244,7 +252,7 @@ class BotConstructor extends Component {
             //if last in vote list
             if (ind === this.state.components[groupId].length - 2) {
                 if (this.state.components[groupId].length > 2) {
-                    this.state.components[groupId][ind - 3].actions = [{
+                    this.state.components[groupId][ind - 1].actions = [{
                             type: BotConstructor.SCHEME_ACTION_TYPE.STORE_VOTE_ENTRY
                         },
                         {

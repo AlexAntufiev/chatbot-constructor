@@ -54,12 +54,19 @@ class ComponentSettings extends Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+        const groupId = Number(this.props.match.params.groupId);
         if ((prevProps.component && this.props.component && (prevProps.component.component.id !== this.props.component.component.id)) ||
             (!prevProps.component && this.props.component)) {
+            let nextState = this.props.component.component.nextState;
+
+            if (this.props.groups[groupId].type === BotConstructor.GROUP_TYPE.VOTE) {
+                const ind = this.props.findComponentInd(groupId, this.props.component.component.nextState);
+                nextState = this.props.components[groupId][ind].component.nextState;
+            }
             this.setState({
                 title: this.props.component.component.title,
                 text: this.props.component.component.text,
-                nextState: this.props.component.component.nextState,
+                nextState: nextState,
                 buttonsGroup: this.props.component.buttonsGroup
             });
         }
@@ -69,18 +76,21 @@ class ComponentSettings extends Component {
                 (prevState.title !== this.state.title ||
                     prevState.text !== this.state.text ||
                     prevState.nextState !== this.state.nextState))) {
-            const groupId = Number(this.props.match.params.groupId);
 
-            let componentObj = this.props.component;
-            componentObj.component.title = this.state.title;
-            componentObj.component.text = this.state.text;
+
+            let textComponentObj;
+            textComponentObj = this.props.component;
+            textComponentObj.component.title = this.state.title;
+            textComponentObj.component.text = this.state.text;
+
             if (this.props.groups[groupId].type === BotConstructor.GROUP_TYPE.VOTE) {
                 const ind = this.props.findComponentInd(groupId, this.props.component.component.nextState);
-                componentObj = this.props.components[groupId][ind];
+                //assumed that input stored after text
+                let componentObj = this.props.components[groupId][ind];
+                componentObj.component.nextState = this.state.nextState;
+                this.props.onChange(componentObj);
             }
-            componentObj.component.nextState = this.state.nextState;
-
-            this.props.onChange(componentObj);
+            this.props.onChange(textComponentObj);
         }
     }
 
@@ -216,7 +226,7 @@ class ComponentSettings extends Component {
                 </div>
                 <div className={"text-card_detail-element"}>
                     {lastInVote &&
-                    <Dropdown value={this.state.nextState} options={nextComponentList}
+                    <Dropdown value={this.state.nextState} options={nextComponentList} editable={true}
                               onChange={(e) => this.setState({nextState: e.value})}
                               placeholder="Select next component"/>}
                 </div>
