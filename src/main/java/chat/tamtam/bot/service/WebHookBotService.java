@@ -195,7 +195,7 @@ public class WebHookBotService {
         @Override
         public void visit(final MessageCreatedUpdate model) {
             rejectIfUpdateFromChat(model.getMessage().getRecipient().getUserId(), model);
-
+            log.info("WEB_HOOK_BOT MESSAGE {}", botSchemeId);
             setBotContextLockKey(model.getMessage().getSender().getUserId());
             lock();
 
@@ -208,6 +208,7 @@ public class WebHookBotService {
 
         @Override
         public void visit(MessageCallbackUpdate model) {
+            log.info("WEB_HOOK_BOT CALLBACK {}", botSchemeId);
             setBotContextLockKey(model.getCallback().getUser().getUserId());
             lock();
 
@@ -255,6 +256,7 @@ public class WebHookBotService {
 
         @Override
         public void visit(BotStartedUpdate model) {
+            log.info("WEB_HOOK_BOT STARTED {}", botSchemeId);
             setBotContextLockKey(model.getUserId());
             lock();
             try {
