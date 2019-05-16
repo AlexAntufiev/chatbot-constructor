@@ -1,0 +1,23 @@
+# config path: config/chatbot-constructor/data
+tamtam:
+  bot:
+    registration:
+      url: https://tamtam.chat/TamTamRegistrationBot
+      id: 574046867817
+      token: TsK1Wo4n5vqy1vLq3fXUqSbw2_kT0BcYc-DBNQyZR-4
+      enabledIds: 555537636725, 590435433004, 575868018573, 577949140156
+    hockey2019:
+      url: https://tt.me/IceHockey2019
+      id: 593077348372
+      token: Oj6kkmCdCyTBMYHJC_8RimGuRatU3pLv8Md6xu9j4h0
+  broadcast:
+    enabled: true
+    executor:
+      corePoolSize: 2
+      maxPoolSize: 4
+  rss:
+    enabled: true
+    token: Iu9O0wVu2dtllKK8MV-Sw9gbFMkM8Z5cLYCTnl8PMGg
+    executor:
+      corePoolSize: 2
+      maxPoolSize: 4

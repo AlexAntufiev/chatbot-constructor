@@ -1,0 +1,135 @@
+<code_scheme name="chatbotScheme">
+    <option name="LINE_SEPARATOR" value="&#xA;" />
+    <option name="INDENT_CASE_FROM_SWITCH" value="false" />
+    <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+    <option name="ALIGN_MULTILINE_FOR" value="false" />
+    <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
+    <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
+    <option name="PACKAGES_TO_USE_IMPORT_ON_DEMAND">
+        <value />
+    </option>
+    <option name="IMPORT_LAYOUT_TABLE">
+        <value>
+            <package name="java" withSubpackages="true" />
+            <emptyLine />
+            <package name="javax" withSubpackages="true" />
+            <emptyLine />
+            <package name="org" withSubpackages="true" />
+            <emptyLine />
+            <package name="com" withSubpackages="true" />
+            <emptyLine />
+            <package name="" withSubpackages="true" />
+        </value>
+    </option>
+    <HTMLCodeStyleSettings>
+        <option name="HTML_ATTRIBUTE_WRAP" value="0" />
+        <option name="HTML_TEXT_WRAP" value="0" />
+        <option name="HTML_ALIGN_ATTRIBUTES" value="false" />
+    </HTMLCodeStyleSettings>
+    <JavaCodeStyleSettings>
+        <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="100" />
+        <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="100" />
+        <option name="JD_KEEP_INVALID_TAGS" value="false" />
+        <option name="JD_PRESERVE_LINE_FEEDS" value="true" />
+    </JavaCodeStyleSettings>
+    <MarkdownNavigatorCodeStyleSettings>
+        <option name="RIGHT_MARGIN" value="72" />
+    </MarkdownNavigatorCodeStyleSettings>
+    <Properties>
+        <option name="SPACES_AROUND_KEY_VALUE_DELIMITER" value="true" />
+        <option name="KEEP_BLANK_LINES" value="true" />
+    </Properties>
+    <XML>
+        <option name="XML_ATTRIBUTE_WRAP" value="0" />
+        <option name="XML_TEXT_WRAP" value="0" />
+        <option name="XML_KEEP_BLANK_LINES" value="1" />
+        <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
+    </XML>
+    <codeStyleSettings language="Groovy">
+        <indentOptions>
+            <option name="CONTINUATION_INDENT_SIZE" value="4" />
+        </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="HTML">
+        <option name="WRAP_ON_TYPING" value="0" />
+        <indentOptions>
+            <option name="CONTINUATION_INDENT_SIZE" value="4" />
+        </indentOptions>
+    </codeStyleSettings>
+    <codeStyleSettings language="JAVA">
+        <option name="INDENT_SIZE" value="4" />
+        <option name="CONTINUATION_INDENT_SIZE" value="8" />
+        <option name="TAB_SIZE" value="4" />
+        <option name="USE_TAB_CHARACTER" value="false" />
+        <option name="SMART_TABS" value="false" />
+        <option name="LABEL_INDENT_SIZE" value="0" />
+        <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+        <option name="RIGHT_MARGIN" value="120" />
+        <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+        <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
+        <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
+        <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="1" />
+        <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+        <option name="ALIGN_MULTILINE_RESOURCES" value="false" />
+        <option name="ALIGN_MULTILINE_FOR" value="false" />
+        <option name="SPACE_BEFORE_ARRAY_INITIALIZER_LBRACE" value="true" />
+        <option name="SPACE_BEFORE_ANNOTATION_ARRAY_INITIALIZER_LBRACE" value="true" />
+        <option name="CALL_PARAMETERS_WRAP" value="5" />
+        <option name="CALL_PARAMETERS_LPAREN_ON_NEXT_LINE" value="true" />
+        <option name="CALL_PARAMETERS_RPAREN_ON_NEXT_LINE" value="true" />
+        <option name="METHOD_PARAMETERS_WRAP" value="5" />
+        <option name="METHOD_PARAMETERS_LPAREN_ON_NEXT_LINE" value="true" />
+        <option name="METHOD_PARAMETERS_RPAREN_ON_NEXT_LINE" value="true" />
+        <option name="RESOURCE_LIST_WRAP" value="5" />
+        <option name="METHOD_CALL_CHAIN_WRAP" value="5" />
+        <option name="TERNARY_OPERATION_WRAP" value="5" />
+        <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+        <option name="KEEP_SIMPLE_METHODS_IN_ONE_LINE" value="true" />
+        <option name="KEEP_SIMPLE_LAMBDAS_IN_ONE_LINE" value="true" />
+        <option name="KEEP_SIMPLE_CLASSES_IN_ONE_LINE" value="true" />
+        <option name="ARRAY_INITIALIZER_WRAP" value="5" />
+        <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
+        <option name="ARRAY_INITIALIZER_RBRACE_ON_NEXT_LINE" value="true" />
+        <option name="IF_BRACE_FORCE" value="3" />
+        <option name="DOWHILE_BRACE_FORCE" value="3" />
+        <option name="WHILE_BRACE_FORCE" value="3" />
+        <option name="FOR_BRACE_FORCE" value="3" />
+        <option name="ENUM_CONSTANTS_WRAP" value="2" />
+    </codeStyleSettings>
+    <ADDITIONAL_INDENT_OPTIONS fileType="js">
+        <option name="INDENT_SIZE" value="4" />
+        <option name="CONTINUATION_INDENT_SIZE" value="8" />
+        <option name="TAB_SIZE" value="4" />
+        <option name="USE_TAB_CHARACTER" value="false" />
+        <option name="SMART_TABS" value="false" />
+        <option name="LABEL_INDENT_SIZE" value="0" />
+        <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+    </ADDITIONAL_INDENT_OPTIONS>
+    <ADDITIONAL_INDENT_OPTIONS fileType="jsp">
+        <option name="INDENT_SIZE" value="4" />
+        <option name="CONTINUATION_INDENT_SIZE" value="8" />
+        <option name="TAB_SIZE" value="4" />
+        <option name="USE_TAB_CHARACTER" value="false" />
+        <option name="SMART_TABS" value="false" />
+        <option name="LABEL_INDENT_SIZE" value="0" />
+        <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+    </ADDITIONAL_INDENT_OPTIONS>
+    <ADDITIONAL_INDENT_OPTIONS fileType="sql">
+        <option name="INDENT_SIZE" value="2" />
+        <option name="CONTINUATION_INDENT_SIZE" value="8" />
+        <option name="TAB_SIZE" value="4" />
+        <option name="USE_TAB_CHARACTER" value="false" />
+        <option name="SMART_TABS" value="false" />
+        <option name="LABEL_INDENT_SIZE" value="0" />
+        <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+    </ADDITIONAL_INDENT_OPTIONS>
+    <ADDITIONAL_INDENT_OPTIONS fileType="xml">
+        <option name="INDENT_SIZE" value="4" />
+        <option name="CONTINUATION_INDENT_SIZE" value="8" />
+        <option name="TAB_SIZE" value="4" />
+        <option name="USE_TAB_CHARACTER" value="false" />
+        <option name="SMART_TABS" value="false" />
+        <option name="LABEL_INDENT_SIZE" value="0" />
+        <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+    </ADDITIONAL_INDENT_OPTIONS>
+</code_scheme>

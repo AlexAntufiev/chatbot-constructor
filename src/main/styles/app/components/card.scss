@@ -1,0 +1,15 @@
+.card-container {
+  flex-basis: 300px;
+  flex-grow: 0;
+  flex-shrink: 1;
+  margin: 14px;
+  overflow: hidden;
+}
+
+.card-container .p-button-text {
+  padding-left: 25px !important;
+}
+
+.card-container .p-button {
+  margin: 2px;
+}

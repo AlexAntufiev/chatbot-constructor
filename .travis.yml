@@ -1,0 +1,47 @@
+addons:
+  ssh_known_hosts:
+    - 89.208.85.185
+    - 89.208.84.173
+
+language: java
+
+jdk:
+  - oraclejdk11
+
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
+before_install:
+  - npm i -g npm@6.7.0
+
+branches:
+  only:
+    - master
+    - develop
+
+script:
+  - ./gradlew clean build
+
+before_deploy:
+  - echo "${TEST_SSH}" | base64 --decode >/tmp/test_ssh
+  - echo "${PROD_SSH}" | base64 --decode >/tmp/prod_ssh
+  - chmod 600 /tmp/test_ssh /tmp/prod_ssh
+  - chmod +x scripts/deploy.sh
+
+deploy:
+  - provider: script
+    script: ./scripts/deploy.sh test ${TEST_IP}
+    skip_cleanup: true
+    on:
+      branch: develop
+  - provider: script
+    script: ./scripts/deploy.sh prod ${PROD_IP}
+    skip_cleanup: true
+    on:
+      branch: master

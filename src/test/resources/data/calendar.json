@@ -1,0 +1,79 @@
+{
+  "matches": [
+    {
+      "team2": "Канада",
+      "stage": "Группа A",
+      "location": "Steel Arena, Кошице",
+      "date": 1557497700,
+      "team2_id": "603",
+      "score": "-:-",
+      "team1_id": "610",
+      "state": "Матч не начался",
+      "is_active": 0,
+      "tv": "",
+      "url": "https://sportmail.ru/hockey2019/match/86352/",
+      "id": "86352",
+      "team1": "Финляндия"
+    },
+    {
+      "team2": "Норвегия",
+      "stage": "Группа B",
+      "location": "\"Словнафт-Арена\", Братислава",
+      "date": 1557497700,
+      "team2_id": "605",
+      "score": "-:-",
+      "team1_id": "606",
+      "state": "Матч не начался",
+      "is_active": 0,
+      "tv": "МАТЧ!: 17:00",
+      "url": "https://sportmail.ru/hockey2019/match/86353/",
+      "id": "86353",
+      "team1": "Россия"
+    },
+    {
+      "team2": "Словакия",
+      "stage": "Группа A",
+      "location": "Steel Arena, Кошице",
+      "date": 1557512100,
+      "team2_id": "607",
+      "score": "-:-",
+      "team1_id": "609",
+      "state": "Матч не начался",
+      "is_active": 0,
+      "tv": "",
+      "url": "https://sportmail.ru/hockey2019/match/86354/",
+      "id": "86354",
+      "team1": "США"
+    },
+    {
+      "team2": "Швеция",
+      "stage": "Группа B",
+      "location": "\"Словнафт-Арена\", Братислава",
+      "date": 1557512100,
+      "team2_id": "614",
+      "score": "-:-",
+      "team1_id": "612",
+      "state": "Матч не начался",
+      "is_active": 0,
+      "tv": "",
+      "url": "https://sportmail.ru/hockey2019/match/86355/",
+      "id": "86355",
+      "team1": "Чехия"
+    },
+    {
+      "team2": "Франция",
+      "stage": "Группа A",
+      "location": "Steel Arena, Кошице",
+      "date": 1557569700,
+      "team2_id": "611",
+      "score": "-:-",
+      "team1_id": "602",
+      "state": "Матч не начался",
+      "is_active": 0,
+      "tv": "",
+      "url": "https://sportmail.ru/hockey2019/match/86356/",
+      "id": "86356",
+      "team1": "Дания"
+    }
+  ]
+}
