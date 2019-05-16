@@ -71,6 +71,7 @@ public class BroadcastMessageComponent {
                         currentInstant,
                         BroadcastMessageState.SCHEDULED.getValue()
                 );
+        log.info(String.format("Firing %d messages for %s", scheduledMessages.size(), currentInstant));
         scheduledMessages.forEach(message -> {
             botSchemeRepository
                     .findById(message.getBotSchemeId())
