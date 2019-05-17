@@ -23,6 +23,10 @@ public class SchemeComponent {
 
     private Integer schemeId;
 
+    @JsonIgnore
+    @Column(nullable = false)
+    private boolean saved = false;
+
     private Byte type;
 
     @Column(columnDefinition = "text")

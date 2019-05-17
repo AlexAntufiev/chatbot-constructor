@@ -46,7 +46,7 @@ public class BotVote {
         time = Instant.now();
     }
 
-    public Object getDataAsList() {
+    public Object getVoteFields() {
         try {
             return new ObjectMapper().readValue(data, new TypeReference<List<VoteEntry>>() { });
         } catch (IOException e) {

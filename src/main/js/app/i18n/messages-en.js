@@ -103,6 +103,9 @@ export default {
     'errors.bot.scheme.component.group.has.empty.title': 'Group has empty title',
     'errors.bot.scheme.component.group.is.not.found': 'Group is not found',
     'errors.bot.scheme.component.group.type.is.illegal': 'Illegal type of group',
+    'errors.bot.scheme.builder.component.action.is.not.found': 'Action is not found',
+    'errors.bot.scheme.builder.component.action.has.illegal.type': 'Action has illegal type',
+    'errors.bot.scheme.builder.component.action.does.not.belong.to.component': 'Action does not belong to component',
 
 
 //Success messages
