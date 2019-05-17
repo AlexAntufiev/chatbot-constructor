@@ -78,7 +78,7 @@ public class BuilderService {
         List<ComponentUpdate> updates = new ArrayList<>();
 
         componentRepository
-                .findAllBySchemeIdOrderBySequence(botScheme.getId())
+                .findAllBySchemeIdAndSavedOrderBySequence(botScheme.getId(), true)
                 .forEach(component -> {
                     ComponentUpdate update = new ComponentUpdate();
                     update.setComponent(component);
@@ -240,6 +240,7 @@ public class BuilderService {
 
                         update.getComponent().setSchemeId(botScheme.getId());
                         update.getComponent().setSequence(sequence.addAndGet(sequenceDelta));
+                        update.getComponent().setSaved(true);
                         schemeComponent = componentRepository.save(update.getComponent());
                         ids.add(update.getComponent().getId());
 
@@ -259,7 +260,7 @@ public class BuilderService {
                                     .getComponent()
                                     .getId()
                     );
-                    removeComponentsByAbsentIds(ids, botScheme.getId());
+                    removeComponentsExcept(ids, botScheme.getId());
                     botScheme.setUpdate(Instant.now());
                     botSchemeRepository.save(botScheme);
                     return updated;
@@ -267,11 +268,14 @@ public class BuilderService {
         return new SuccessResponseWrapper<>(updatedComponents);
     }
 
-    private void removeComponentsByAbsentIds(final Set<Long> ids, final int schemeId) {
+    private void removeComponentsExcept(final Set<Long> ids, final int schemeId) {
         List<SchemeComponent> list =
                 StreamSupport.stream(componentRepository.findAllBySchemeId(schemeId).spliterator(), false)
                         .filter(component -> !ids.contains(component.getId()))
-                        .peek(component -> component.setSchemeId(null))
+                        .peek(component -> {
+                            component.setSchemeId(null);
+                            component.setSaved(false);
+                        })
                         .collect(Collectors.toList());
         componentRepository.saveAll(list);
     }
@@ -323,10 +327,20 @@ public class BuilderService {
         AtomicInteger sequence = new AtomicInteger(Integer.MIN_VALUE);
         final int sequenceDelta = 1;
 
+        Set<Long> ids = new HashSet<>();
+
         // Prepare actions to store
         update.getActions().forEach(action -> {
 
-            action.setComponentId(component.getId());
+            if (action.getComponentId() != null && !component.getId().equals(action.getComponentId())) {
+                throw new ChatBotConstructorException(
+                        String.format(
+                                "Action(%s) does not belong to component(%s)",
+                                action, component
+                        ),
+                        Error.SCHEME_BUILDER_COMPONENT_ACTION_DOES_NOT_BELONG_TO_COMPONENT
+                );
+            }
 
             if (action.getId() != null) {
                 actionRepository
@@ -341,6 +355,8 @@ public class BuilderService {
                                 )
                         );
             }
+
+            action.setComponentId(component.getId());
 
             SchemeActionType type = SchemeActionType.getById(action.getType());
 
@@ -357,7 +373,23 @@ public class BuilderService {
             action.setSequence(sequence.addAndGet(sequenceDelta));
         });
 
-        return Lists.newArrayList(actionRepository.saveAll(update.getActions()));
+        List<SchemeAction> actions = Lists.newArrayList(actionRepository.saveAll(update.getActions()));
+
+        actions.forEach(action -> ids.add(action.getId()));
+
+        removeActionsExcept(ids, update.getComponent().getId());
+
+        return actions;
+    }
+
+    private void removeActionsExcept(final Set<Long> actions, final long componentId) {
+        Iterable<SchemeAction> allActions = actionRepository.findAllByComponentId(componentId);
+        allActions.forEach(action -> {
+            if (!actions.contains(action.getId())) {
+                action.setComponentId(null);
+            }
+        });
+        actionRepository.saveAll(allActions);
     }
 
     private ButtonsGroupUpdate updateButtonsGroup(

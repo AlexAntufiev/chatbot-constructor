@@ -96,27 +96,42 @@ public class WebHookBotService {
             TamTamBotAPI api = getTamTamBotAPI(component);
 
             while (true) {
-                switch (ComponentType.getById(component.getType())) {
-                    case INPUT:
-                        if (update instanceof MessageCreatedUpdate) {
-                            componentProcessorService
-                                    .process(((MessageCreatedUpdate) update), context, component, api);
-                        }
-                        if (update instanceof MessageCallbackUpdate) {
-                            componentProcessorService
-                                    .process(((MessageCallbackUpdate) update), context, component, api);
-                        }
-                        botContextRepository.save(context);
-                        break;
+                try {
+                    switch (ComponentType.getById(component.getType())) {
+                        case INPUT:
+                            if (update instanceof MessageCreatedUpdate) {
+                                componentProcessorService
+                                        .process(((MessageCreatedUpdate) update), context, component, api);
+                            }
+                            if (update instanceof MessageCallbackUpdate) {
+                                componentProcessorService
+                                        .process(((MessageCallbackUpdate) update), context, component, api);
+                            }
+                            botContextRepository.save(context);
+                            break;
 
-                    case INFO:
-                        componentProcessorService
-                                .process(context, component, api);
-                        botContextRepository.save(context);
-                        break;
+                        case INFO:
+                            componentProcessorService
+                                    .process(context, component, api);
+                            botContextRepository.save(context);
+                            break;
 
-                    default:
-                        break;
+                        default:
+                            break;
+                    }
+                } catch (RuntimeException e) {
+                    log.error(
+                            String.format(
+                                    "Graph execution produced exception(component=%s, context=%s, update=%s)"
+                                    + ", context should be reset on next update",
+                                    component, context, update
+                            ),
+                            e
+                    );
+                    context.setSchemeUpdate(null);
+                    context.setState(null);
+                    botContextRepository.save(context);
+                    break;
                 }
 
                 if (context.getState() == null) {

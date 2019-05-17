@@ -6,14 +6,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class VoteEntry {
-    public static final String AUTHOR_BOT = "bot";
-    public static final String AUTHOR_USER = "user";
+    private String field;
+    private String value;
 
-    private String author;
-    private String data;
-
-    public VoteEntry(final String author, final String data) {
-        this.author = author;
-        this.data = data;
+    public VoteEntry(final String field, final String value) {
+        this.field = field;
+        this.value = value;
     }
 }
