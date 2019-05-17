@@ -154,40 +154,41 @@ public class Hockey2019Bot extends AbstractCustomBot {
         Callback callback = update.getCallback();
         Message message = update.getMessage();
         Long userId = message.getSender().getUserId();
+        Long targetUserId = message.getRecipient().getUserId();
 
         String[] payload = callback.getPayload().split(" ");
 
         switch (payload[0]) {
             case INFO:
-                log.info("HOCKEY_BOT_2019 INFO {}", userId);
+                log.info("HOCKEY_BOT_2019 INFO {}", targetUserId);
                 sendCallbackMessage(callback, message, INFO_MESSAGE);
                 break;
             case NEWS:
-                log.info("HOCKEY_BOT_2019 NEWS {}", userId);
+                log.info("HOCKEY_BOT_2019 NEWS {}", targetUserId);
                 sendCallbackMessage(callback, message, news());
                 break;
             case TEAM_NEWS:
-                log.info("HOCKEY_BOT_2019 TEAM_NEWS {}", userId);
+                log.info("HOCKEY_BOT_2019 TEAM_NEWS {}", targetUserId);
                 sendCallbackMessage(callback, message, TEAMS);
                 return;
             case SELECTED_TEAM_NEWS:
                 log.info(
                         "HOCKEY_BOT_2019 SELECTED_TEAM_NEWS {} {}",
-                        userId,
+                        targetUserId,
                         Team.getById(Integer.parseInt(payload[1])).getName()
                 );
                 sendCallbackMessage(callback, message, news(Integer.parseInt(payload[1])));
                 break;
             case CALENDAR:
-                log.info("HOCKEY_BOT_2019 CALENDAR {}", userId);
+                log.info("HOCKEY_BOT_2019 CALENDAR {}", targetUserId);
                 sendCallbackMessage(callback, message, calendar());
                 break;
             case RESULTS:
-                log.info("HOCKEY_BOT_2019 RESULTS {}", userId);
+                log.info("HOCKEY_BOT_2019 RESULTS {}", targetUserId);
                 sendCallbackMessage(callback, message, results());
                 break;
             case MATCH:
-                log.info("HOCKEY_BOT_2019 MATCH {}", userId);
+                log.info("HOCKEY_BOT_2019 MATCH {}", targetUserId);
                 NewMessageBody matches = matches();
                 if(matches == null){
                     sendCallbackMessage(callback, message, messageOf("Нет активных матчей."));
@@ -196,7 +197,7 @@ public class Hockey2019Bot extends AbstractCustomBot {
                 sendCallbackMessage(callback, message, matches);
                 return;
             case SELECTED_MATCH:
-                log.info("HOCKEY_BOT_2019 SELECTED_MATCH {}", userId);
+                log.info("HOCKEY_BOT_2019 SELECTED_MATCH {}", targetUserId);
                 Match match = match(Integer.parseInt(payload[1]));
 
                 sendCallbackMessage(callback, message, messageOf(match.getMatchInfo()));
