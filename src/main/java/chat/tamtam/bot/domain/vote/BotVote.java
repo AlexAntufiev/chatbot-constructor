@@ -31,14 +31,17 @@ public class BotVote {
 
     private Long userId;
 
+    private Long groupId;
+
     private Instant time;
 
     @JsonIgnore
     private byte[] data;
 
-    public BotVote(final Integer botSchemeId, final Long userId, final byte[] voteData) {
+    public BotVote(final Integer botSchemeId, final Long userId, final Long groupId, final byte[] voteData) {
         schemeId = botSchemeId;
         this.userId = userId;
+        this.groupId = groupId;
         data = voteData;
         time = Instant.now();
     }
