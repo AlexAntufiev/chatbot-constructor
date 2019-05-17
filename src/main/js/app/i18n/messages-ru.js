@@ -133,6 +133,7 @@ export default {
     'app.constructor.intent': 'Цвет',
     'app.constructor.next.component': 'Следующий компонент',
     'app.constructor.component.buttongroup': 'Группа кнопок',
+    'app.constructor.component.userinput': 'Ввод пользователя',
     'app.constructor.component.button': 'Кнопка',
     'app.constructor.message.text': 'Текст сообщения',
     'app.constructor.scheme.saved': 'Схема сохранена',
