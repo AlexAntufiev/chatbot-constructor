@@ -63,7 +63,7 @@ public class ActionProcessorService {
                     break;
 
                 case PERSIST_VOTE_TO_TABLE:
-                    persistVote(context);
+                    persistVote(component, context);
                     break;
 
                 default:
@@ -138,10 +138,11 @@ public class ActionProcessorService {
         }
     }
 
-    private void persistVote(final BotContext context) {
+    private void persistVote(final SchemeComponent component, final BotContext context) {
         BotVote botVote = new BotVote(
                 context.getId().getBotSchemeId(),
                 context.getId().getUserId(),
+                component.getGroupId(),
                 context.getVoteData()
         );
         voteRepository.save(botVote);
