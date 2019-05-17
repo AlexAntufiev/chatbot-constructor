@@ -139,7 +139,9 @@ class BotConstructor extends Component {
 
             };
             componentObj.component.nextState = inputElem.component.id;
-
+            componentObj.actions = [{
+                type: BotConstructor.SCHEME_ACTION_TYPE.STORE_VOTE_ENTRY
+            }];
 
             if (this.state.components[groupId].length > 0) {
                 let lastComponent = this.state.components[groupId][this.state.components[groupId].length - 1];
@@ -253,8 +255,8 @@ class BotConstructor extends Component {
             if (ind === this.state.components[groupId].length - 2) {
                 if (this.state.components[groupId].length > 2) {
                     this.state.components[groupId][ind - 1].actions = [{
-                            type: BotConstructor.SCHEME_ACTION_TYPE.STORE_VOTE_ENTRY
-                        },
+                        type: BotConstructor.SCHEME_ACTION_TYPE.STORE_VOTE_ENTRY
+                    },
                         {
                             type: BotConstructor.SCHEME_ACTION_TYPE.PERSIST_VOTE_TO_TABLE
                         }];
@@ -305,7 +307,7 @@ class BotConstructor extends Component {
                         for (let col = 0; col < elem.buttonsGroup.buttons[row].length; col++) {
                             if (elem.buttonsGroup.buttons[row][col].nextState === componentObj.component.id) {
                                 if (this.state.groups[groupId].type === BotConstructor.GROUP_TYPE.VOTE && this.state.components[groupId].length > 0) {
-                                    elem.buttonsGroup.buttons[row][col].nextState =  this.state.components[groupId][0].component.id;
+                                    elem.buttonsGroup.buttons[row][col].nextState = this.state.components[groupId][0].component.id;
                                 } else {
                                     elem.buttonsGroup.buttons[row][col].nextState = elem.component.id;
                                 }
