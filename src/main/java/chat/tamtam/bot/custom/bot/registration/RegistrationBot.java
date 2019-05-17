@@ -158,26 +158,27 @@ public class RegistrationBot extends AbstractCustomBot {
                 .ofNullable(message.getBody().getText())
                 .orElse("")
                 .split(" ");
+        Long targetUserId = message.getRecipient().getUserId();
         switch (cmd[0]) {
             case "/создать_аккаунт":
-                log.info("REGISTRATION_BOT CREATE {}", message.getRecipient().getUserId());
+                log.info("REGISTRATION_BOT CREATE {}", targetUserId);
                 return registrate(message.getSender().getUserId().toString());
             case "/удалить_аккаунт":
-                log.info("REGISTRATION_BOT DELETE {}", message.getRecipient().getUserId());
+                log.info("REGISTRATION_BOT DELETE {}", targetUserId);
                 return delete(message.getSender().getUserId().toString());
             case "/изменить_пароль":
                 if (cmd.length < 2) {
-                    log.info("REGISTRATION_BOT CHANGE_PASSWORD_WRONG {}", message.getRecipient().getUserId());
+                    log.info("REGISTRATION_BOT CHANGE_PASSWORD_WRONG {}", targetUserId);
                     return messageOf("Отправьте пароль");
                 } else {
-                    log.info("REGISTRATION_BOT CHANGE_PASSWORD {}", message.getRecipient().getUserId());
+                    log.info("REGISTRATION_BOT CHANGE_PASSWORD {}", targetUserId);
                     return updatePassword(message.getSender().getUserId().toString(), cmd[1]);
                 }
             case "/войти_в_аккаунт":
-                log.info("REGISTRATION_BOT ENTER_ACCOUNT {}", message.getRecipient().getUserId());
+                log.info("REGISTRATION_BOT ENTER_ACCOUNT {}", targetUserId);
                 return login(message.getSender().getUserId().toString());
             default:
-                log.info("REGISTRATION_BOT HELP_MESSAGE {}", message.getRecipient().getUserId());
+                log.info("REGISTRATION_BOT HELP_MESSAGE {}", targetUserId);
                 return messageOf(HELP_MESSAGE);
         }
     }
