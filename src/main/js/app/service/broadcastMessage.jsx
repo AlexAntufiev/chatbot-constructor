@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as ApiPoints from 'app/constants/apiPoints';
 import makeTemplateStr from 'app/utils/makeTemplateStr'
-import {handleMultiplyRequests, handleRequest} from 'app/service/handleRequest'
+import {handleRequest, handleMultiplyRequests} from 'app/service/handleRequest'
 
 export function addBroadcastMessage(botSchemeId, chatChannelId, broadcastMessage, callbackSuccess, callbackFail, context) {
     const url = makeTemplateStr(ApiPoints.ADD_BROADCAST_MESSAGE, {id: botSchemeId, chatChannelId: chatChannelId});
