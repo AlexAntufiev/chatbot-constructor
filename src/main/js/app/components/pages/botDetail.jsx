@@ -9,6 +9,7 @@ import BotConstructor from "app/components/pages/botConstructor";
 import BotStatistic from "app/components/pages/botStatistic";
 import BotBroadcasting from "app/components/pages/botBroadcasting";
 import BotBroadcastingDetail from "app/components/pages/botBroadcastingDetail"
+import VotesResults from "app/components/pages/votesResults";
 
 class BotDetail extends React.Component {
     constructor(props) {
@@ -30,6 +31,7 @@ class BotDetail extends React.Component {
                             <Route path={routes.botSettings()} component={BotSettings}/>
                             <Route path={routes.botConstructorComponent()} component={BotConstructor}/>
                             <Route path={routes.botSetup()} component={BotConstructor}/>
+                            <Route path={routes.botVotes()} component={VotesResults}/>
                             <Route path={routes.botStatistic()} component={BotStatistic}/>
                             <Route path={routes.botBroadcastingDetailMessage()} component={BotBroadcastingDetail}/>
                             <Route path={routes.botBroadcastingDetail()} component={BotBroadcastingDetail}/>
