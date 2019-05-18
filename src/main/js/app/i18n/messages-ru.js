@@ -140,6 +140,7 @@ export default {
     'app.constructor.component.button': 'Кнопка',
     'app.constructor.component.vote': 'Опрос',
     'app.constructor.component.votes': 'Опросы',
+    'app.constructor.groups.default': 'Обычная',
     'app.constructor.message.text': 'Текст сообщения',
     'app.constructor.scheme.saved': 'Схема сохранена',
     'app.constructor.error.fill.text.template': 'Текст не может быть пустым ":title"',

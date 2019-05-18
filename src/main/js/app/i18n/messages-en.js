@@ -141,6 +141,7 @@ export default {
     'app.constructor.component.button': 'Button',
     'app.constructor.component.vote': 'Vote',
     'app.constructor.component.votes': 'Votes',
+    'app.constructor.groups.default': 'Обычная',
     'app.constructor.message.text': 'Message text',
     'app.constructor.scheme.saved': 'Scheme was saved',
     'app.constructor.error.fill.text.template': 'Text cannot be empty ":title"',
