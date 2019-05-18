@@ -70,7 +70,7 @@ class LeftMenu extends Component {
                     this.setState({selected: LeftMenu.MENU_ELEM.BROADCASTING});
                 }
             },
-            {
+          /*  {
                 label: intl.formatMessage({id: 'app.menu.statistic'}),
                 icon: 'pi pi-chart-bar',
                 className: this.state.selected === LeftMenu.MENU_ELEM.STATISTIC ? "menu-item active" : 'menu-item',
@@ -78,7 +78,7 @@ class LeftMenu extends Component {
                     this.props.history.push(statisticUrl);
                     this.setState({selected: LeftMenu.MENU_ELEM.STATISTIC});
                 }
-            },
+            },*/
         ];
 
         return (
