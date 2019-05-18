@@ -250,6 +250,7 @@ class BotConstructor extends Component {
         }
 
         if (this.state.groups[groupId].type === BotConstructor.GROUP_TYPE.VOTE) {
+            //Vote specific remove
 
             //if last in vote list
             if (ind === this.state.components[groupId].length - 2) {
@@ -261,6 +262,7 @@ class BotConstructor extends Component {
                             type: BotConstructor.SCHEME_ACTION_TYPE.PERSIST_VOTE_TO_TABLE
                         }];
                 }
+                this.state.components[groupId][ind - 1].component.nextState = this.state.components[groupId][ind + 1].component.nextState;
             }
             if (ind - 1 > 0) {
                 if (ind + 2 < this.state.components[groupId].length) {
@@ -270,6 +272,7 @@ class BotConstructor extends Component {
             this.state.components[groupId].splice(ind, 1); //remove text
             this.state.components[groupId].splice(ind, 1); //remove input
         } else {
+            //default groupRemove
             this.state.components[groupId].splice(ind, 1);
 
             if (componentObj.buttonsGroup) {
