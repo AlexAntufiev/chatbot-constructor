@@ -25,7 +25,7 @@ public class BotVoteController {
     private final BotVoteService voteService;
 
     @GetMapping(path = Endpoint.LIST, consumes = MediaType.ALL_VALUE)
-    public ResponseEntity<?> getNewComponentId(
+    public ResponseEntity<?> getVotesList(
             @RequestHeader(name = HttpHeaders.AUTHORIZATION) final String authToken,
             @PathVariable("id") final int botSchemeId
     ) {
