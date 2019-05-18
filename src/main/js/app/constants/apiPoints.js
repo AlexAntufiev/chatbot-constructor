@@ -42,3 +42,6 @@ export const BUILDER_SCHEME_GROUPS_LIST = BUILDER_SCHEME + "/group/list";
 export const BUILDER_SCHEME_GROUP_ADD = BUILDER_SCHEME + "/group/add";
 export const BUILDER_SCHEME_GROUP = BUILDER_SCHEME + "/group";
 export const BUILDER_SCHEME_GROUP_REMOVE = BUILDER_SCHEME + "/group/:groupId/delete";
+
+const VOTE = API_POINT + "bot/:id/vote/";
+export const VOTE_LIST = VOTE + "list";
