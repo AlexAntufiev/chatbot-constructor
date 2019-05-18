@@ -6,6 +6,7 @@ import * as VotesService from "app/service/votes";
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
 import * as BuilderService from "../../service/builder";
+import {Button} from "primereact/button";
 
 class VotesResults extends React.Component {
 
@@ -14,15 +15,21 @@ class VotesResults extends React.Component {
 
         this.state = {
             votes: {},
-            groups:{}
+            groups:{},
+            ajaxRefreshProcess: false
         };
 
         this.createTabs = this.createTabs.bind(this);
+        this.refresh = this.refresh.bind(this);
     }
 
     componentDidMount() {
-        const botSchemeId = Number(this.props.match.params.id);
+        this.refresh();
+    }
 
+    refresh() {
+        const botSchemeId = Number(this.props.match.params.id);
+        this.setState({ajaxRefreshProcess: true});
         BuilderService.getGroups(botSchemeId, (res) => {
             let groups = {};
             res.data.payload.forEach((group) => {
@@ -38,9 +45,12 @@ class VotesResults extends React.Component {
                     });
                     votes[vote.groupId].push(votes);
                 });
-                this.setState({votes: votes});
-            }, null, this);
-        }, null, this);
+                this.setState({
+                    votes: votes,
+                    ajaxRefreshProcess: false
+                });
+            }, () => this.setState({ajaxRefreshProcess: false}), this);
+        }, () => this.setState({ajaxRefreshProcess: false}), this);
     }
 
     createTabs() {
@@ -66,8 +76,14 @@ class VotesResults extends React.Component {
     }
 
     render() {
+        const {intl} = this.props;
         const tabs = this.createTabs();
         return (<div>
+            <Button label={intl.formatMessage({id: 'app.dialog.refresh'})}
+                    className={'vote-refresh-button'}
+                    icon={"pi pi-refresh" + (this.state.ajaxRefreshProcess ? " pi-spin" : "")}
+                    disabled={this.state.ajaxRefreshProcess}
+                    onClick={this.refresh}/>
             <TabView>
                 {tabs}
             </TabView>
