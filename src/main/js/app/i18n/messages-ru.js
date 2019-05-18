@@ -103,6 +103,9 @@ export default {
     'errors.bot.scheme.component.group.has.empty.title': 'Пустое название группы',
     'errors.bot.scheme.component.group.is.not.found': 'Группа не найдена',
     'errors.bot.scheme.component.group.type.is.illegal': 'Неверный тип группы',
+    'errors.bot.scheme.builder.component.action.is.not.found': 'Действие не найдено',
+    'errors.bot.scheme.builder.component.action.has.illegal.type': 'Действие имеет недопустимый тип',
+    'errors.bot.scheme.builder.component.action.does.not.belong.to.component': 'Действие не относится к компоненту',
 
     //Success messages
     'app.successmessage.successsumary': 'Успешно',
@@ -127,13 +130,17 @@ export default {
     //Common
     'app.common.sigin.message': 'Необходима авторизация',
 
-    'app.constructor.intent.positive': 'зеленый',
+    'app.constructor.intent.positive': 'синий',
     'app.constructor.intent.negative': 'красный',
     'app.constructor.intent.default': 'серый',
     'app.constructor.intent': 'Цвет',
     'app.constructor.next.component': 'Следующий компонент',
     'app.constructor.component.buttongroup': 'Группа кнопок',
+    'app.constructor.component.userinput': 'Ввод пользователя',
     'app.constructor.component.button': 'Кнопка',
+    'app.constructor.component.vote': 'Опрос',
+    'app.constructor.component.votes': 'Опросы',
+    'app.constructor.groups.default': 'Обычная',
     'app.constructor.message.text': 'Текст сообщения',
     'app.constructor.scheme.saved': 'Схема сохранена',
     'app.constructor.error.fill.text.template': 'Текст не может быть пустым ":title"',

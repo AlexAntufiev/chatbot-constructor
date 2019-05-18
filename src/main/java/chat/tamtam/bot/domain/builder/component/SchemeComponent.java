@@ -23,15 +23,16 @@ public class SchemeComponent {
 
     private Integer schemeId;
 
+    @JsonIgnore
+    @Column(nullable = false)
+    private boolean saved = false;
+
     private Byte type;
 
     @Column(columnDefinition = "text")
     private String text;
 
     private Long nextState;
-
-    @Column(nullable = false)
-    private boolean persistVoteContext = false;
 
     private Long groupId;
 

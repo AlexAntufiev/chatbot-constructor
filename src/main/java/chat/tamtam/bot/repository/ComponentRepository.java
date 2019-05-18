@@ -11,5 +11,5 @@ public interface ComponentRepository extends CrudRepository<SchemeComponent, Lon
 
     Iterable<SchemeComponent> findAllBySchemeId(Integer schemeId);
 
-    Iterable<SchemeComponent> findAllBySchemeIdOrderBySequence(Integer schemeId);
+    Iterable<SchemeComponent> findAllBySchemeIdAndSavedOrderBySequence(Integer schemeId, boolean saved);
 }

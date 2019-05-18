@@ -7,6 +7,7 @@ import {injectIntl} from "react-intl";
 import BotConstructor from "app/components/pages/botConstructor";
 import ButtonSettingsDialog from "app/components/constructor/buttonSettingsDialog";
 import {Growl} from "primereact/growl";
+import {Dropdown} from "primereact/dropdown";
 
 class ComponentSettings extends Component {
     constructor(props) {
@@ -31,34 +32,42 @@ class ComponentSettings extends Component {
 
     createNextStatesList() {
         let nextComponents = [];
+        const {intl} = this.props;
         for (let groupId in this.props.components) {
             const group = this.props.components[groupId];
             for (let i = 0; i < group.length; i++) {
                 const componentObj = group[i];
-                //continue, if text message
-                if (componentObj.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO && !componentObj.buttonsGroup) {
-                    continue;
+                if (componentObj.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO) {
+                    const firstInVote = !componentObj.buttonsGroup
+                        && this.props.groups[componentObj.component.groupId].type === BotConstructor.GROUP_TYPE.VOTE && i === 0;
+
+                    if (componentObj.buttonsGroup || firstInVote)
+                        nextComponents.push({
+                            label: firstInVote ?
+                                intl.formatMessage({id: 'app.constructor.component.vote'}) + " " + this.props.groups[componentObj.component.groupId].title :
+                                this.props.groups[componentObj.component.groupId].title + ' - ' + componentObj.component.title,
+                            value: componentObj.component.id
+                        });
                 }
-                //continue, if not info
-                if (componentObj.component.type !== BotConstructor.COMPONENT_SCHEME_TYPES.INFO) {
-                    continue;
-                }
-                nextComponents.push({
-                    label: this.props.groups[componentObj.component.groupId].title + ' - ' + componentObj.component.title,
-                    value: componentObj.component.id
-                });
             }
         }
         return nextComponents;
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
+        const groupId = Number(this.props.match.params.groupId);
         if ((prevProps.component && this.props.component && (prevProps.component.component.id !== this.props.component.component.id)) ||
             (!prevProps.component && this.props.component)) {
+            let nextState = this.props.component.component.nextState;
+
+            if (this.props.groups[groupId].type === BotConstructor.GROUP_TYPE.VOTE) {
+                const ind = this.props.findComponentInd(groupId, this.props.component.component.nextState);
+                nextState = this.props.components[groupId][ind].component.nextState;
+            }
             this.setState({
                 title: this.props.component.component.title,
                 text: this.props.component.component.text,
-                nextState: this.props.component.component.nextState,
+                nextState: nextState,
                 buttonsGroup: this.props.component.buttonsGroup
             });
         }
@@ -68,12 +77,21 @@ class ComponentSettings extends Component {
                 (prevState.title !== this.state.title ||
                     prevState.text !== this.state.text ||
                     prevState.nextState !== this.state.nextState))) {
-            let componentObj = Object.assign({}, this.props.component);
-            componentObj.component.title = this.state.title;
-            componentObj.component.text = this.state.text;
-            componentObj.component.nextState = this.state.nextState;
 
-            this.props.onChange(componentObj);
+
+            let textComponentObj;
+            textComponentObj = this.props.component;
+            textComponentObj.component.title = this.state.title;
+            textComponentObj.component.text = this.state.text;
+
+            if (this.props.groups[groupId].type === BotConstructor.GROUP_TYPE.VOTE) {
+                const ind = this.props.findComponentInd(groupId, this.props.component.component.nextState);
+                //assumed that input stored after text
+                let componentObj = this.props.components[groupId][ind];
+                componentObj.component.nextState = this.state.nextState;
+                this.props.onChange(componentObj);
+            }
+            this.props.onChange(textComponentObj);
         }
     }
 
@@ -188,6 +206,13 @@ class ComponentSettings extends Component {
         const buttonsList = this.createButtonsList();
         const {intl} = this.props;
 
+        const groupId = Number(this.props.match.params.groupId);
+        const componentId = Number(this.props.match.params.componentId);
+
+        const lastInVote = this.props.groups[groupId].type === BotConstructor.GROUP_TYPE.VOTE &&
+            this.props.components[groupId].length > 0 &&
+            this.props.components[groupId][this.props.components[groupId].length - 2].component.id === componentId;
+
         return (
             <div className={"text-card"}>
                 <Growl ref={(el) => this.growl = el}/>
@@ -200,30 +225,35 @@ class ComponentSettings extends Component {
                                    onChange={(e) => this.setState({text: e.target.value})}
                                    placeholder={intl.formatMessage({id: 'app.constructor.message.text'})}/>
                 </div>
-                {/*<div className={"text-card_detail-element"}>
-                    <Dropdown value={this.state.nextState} options={nextComponentList}
+                <div className={"text-card_detail-element"}>
+                    {lastInVote &&
+                    <Dropdown value={this.state.nextState} options={nextComponentList} editable={true}
                               onChange={(e) => this.setState({nextState: e.value})}
-                              editable={true} placeholder="Select next component"/>
-                </div>*/}
+                              placeholder="Select next component"/>}
+                </div>
                 <div className="text-card_button-panel">
                     <Button label={intl.formatMessage({id: "app.bot.remove"})}
                             onClick={() => this.props.onRemove(this.props.component)}/>
                 </div>
-                <div className={"button-panel"}>
-                    <div>
-                        <Button icon='pi pi-plus' className={"button-elem"} onClick={() => this.createButton(-1)}/>
+                {this.props.component.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO &&
+                this.props.component.buttonsGroup &&
+                <div>
+                    <div className={"button-panel"}>
+                        <div>
+                            <Button icon='pi pi-plus' className={"button-elem"} onClick={() => this.createButton(-1)}/>
+                        </div>
+                        {buttonsList}
                     </div>
-                    {buttonsList}
-                </div>
-                <ButtonSettingsDialog nextComponentList={nextComponentList}
-                                      botSchemeId={Number(this.props.match.params.id)}
-                                      removeComponent={this.props.onRemove}
-                                      ref={(obj) => this.settingsButtonDialog = obj}
-                                      id={this.props.component.component.id}
-                                      appendComponent={this.props.appendComponent}
-                                      saveButton={this.saveButton}
-                                      removeButton={this.removeButton}
-                                      onChange={this.props.onChange}/>
+                    <ButtonSettingsDialog nextComponentList={nextComponentList}
+                                          botSchemeId={Number(this.props.match.params.id)}
+                                          removeComponent={this.props.onRemove}
+                                          ref={(obj) => this.settingsButtonDialog = obj}
+                                          id={this.props.component.component.id}
+                                          appendComponent={this.props.appendComponent}
+                                          saveButton={this.saveButton}
+                                          removeButton={this.removeButton}
+                                          onChange={this.props.onChange}/>
+                </div>}
             </div>
         );
     }

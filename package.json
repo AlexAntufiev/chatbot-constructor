@@ -1,6 +1,6 @@
 {
   "name": "chatbot-constructor",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "chatbots constructor for tamtam",
   "private": true,
   "main": "index.js",

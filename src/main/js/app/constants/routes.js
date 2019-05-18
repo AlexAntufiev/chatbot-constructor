@@ -10,6 +10,7 @@ export const botDetail = () => '/bot/:id/';
 
 export const botSettings = () => '/bot/:id/settings/';
 export const botSetup = () => '/bot/:id/setup/';
+export const botVotes = () => '/bot/:id/votes/';
 export const botStatistic = () => '/bot/:id/statistic/';
 export const botBroadcasting = () => '/bot/:id/broadcasting/';
 export const botBroadcastingDetail = () => '/bot/:id/broadcasting/:chatChannelId/';

@@ -63,7 +63,7 @@ public class ActionProcessorService {
                     break;
 
                 case PERSIST_VOTE_TO_TABLE:
-                    persistVote(context);
+                    persistVote(component, context);
                     break;
 
                 default:
@@ -100,12 +100,10 @@ public class ActionProcessorService {
             ObjectMapper mapper = new ObjectMapper();
 
             List<VoteEntry> entries = mapper.readValue(context.getVoteData(), new TypeReference<List<VoteEntry>>() { });
-
-            VoteEntry voteEntry = new VoteEntry(VoteEntry.AUTHOR_BOT, component.getText());
+            VoteEntry voteEntry = new VoteEntry(component.getTitle(), null);
             entries.add(voteEntry);
 
             context.setVoteData(mapper.writeValueAsBytes(entries));
-
         } catch (IOException e) {
             log.error(String.format("Can't parse context(%s) vote data", context), e);
         }
@@ -116,34 +114,42 @@ public class ActionProcessorService {
             ObjectMapper mapper = new ObjectMapper();
             List<VoteEntry> entries = mapper.readValue(context.getVoteData(), new TypeReference<List<VoteEntry>>() { });
 
-            VoteEntry voteEntry = null;
+            if (entries.isEmpty()) {
+                throw new RuntimeException(
+                        String.format(
+                                "Can't store user input into vote entry, no entries found(update=%s,context=%s)",
+                                update, context
+                        )
+                );
+            }
+
+            VoteEntry voteEntry = entries.get(entries.size() - 1);
 
             if (update instanceof MessageCreatedUpdate) {
                 MessageCreatedUpdate message = ((MessageCreatedUpdate) update);
-                voteEntry = new VoteEntry(VoteEntry.AUTHOR_USER, message.getMessage().getBody().getText());
+                voteEntry.setValue(message.getMessage().getBody().getText());
             }
 
             if (update instanceof MessageCallbackUpdate) {
                 MessageCallbackUpdate callback = ((MessageCallbackUpdate) update);
                 ButtonPayload payload = new ButtonPayload(callback.getCallback().getPayload());
-                voteEntry = new VoteEntry(VoteEntry.AUTHOR_USER, payload.getValue());
+                voteEntry.setValue(payload.getValue());
             }
 
-            entries.add(voteEntry);
-
             context.setVoteData(mapper.writeValueAsBytes(entries));
-
         } catch (IOException e) {
             log.error(String.format("Can't parse context(%s) vote data", context), e);
         }
     }
 
-    private void persistVote(final BotContext context) {
+    private void persistVote(final SchemeComponent component, final BotContext context) {
         BotVote botVote = new BotVote(
                 context.getId().getBotSchemeId(),
                 context.getId().getUserId(),
+                component.getGroupId(),
                 context.getVoteData()
         );
+
         voteRepository.save(botVote);
         context.setVoteData("[]".getBytes());
     }

@@ -163,9 +163,6 @@ public class RegistrationBot extends AbstractCustomBot {
             case "/создать_аккаунт":
                 log.info("REGISTRATION_BOT CREATE {}", targetUserId);
                 return registrate(message.getSender().getUserId().toString());
-            case "/удалить_аккаунт":
-                log.info("REGISTRATION_BOT DELETE {}", targetUserId);
-                return delete(message.getSender().getUserId().toString());
             case "/изменить_пароль":
                 if (cmd.length < 2) {
                     log.info("REGISTRATION_BOT CHANGE_PASSWORD_WRONG {}", targetUserId);
@@ -209,7 +206,7 @@ public class RegistrationBot extends AbstractCustomBot {
         return messageOf(response, List.of(getAutoLoginButton(userId)));
     }
 
-    private NewMessageBody delete(final String userId) {
+    /*private NewMessageBody delete(final String userId) {
         UserEntity user = userRepository.findByLogin(userId);
         if (user != null) {
             userRepository.removeByLogin(userId);
@@ -217,7 +214,7 @@ public class RegistrationBot extends AbstractCustomBot {
             return messageOf("Пользователь с id: " + userId + " удален");
         }
         return messageOf("Пользователь с id: " + userId + " не найден\nЧтобы зарегистрироваться: /создать_аккаунт");
-    }
+    }*/
 
     private NewMessageBody updatePassword(final String userId, final String newPassword) {
         UserEntity user = userRepository.findByLogin(userId);
