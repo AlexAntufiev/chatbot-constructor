@@ -100,7 +100,7 @@ public class ActionProcessorService {
             ObjectMapper mapper = new ObjectMapper();
 
             List<VoteEntry> entries = mapper.readValue(context.getVoteData(), new TypeReference<List<VoteEntry>>() { });
-            VoteEntry voteEntry = new VoteEntry(component.getText(), null);
+            VoteEntry voteEntry = new VoteEntry(component.getTitle(), null);
             entries.add(voteEntry);
 
             context.setVoteData(mapper.writeValueAsBytes(entries));
