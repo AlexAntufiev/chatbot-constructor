@@ -45,6 +45,7 @@ class BotConstructor extends Component {
 
     constructor(props) {
         super(props);
+        const {intl} = this.props;
 
         this.state = {
             components: {},
@@ -54,14 +55,14 @@ class BotConstructor extends Component {
 
         this.groupTypeMenuItems = [
             {
-                label: 'Обычная',
+                label: intl.formatMessage({id: 'app.constructor.groups.default'}),
                 command: () => {
                     this.addGroup(BotConstructor.GROUP_TYPE.DEFAULT);
                     this.menu.hide();
                 }
             },
             {
-                label: 'Опрос',
+                label: intl.formatMessage({id: 'app.constructor.component.vote'}),
                 command: () => {
                     this.addGroup(BotConstructor.GROUP_TYPE.VOTE);
                     this.menu.hide();
@@ -261,8 +262,8 @@ class BotConstructor extends Component {
                         {
                             type: BotConstructor.SCHEME_ACTION_TYPE.PERSIST_VOTE_TO_TABLE
                         }];
+                    this.state.components[groupId][ind - 1].component.nextState = this.state.components[groupId][ind + 1].component.nextState;
                 }
-                this.state.components[groupId][ind - 1].component.nextState = this.state.components[groupId][ind + 1].component.nextState;
             }
             if (ind - 1 > 0) {
                 if (ind + 2 < this.state.components[groupId].length) {
