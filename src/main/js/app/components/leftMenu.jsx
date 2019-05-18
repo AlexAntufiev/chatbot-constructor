@@ -53,7 +53,7 @@ class LeftMenu extends Component {
                 }
             },
             {
-                label: "Опросы",
+                label: intl.formatMessage({id: 'app.constructor.component.votes'}),
                 icon: 'pi pi-user',
                 className: this.state.selected === LeftMenu.MENU_ELEM.VOTES ? "menu-item active" : 'menu-item',
                 command: () => {

@@ -130,7 +130,7 @@ export default {
     //Common
     'app.common.sigin.message': 'Необходима авторизация',
 
-    'app.constructor.intent.positive': 'зеленый',
+    'app.constructor.intent.positive': 'синий',
     'app.constructor.intent.negative': 'красный',
     'app.constructor.intent.default': 'серый',
     'app.constructor.intent': 'Цвет',
@@ -138,6 +138,8 @@ export default {
     'app.constructor.component.buttongroup': 'Группа кнопок',
     'app.constructor.component.userinput': 'Ввод пользователя',
     'app.constructor.component.button': 'Кнопка',
+    'app.constructor.component.vote': 'Опрос',
+    'app.constructor.component.votes': 'Опросы',
     'app.constructor.message.text': 'Текст сообщения',
     'app.constructor.scheme.saved': 'Схема сохранена',
     'app.constructor.error.fill.text.template': 'Текст не может быть пустым ":title"',

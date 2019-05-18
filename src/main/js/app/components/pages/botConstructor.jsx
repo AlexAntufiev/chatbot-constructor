@@ -261,8 +261,8 @@ class BotConstructor extends Component {
                         {
                             type: BotConstructor.SCHEME_ACTION_TYPE.PERSIST_VOTE_TO_TABLE
                         }];
+                    this.state.components[groupId][ind - 1].component.nextState = this.state.components[groupId][ind + 1].component.nextState;
                 }
-                this.state.components[groupId][ind - 1].component.nextState = this.state.components[groupId][ind + 1].component.nextState;
             }
             if (ind - 1 > 0) {
                 if (ind + 2 < this.state.components[groupId].length) {

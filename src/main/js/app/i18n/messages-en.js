@@ -131,7 +131,7 @@ export default {
     //Common
     'app.common.sigin.message': 'Please, sign in',
 
-    'app.constructor.intent.positive': 'green',
+    'app.constructor.intent.positive': 'blue',
     'app.constructor.intent.negative': 'red',
     'app.constructor.intent.default': 'gray',
     'app.constructor.intent': 'Select color',
@@ -139,6 +139,8 @@ export default {
     'app.constructor.component.buttongroup': 'Button group',
     'app.constructor.component.userinput': 'User input',
     'app.constructor.component.button': 'Button',
+    'app.constructor.component.vote': 'Vote',
+    'app.constructor.component.votes': 'Votes',
     'app.constructor.message.text': 'Message text',
     'app.constructor.scheme.saved': 'Scheme was saved',
     'app.constructor.error.fill.text.template': 'Text cannot be empty ":title"',

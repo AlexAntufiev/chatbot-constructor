@@ -32,6 +32,7 @@ class ComponentSettings extends Component {
 
     createNextStatesList() {
         let nextComponents = [];
+        const {intl} = this.props;
         for (let groupId in this.props.components) {
             const group = this.props.components[groupId];
             for (let i = 0; i < group.length; i++) {
@@ -43,7 +44,7 @@ class ComponentSettings extends Component {
                     if (componentObj.buttonsGroup || firstInVote)
                         nextComponents.push({
                             label: firstInVote ?
-                                "Опрос " + this.props.groups[componentObj.component.groupId].title :
+                                intl.formatMessage({id: 'app.constructor.component.vote'}) + " " + this.props.groups[componentObj.component.groupId].title :
                                 this.props.groups[componentObj.component.groupId].title + ' - ' + componentObj.component.title,
                             value: componentObj.component.id
                         });
