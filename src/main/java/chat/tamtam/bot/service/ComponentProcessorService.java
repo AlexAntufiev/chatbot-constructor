@@ -159,7 +159,14 @@ public class ComponentProcessorService {
                                                     api
                                             ).isSuccess();
                                     if (!success) {
+                                        log.error(
+                                                String.format(
+                                                        "%s update to %s with %s: callback response has success:false",
+                                                        update, component, context
+                                                )
+                                        );
                                         context.setState(null);
+                                        context.setSchemeUpdate(null);
                                         return;
 
                                     }
@@ -193,6 +200,13 @@ public class ComponentProcessorService {
                                 }
                             },
                             () -> {
+                                log.error(
+                                        String.format(
+                                                "Component is not presented for %s with %s",
+                                                update, context
+                                        )
+                                );
+                                context.setSchemeUpdate(null);
                                 context.setState(null);
                             }
                     );
