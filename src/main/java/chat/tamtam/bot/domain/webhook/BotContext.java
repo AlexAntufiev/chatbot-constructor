@@ -31,7 +31,7 @@ public class BotContext {
 
     private Instant schemeUpdate;
 
-    private byte[] pendingMessage;
+    private String mid;
 
     @JsonIgnore
     private byte[] voteData = "[]".getBytes();
