@@ -1,6 +1,5 @@
 package chat.tamtam.bot.service;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,15 +53,7 @@ public class ComponentProcessorService {
                             )
                     ).userId(context.getId().getUserId())
                             .execute();
-            if (component.isHasCallbacks()) {
-                final String mid = result.getMessage().getBody().getMid();
-                context.setPendingMessage(
-                        ByteBuffer.allocate(Long.BYTES + mid.length())
-                                .putLong(component.getId())
-                                .put(mid.getBytes())
-                                .array()
-                );
-            }
+            context.setLastMessageId(result.getMessage().getBody().getMid());
             context.setState(component.getNextState());
 
             actionProcessor.perform(component, context, null);
@@ -104,9 +95,6 @@ public class ComponentProcessorService {
             final SchemeComponent component,
             final TamTamBotAPI api
     ) {
-        // update pending message
-        updatePendingMessage(context, api);
-
         /*Iterable<ComponentValidator> validators = validatorRepository.findAllByComponentId(component.getId());
         for (ComponentValidator componentValidator
                 : validators) {
@@ -121,6 +109,8 @@ public class ComponentProcessorService {
                     break;
             }
         }*/
+
+        context.setUsername(update.getMessage().getSender().getName());
 
         context.setState(component.getNextState());
 
@@ -137,6 +127,23 @@ public class ComponentProcessorService {
             final TamTamBotAPI api
     ) {
         try {
+            if (!update.getMessage().getBody().getMid().equals(context.getLastMessageId())) {
+
+                CallbackAnswer answer = new CallbackAnswer();
+                answer.message(new NewMessageBody(update.getMessage().getBody().getText(), null));
+                answer.setUserId(update.getCallback().getUser().getUserId());
+
+                answerOnCallback(
+                        answer,
+                        update.getCallback().getCallbackId(),
+                        context,
+                        api
+                );
+                return;
+            }
+
+            context.setUsername(update.getCallback().getUser().getName());
+
             actionProcessor.perform(component, context, update);
 
             ButtonPayload payload = new ButtonPayload(update.getCallback().getPayload());
@@ -174,17 +181,6 @@ public class ComponentProcessorService {
 
                                     actionProcessor.perform(foundComponent, context, null);
 
-                                    if (foundComponent.isHasCallbacks()) {
-                                        context.setPendingMessage(
-                                                ByteBuffer
-                                                        .wrap(context.getPendingMessage())
-                                                        .putLong(foundComponent.getId())
-                                                        .array()
-                                        );
-                                    } else {
-                                        context.setPendingMessage(null);
-                                    }
-
                                 } else {
                                     // just notification
                                     final boolean success =
@@ -196,7 +192,6 @@ public class ComponentProcessorService {
                                                     context,
                                                     api
                                             ).isSuccess();
-                                    updatePendingMessage(context, api);
                                 }
                             },
                             () -> {
@@ -240,45 +235,9 @@ public class ComponentProcessorService {
                     ),
                     e
             );
+            context.setSchemeUpdate(null);
+            context.setState(null);
         }
         return new SimpleQueryResult(false);
-    }
-
-    public void updatePendingMessage(final BotContext context, final TamTamBotAPI api) {
-        if (context.getPendingMessage() == null) {
-            return;
-        }
-        ByteBuffer byteBuffer = ByteBuffer.wrap(context.getPendingMessage());
-        final Long componentId = byteBuffer.getLong();
-        byte[] midBytes = new byte[byteBuffer.remaining()];
-        byteBuffer.get(midBytes);
-        final String mid = new String(midBytes);
-        componentRepository.findById(componentId)
-                .ifPresentOrElse(
-                        component -> {
-                            try {
-                                boolean success =
-                                        api.editMessage(
-                                                new NewMessageBody(
-                                                        component.getText(),
-                                                        getAttachments(componentId, false)
-                                                ),
-                                                mid
-                                        ).execute().isSuccess();
-                                context.setPendingMessage(null);
-                            } catch (ClientException | APIException e) {
-                                log.error(
-                                        String.format(
-                                                "Pending message update failed(%s, %s, mid=%s, %s)",
-                                                context, api, mid, component
-                                        ),
-                                        e
-                                );
-                            }
-                        },
-                        () -> {
-                            // Maybe delete message if cannot update
-                        }
-                );
     }
 }

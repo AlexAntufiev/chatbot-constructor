@@ -136,7 +136,6 @@ public class WebHookBotService {
 
                 if (context.getState() == null) {
                     // In this case all further updates will be ignored
-                    componentProcessorService.updatePendingMessage(context, api);
                     log.info(String.format("%s has state==null, bot is locked for this user", context, update));
                     break;
                 }
