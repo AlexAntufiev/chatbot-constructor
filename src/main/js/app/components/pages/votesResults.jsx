@@ -50,11 +50,13 @@ class VotesResults extends React.Component {
             this.setState({groups: groups});
             VotesService.getVotesList(botSchemeId, (res) => {
                 res.data.payload.forEach((vote) => {
-                    let voteObj = {userId: vote.userId};
-                    vote.voteFields.forEach((voteData) => {
-                        voteObj[voteData.field] = voteData.value;
-                    });
-                    votes[vote.groupId].push(voteObj);
+                    if (votes[vote.groupId]) {
+                        let voteObj = {userId: vote.userId};
+                        vote.voteFields.forEach((voteData) => {
+                            voteObj[voteData.field] = voteData.value;
+                        });
+                        votes[vote.groupId].push(voteObj);
+                    }
                 });
                 this.setState({
                     votes: votes,
