@@ -90,6 +90,13 @@ class ButtonSettingsDialog extends BaseDialog {
         this.onHide();
     }
 
+    onHide() {
+        if (this.state.message && this.state.message.component.text.trim() === "") {
+            this.props.removeComponent(this.state.message);
+        }
+        super.onHide();
+    }
+
     render() {
         const {intl} = this.props;
         const footer = (
