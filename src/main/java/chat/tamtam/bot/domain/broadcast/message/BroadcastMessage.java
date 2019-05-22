@@ -40,7 +40,7 @@ public class BroadcastMessage {
     private Instant firingTime;
     @Column(name = "erasingTime")
     private Instant erasingTime;
-    @Column(name = "mid")
+    @Column(name = "lastMessageId")
     private String messageId;
     @Column(name = "text", columnDefinition = "text")
     private String text;

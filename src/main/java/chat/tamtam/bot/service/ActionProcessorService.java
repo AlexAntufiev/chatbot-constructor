@@ -150,6 +150,8 @@ public class ActionProcessorService {
                 context.getVoteData()
         );
 
+        botVote.setUsername(context.getUsername());
+
         voteRepository.save(botVote);
         context.setVoteData("[]".getBytes());
     }

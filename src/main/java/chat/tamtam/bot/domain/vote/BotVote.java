@@ -31,6 +31,8 @@ public class BotVote {
 
     private Long userId;
 
+    private String username;
+
     private Long groupId;
 
     private Instant time;
