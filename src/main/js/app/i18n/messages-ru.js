@@ -144,6 +144,7 @@ export default {
     'app.constructor.message.text': 'Текст сообщения',
     'app.constructor.scheme.saved': 'Схема сохранена',
     'app.constructor.error.fill.text.template': 'Текст не может быть пустым ":title"',
+    'app.constructor.error.vote.component.title.template': 'Неверное название компонента ":title"',
     'app.constructor.scheme.add.group': 'Добавить группу',
     'app.constructor.error.empty.buttons.template': 'Группа кнопок не может быть без кнопок ":title"',
     'app.constructor.error.empty.title': 'Пустое название'
