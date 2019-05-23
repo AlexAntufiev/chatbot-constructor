@@ -5,17 +5,22 @@ import {TabPanel, TabView} from "primereact/tabview";
 import * as VotesService from "app/service/votes";
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
-import * as BuilderService from "../../service/builder";
+import * as BuilderService from "app/service/builder";
 import {Button} from "primereact/button";
+import dateFormat from "dateformat";
 
 class VotesResults extends React.Component {
+
+    static get SYSTEM_FIELDS() {
+        return ["userId", "username", "time"];
+    }
 
     constructor(props) {
         super(props);
 
         this.state = {
             votes: {},
-            groups:{},
+            groups: {},
             ajaxRefreshProcess: false
         };
 
@@ -25,16 +30,6 @@ class VotesResults extends React.Component {
 
     componentDidMount() {
         this.refresh();
-    }
-
-    static uniqueArray(a) {
-        for(let i = 0; i < a.length; ++i) {
-            for(let j = i + 1; j < a.length; ++j) {
-                if(a[i] === a[j])
-                    a.splice(j--, 1);
-            }
-        }
-        return a;
     }
 
     refresh() {
@@ -51,7 +46,11 @@ class VotesResults extends React.Component {
             VotesService.getVotesList(botSchemeId, (res) => {
                 res.data.payload.forEach((vote) => {
                     if (votes[vote.groupId]) {
-                        let voteObj = {userId: vote.userId};
+                        let voteObj = {
+                            userId: vote[VotesResults.SYSTEM_FIELDS[0]],
+                            username: vote[VotesResults.SYSTEM_FIELDS[1]],
+                            time: dateFormat(new Date(vote[VotesResults.SYSTEM_FIELDS[2]]), this.props.intl.locale === "ru" ? "dd-mm-yyyy H:MM" : "dd-mm-yyyy h:MM TT")
+                        };
                         vote.voteFields.forEach((voteData) => {
                             voteObj[voteData.field] = voteData.value;
                         });
@@ -74,22 +73,23 @@ class VotesResults extends React.Component {
             if (this.state.votes[voteId].length === 0) continue;
             let keys = [];
             this.state.votes[voteId].forEach((ans) => {
-               keys = keys.concat(Object.keys(ans));
+                keys = keys.concat(Object.keys(ans).filter(value => keys.indexOf(value) < 0));
             });
-
-            keys = VotesResults.uniqueArray(keys);
-            //set userId to first column
-            for (let i = 0; i < keys.length; i++) {
-                if (keys[i] === 'userId') {
+            //move system fields to start of columns array
+            let i = 0;
+            while (i < keys.length) {
+                const ind = VotesResults.SYSTEM_FIELDS.indexOf(keys[i]);
+                if (ind !== -1) {
                     keys.splice(i, 1);
-                    continue;
+                } else {
+                    i++;
                 }
             }
+            keys = VotesResults.SYSTEM_FIELDS.concat(keys);
 
-            keys.unshift("userId");
             keys.forEach(key => {
                 columns.push(
-                    <Column field={key} header={key} filter={true} />);
+                    <Column field={key} header={key} filter={true}/>);
             });
 
             renderedTabs.push(<TabPanel header={this.state.groups[voteId]}>
