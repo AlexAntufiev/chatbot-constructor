@@ -10,6 +10,7 @@ import {AUTHORIZATION} from "app/constants/cookies";
 import {connect} from "react-redux";
 import setUserInfo from "app/actions/userInfo";
 import * as UserService from "app/service/user"
+import * as AxiosMessages from 'app/utils/axiosMessages';
 
 export class LoginDialog extends BaseDialog {
     constructor(props) {
@@ -26,21 +27,16 @@ export class LoginDialog extends BaseDialog {
         const {intl} = this.props;
 
         if (this.state.password.trim() === '' || this.state.password.trim() === '') {
-            this.growl.show({
-                severity: 'error',
-                summary: intl.formatMessage({id: 'app.errormessage.errorsummary'}),
-                detail: intl.formatMessage({id: 'app.errormessage.fillallfields'})
-            });
+            AxiosMessages.customError(this, intl.formatMessage({id: 'app.errormessage.fillallfields'}));
             return;
         }
 
-        const self = this;
         UserService.login(this.state.username, this.state.password, (res) => {
-            self.props.setUser({
+            this.props.setUser({
                 userId: res.data.payload.userId,
                 token: res.headers[AUTHORIZATION]
             });
-            self.onHide();
+            this.onHide();
         }, null, this);
     }
 
