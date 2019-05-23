@@ -53,6 +53,7 @@ class ButtonSettingsDialog extends BaseDialog {
                 nextState: this.state.nextState,
                 schemeId: this.props.botSchemeId,
                 text: "",
+                title: "Button message",
                 type: BotConstructor.COMPONENT_SCHEME_TYPES.INFO
             };
             this.props.appendComponent(messageObj);
@@ -72,7 +73,7 @@ class ButtonSettingsDialog extends BaseDialog {
     onSave() {
         const {intl} = this.props;
         if (this.state.message && this.state.message.component.text === '') {
-            AxiosMessages.customError(this, intl.formatMessage({id: 'app.constructor.error.fill.text'}));
+            AxiosMessages.customError(this, intl.formatMessage({id: 'errors.bot.scheme.builder.component.text.is.empty'}));
             return;
         }
         if (this.state.text.trim() === '') {
