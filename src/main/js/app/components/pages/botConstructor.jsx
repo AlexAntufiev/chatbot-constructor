@@ -10,6 +10,7 @@ import ComponentSettings from "app/components/constructor/componentSettings";
 import {Growl} from "primereact/growl";
 import * as AxiosMessages from 'app/utils/axiosMessages';
 import {TieredMenu} from "primereact/tieredmenu";
+import VoteResults from "app/components/pages/votesResults";
 
 class BotConstructor extends Component {
 
@@ -80,7 +81,6 @@ class BotConstructor extends Component {
         this.addGroup = this.addGroup.bind(this);
         this.removeGroup = this.removeGroup.bind(this);
         this.updateGroup = this.updateGroup.bind(this);
-        this.isShadowInput = this.isShadowInput.bind(this);
         this.createButtonGroup = this.createButtonGroup.bind(this);
         this.createUserInput = this.createUserInput.bind(this);
     }
@@ -345,15 +345,28 @@ class BotConstructor extends Component {
             for (let i = 0; i < this.state.components[groupId].length; i++) {
                 if (this.state.components[groupId][i].component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO) {
                     const {intl} = this.props;
+                    const componentTitle = this.state.components[groupId][i].component.title.trim();
+                    const componentText = this.state.components[groupId][i].component.text.trim();
                     if (this.state.components[groupId][i].buttonsGroup && this.state.components[groupId][i].buttonsGroup.buttons.length === 0) {
                         const text = makeTemplateStr(intl.formatMessage({id: 'app.constructor.error.empty.buttons.template'}),
-                            {title: this.state.components[groupId][i].component.title});
+                            {title: componentTitle});
                         AxiosMessages.customError(this, text);
                         return;
                     }
-                    if (this.state.components[groupId][i].component.text.trim() === '') {
+                    if (componentText === '') {
                         const text = makeTemplateStr(intl.formatMessage({id: 'app.constructor.error.fill.text.template'}),
-                            {title: this.state.components[groupId][i].component.title});
+                            {title: componentTitle});
+                        AxiosMessages.customError(this, text);
+                        return;
+                    }
+                    if (componentTitle === '') {
+                        AxiosMessages.customError(this, intl.formatMessage({id: 'app.constructor.error.empty.title'}));
+                        return;
+                    }
+                    if (this.state.groups[groupId].type === BotConstructor.GROUP_TYPE.VOTE
+                        && VoteResults.SYSTEM_FIELDS.indexOf(componentTitle) !== -1) {
+                        const text = makeTemplateStr(intl.formatMessage({id: 'app.constructor.error.vote.component.title.template'}),
+                            {title: componentTitle});
                         AxiosMessages.customError(this, text);
                         return;
                     }
@@ -410,23 +423,6 @@ class BotConstructor extends Component {
         this.setState({groups: this.state.groups});
     }
 
-    isShadowInput(component) {
-        if (!component) {
-            return false;
-        }
-
-        if (component.component.type === BotConstructor.COMPONENT_SCHEME_TYPES.INFO) {
-            return false;
-        }
-        for (let i = 0; i < this.state.components[component.component.groupId].length; i++) {
-            const tmpComp = this.state.components[component.component.groupId][i];
-            if (tmpComp.component.nextState === component.component.id && tmpComp.buttonsGroup) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     render() {
         const groupId = Number(this.props.match.params.groupId);
         const componentId = Number(this.props.match.params.componentId);
@@ -455,8 +451,7 @@ class BotConstructor extends Component {
                     <ComponentSettings components={this.state.components}
                                        onRemove={this.removeComponent} onChange={this.changeComponent}
                                        component={component} appendComponent={this.appendComponent}
-                                       findComponentInd={this.findComponentInd} groups={this.state.groups}
-                                       isShadowInput={this.isShadowInput}/>
+                                       findComponentInd={this.findComponentInd} groups={this.state.groups}/>
                 </div>
             </div>
         </div>);

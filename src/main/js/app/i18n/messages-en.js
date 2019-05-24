@@ -145,6 +145,7 @@ export default {
     'app.constructor.message.text': 'Message text',
     'app.constructor.scheme.saved': 'Scheme was saved',
     'app.constructor.error.fill.text.template': 'Text cannot be empty ":title"',
+    'app.constructor.error.vote.component.title.template': 'Invalid component title ":title"',
     'app.constructor.scheme.add.group': 'Add group',
     'app.constructor.error.empty.buttons.template': 'Button group can not be without buttons ":title"',
     'app.constructor.error.empty.title': 'Empty title'
