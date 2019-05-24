@@ -1,7 +1,6 @@
 *.log
 *.iml
 *.pem
-*.db
 *.jar
 *.properties
 
@@ -10,7 +9,8 @@
 node_modules
 logs/
 out/
-/src/main/resources/static/
+dev_db/
+src/main/resources/static/
 
 package-lock.json
 lombok.config
