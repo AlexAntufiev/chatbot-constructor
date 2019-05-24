@@ -10,6 +10,7 @@ import {AUTHORIZATION} from "app/constants/cookies";
 import {connect} from "react-redux";
 import setUserInfo from "app/actions/userInfo";
 import * as UserService from "app/service/user"
+import * as AxiosMessages from 'app/utils/axiosMessages';
 
 export class LoginDialog extends BaseDialog {
     constructor(props) {
@@ -26,20 +27,16 @@ export class LoginDialog extends BaseDialog {
         const {intl} = this.props;
 
         if (this.state.password.trim() === '' || this.state.password.trim() === '') {
-            this.growl.show({
-                severity: 'error',
-                summary: intl.formatMessage({id: 'app.errormessage.errorsummary'}),
-                detail: intl.formatMessage({id: 'app.errormessage.fillallfields'})
-            });
+            AxiosMessages.customError(this, intl.formatMessage({id: 'app.errormessage.fillallfields'}));
+            return;
         }
 
-        const self = this;
         UserService.login(this.state.username, this.state.password, (res) => {
-            self.props.setUser({
+            this.props.setUser({
                 userId: res.data.payload.userId,
                 token: res.headers[AUTHORIZATION]
             });
-            self.onHide();
+            this.onHide();
         }, null, this);
     }
 
@@ -62,12 +59,13 @@ export class LoginDialog extends BaseDialog {
                 <span className="p-float-label">
                     <InputText id="login-username" value={this.state.username}
                                onChange={(e) => this.setState({username: e.target.value})}
-                               style={{overflow: 'hidden'}}/>
+                               style={{overflow: 'hidden'}} onKeyDown={(e) => {if (e.key === 'Enter') this.onLogin()}}/>
                     <label htmlFor="login-username"><FormattedMessage id='app.dialog.username'/></label>
                 </span>
                     <span className="p-float-label">
                     <Password id="login-password" feedback={false} value={this.state.password}
-                              onChange={(e) => this.setState({password: e.target.value})}/>
+                              onChange={(e) => this.setState({password: e.target.value})}
+                              onKeyDown={(e) => {if (e.key === 'Enter') this.onLogin()}}/>
                     <label htmlFor="login-password"><FormattedMessage id='app.dialog.password'/></label>
                 </span>
                 </Dialog>
