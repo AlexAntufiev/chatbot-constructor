@@ -1,14 +1,18 @@
 spring:
   jpa:
+    hibernate:
+      ddl-auto: update
     properties:
       hibernate:
         show-sql: true
         format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.H2
   datasource:
-    url: jdbc:h2:file:./testdb;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL
+    url: jdbc:h2:./dev_db/testdb;DB_CLOSE_ON_EXIT=FALSE
     username: sa
     password:
-
+    driverClassName: org.h2.Driver
 logging:
   level:
     com:
@@ -17,11 +21,14 @@ logging:
           HikariConfig: DEBUG
     org:
       hibernate:
-        SQL: DEBUG
+        SQL: 'off'
         type:
           descriptor:
             sql:
-              BasicBinder: TRACE
+              BasicBinder: 'off'
+        tool:
+          schema:
+            internal: error
     chat:
       tamtam:
         bot: DEBUG

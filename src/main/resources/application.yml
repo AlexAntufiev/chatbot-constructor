@@ -41,11 +41,11 @@ logging:
     org:
       springframework: INFO
       hibernate:
-        SQL: OFF
+        SQL: off
         type:
           descriptor:
             sql:
-              BasicBinder: OFF
+              BasicBinder: off
     chat:
       tamtam:
         bot: INFO
