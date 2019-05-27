@@ -2,8 +2,11 @@ package chat.tamtam.bot.custom.bot;
 
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 
 import chat.tamtam.bot.configuration.AppProfiles;
@@ -16,16 +19,19 @@ import chat.tamtam.botapi.model.NewMessageBody;
 import chat.tamtam.botapi.model.SimpleQueryResult;
 import chat.tamtam.botapi.model.SubscriptionRequestBody;
 import chat.tamtam.botapi.model.Update;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 public abstract class AbstractCustomBot {
+    @Getter
     protected final String id;
-    protected final String token;
     protected final String host;
-    private String url;
     protected final TamTamBotAPI api;
-    protected final Environment environment;
+
+    private final Environment environment;
+    private final String token;
+    private String url;
 
     protected AbstractCustomBot(
             final String id,
@@ -38,22 +44,13 @@ public abstract class AbstractCustomBot {
         this.host = host;
         this.environment = environment;
         api = token == null ? null : TamTamBotAPI.create(token);
-        subscribe();
     }
 
     public void process(Update update) {
         throw new UnsupportedOperationException("from " + getType());
     }
 
-    public String getId() {
-        throw new UnsupportedOperationException("from " + getType());
-    }
-
     public abstract BotType getType();
-
-    public String getToken() {
-        throw new UnsupportedOperationException("from " + getType());
-    }
 
     protected static NewMessageBody messageOf(String message) {
         return new NewMessageBody(message, null);
@@ -63,6 +60,7 @@ public abstract class AbstractCustomBot {
         return new NewMessageBody(message, attachments);
     }
 
+    @PostConstruct
     protected void subscribe() {
         log.info(String.format("%s(id:%s, token:%s) initialized", getClass().getCanonicalName(), id, token));
         if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
@@ -95,6 +93,9 @@ public abstract class AbstractCustomBot {
             }
         }
     }
+
+    @EventListener
+    public void onRefreshScopeRefreshed(final RefreshScopeRefreshedEvent event) {}
 
     @PreDestroy
     public void unsubscribe() {

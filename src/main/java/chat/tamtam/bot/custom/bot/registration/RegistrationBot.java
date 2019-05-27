@@ -66,8 +66,6 @@ public class RegistrationBot extends AbstractCustomBot {
 
     private final EnabledIds enabledIds;
 
-    private String url;
-
     private final RegistrationBotVisitor visitor;
 
     public RegistrationBot(
@@ -87,16 +85,6 @@ public class RegistrationBot extends AbstractCustomBot {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.enabledIds = enabledIdsConverter.convert(enabledIds, getClass());
         visitor = new RegistrationBotVisitor();
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getToken() {
-        return token;
     }
 
     @Override
