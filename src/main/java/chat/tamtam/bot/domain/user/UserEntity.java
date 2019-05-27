@@ -26,6 +26,8 @@ public class UserEntity {
     @Column(name = "login")
     private @NonNull String login;
 
+    private String username;
+
     @Column(name = "passwordHash")
     private @NonNull String passwordHash;
 

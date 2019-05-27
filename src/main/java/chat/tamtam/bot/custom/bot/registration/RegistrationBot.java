@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.env.Environment;
@@ -56,7 +58,7 @@ public class RegistrationBot extends AbstractCustomBot {
     private static final String HELP_MESSAGE =
             "Команды:\n\n"
                     + "/создать_аккаунт - создать аккаунт\n"
-                    + "/удалить_аккаунт - удалить аккаунт\n"
+                    /*+ "/удалить_аккаунт - удалить аккаунт\n"*/
                     + "/изменить_пароль - изменить пароль\n"
                     + "/войти_в_аккаунт - ссылка для входа";
 
@@ -87,6 +89,14 @@ public class RegistrationBot extends AbstractCustomBot {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.enabledIds = enabledIdsConverter.convert(enabledIds, getClass());
         visitor = new RegistrationBotVisitor();
+    }
+
+    /*
+    * In test purposes
+    * */
+    @PostConstruct
+    public void init() {
+        log.info("Registration bot init method invocation");
     }
 
     @Override
@@ -162,7 +172,7 @@ public class RegistrationBot extends AbstractCustomBot {
         switch (cmd[0]) {
             case "/создать_аккаунт":
                 log.info("REGISTRATION_BOT CREATE {}", targetUserId);
-                return registrate(message.getSender().getUserId().toString());
+                return registrate(message.getSender().getUserId().toString(), message.getSender().getName());
             case "/изменить_пароль":
                 if (cmd.length < 2) {
                     log.info("REGISTRATION_BOT CHANGE_PASSWORD_WRONG {}", targetUserId);
@@ -189,7 +199,7 @@ public class RegistrationBot extends AbstractCustomBot {
         }
     }
 
-    private NewMessageBody registrate(final String userId) {
+    private NewMessageBody registrate(final String userId, final String username) {
         UserEntity user = userRepository.findByLogin(userId);
         if (user == null) {
             // @todo #CC-36 Improve password generation
@@ -198,6 +208,7 @@ public class RegistrationBot extends AbstractCustomBot {
                     userId,
                     bCryptPasswordEncoder.encode(password)
             );
+            user.setUsername(username);
             userRepository.save(user);
             String response = "Id пользователя: " + userId + "\nПароль: " + password;
             return messageOf(response, List.of(getAutoLoginButton(userId)));
