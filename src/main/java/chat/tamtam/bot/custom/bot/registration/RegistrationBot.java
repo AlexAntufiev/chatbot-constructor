@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.env.Environment;
@@ -89,14 +87,6 @@ public class RegistrationBot extends AbstractCustomBot {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.enabledIds = enabledIdsConverter.convert(enabledIds, getClass());
         visitor = new RegistrationBotVisitor();
-    }
-
-    /*
-    * In test purposes
-    * */
-    @PostConstruct
-    public void init() {
-        log.info("Registration bot init method invocation");
     }
 
     @Override
