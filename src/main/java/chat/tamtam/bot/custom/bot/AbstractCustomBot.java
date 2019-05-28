@@ -95,7 +95,7 @@ public abstract class AbstractCustomBot {
     }
 
     @EventListener
-    public void onRefreshScopeRefreshed(final RefreshScopeRefreshedEvent event) {}
+    public void onRefreshScopeRefreshed(final RefreshScopeRefreshedEvent event) { }
 
     @PreDestroy
     public void unsubscribe() {
