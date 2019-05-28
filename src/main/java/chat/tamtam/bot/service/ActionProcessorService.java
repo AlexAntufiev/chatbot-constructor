@@ -206,7 +206,7 @@ public class ActionProcessorService {
         @Getter
         private String url;
 
-        public AttachmentVisitor(final Attachment attachment) {
+        AttachmentVisitor(final Attachment attachment) {
             switch (attachment.getType()) {
 
                 case Attachment.IMAGE:
