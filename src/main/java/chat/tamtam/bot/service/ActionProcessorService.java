@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,9 +19,20 @@ import chat.tamtam.bot.domain.vote.VoteEntry;
 import chat.tamtam.bot.domain.webhook.BotContext;
 import chat.tamtam.bot.repository.BotVoteRepository;
 import chat.tamtam.bot.repository.SchemeActionRepository;
+import chat.tamtam.botapi.model.Attachment;
+import chat.tamtam.botapi.model.AudioAttachment;
+import chat.tamtam.botapi.model.ContactAttachment;
+import chat.tamtam.botapi.model.FileAttachment;
+import chat.tamtam.botapi.model.InlineKeyboardAttachment;
+import chat.tamtam.botapi.model.LocationAttachment;
 import chat.tamtam.botapi.model.MessageCallbackUpdate;
 import chat.tamtam.botapi.model.MessageCreatedUpdate;
+import chat.tamtam.botapi.model.PhotoAttachment;
+import chat.tamtam.botapi.model.ShareAttachment;
+import chat.tamtam.botapi.model.StickerAttachment;
 import chat.tamtam.botapi.model.Update;
+import chat.tamtam.botapi.model.VideoAttachment;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -127,7 +139,37 @@ public class ActionProcessorService {
 
             if (update instanceof MessageCreatedUpdate) {
                 MessageCreatedUpdate message = ((MessageCreatedUpdate) update);
-                voteEntry.setValue(message.getMessage().getBody().getText());
+
+                StringBuilder valueBuilder = new StringBuilder();
+
+                if (message.getMessage().getBody().getText() != null) {
+                    valueBuilder.append(message.getMessage().getBody().getText());
+                }
+
+                List<Attachment> attachments = message.getMessage().getBody().getAttachments();
+
+                if (attachments != null && !attachments.isEmpty()) {
+                    for (Attachment attachment
+                            : attachments) {
+                        final String attachmentUrl = getAttachmentUrl(attachment);
+                        if (StringUtils.isEmpty(attachmentUrl)) {
+                            log.error(
+                                    String.format(
+                                            "Update with attachments(%s) contains unsupported attachment(%s),"
+                                                    + " context(%s)",
+                                            attachments, attachment, context
+                                    )
+                            );
+                            continue;
+                        }
+                        if (valueBuilder.length() != 0) {
+                            valueBuilder.append("\n");
+                        }
+                        valueBuilder.append(attachmentUrl);
+                    }
+                }
+
+                voteEntry.setValue(valueBuilder.toString());
             }
 
             if (update instanceof MessageCallbackUpdate) {
@@ -142,6 +184,10 @@ public class ActionProcessorService {
         }
     }
 
+    private String getAttachmentUrl(Attachment attachment) {
+        return new AttachmentVisitor(attachment).getUrl();
+    }
+
     private void persistVote(final SchemeComponent component, final BotContext context) {
         BotVote botVote = new BotVote(
                 context.getId().getBotSchemeId(),
@@ -154,5 +200,84 @@ public class ActionProcessorService {
 
         voteRepository.save(botVote);
         context.setVoteData("[]".getBytes());
+    }
+
+    private static class AttachmentVisitor implements Attachment.Visitor {
+        @Getter
+        private String url;
+
+        public AttachmentVisitor(final Attachment attachment) {
+            switch (attachment.getType()) {
+
+                case Attachment.IMAGE:
+                    visit(((PhotoAttachment) attachment));
+                    break;
+
+                case Attachment.VIDEO:
+                    visit(((VideoAttachment) attachment));
+                    break;
+
+                case Attachment.FILE:
+                    visit(((FileAttachment) attachment));
+                    break;
+
+                case Attachment.AUDIO:
+                    visit(((AudioAttachment) attachment));
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        @Override
+        public void visit(PhotoAttachment model) {
+            url = model.getPayload().getUrl();
+        }
+
+        @Override
+        public void visit(VideoAttachment model) {
+            url = model.getPayload().getUrl();
+        }
+
+        @Override
+        public void visit(AudioAttachment model) {
+            url = model.getPayload().getUrl();
+        }
+
+        @Override
+        public void visit(FileAttachment model) {
+            url = model.getPayload().getUrl();
+        }
+
+        @Override
+        public void visit(StickerAttachment model) {
+
+        }
+
+        @Override
+        public void visit(ContactAttachment model) {
+
+        }
+
+        @Override
+        public void visit(InlineKeyboardAttachment model) {
+
+        }
+
+        @Override
+        public void visit(ShareAttachment model) {
+
+        }
+
+        @Override
+        public void visit(LocationAttachment model) {
+
+        }
+
+        @Override
+        public void visitDefault(Attachment model) {
+
+        }
     }
 }
