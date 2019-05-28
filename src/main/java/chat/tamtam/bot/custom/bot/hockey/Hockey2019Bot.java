@@ -99,8 +99,6 @@ public class Hockey2019Bot extends AbstractCustomBot {
 
     private final Hockey2019Service hockey2019Service;
 
-    private String url;
-
     private final Hockey2019BotVisitor hockey2019BotVisitor;
 
     public Hockey2019Bot(
@@ -113,16 +111,6 @@ public class Hockey2019Bot extends AbstractCustomBot {
         super(id, token, host, environment);
         this.hockey2019Service = hockey2019Service;
         hockey2019BotVisitor = new Hockey2019BotVisitor();
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getToken() {
-        return token;
     }
 
     @Override
