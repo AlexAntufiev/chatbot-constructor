@@ -37,8 +37,11 @@ class VotesResults extends React.Component {
     }
 
     static filterColumn(value, filter) {
-        const res = String(value.text).search(new RegExp("[\s\S]*" + filter + "[\s\S]*", "i"));
-        return res !== -1;
+        if (value) {
+            const res = String(value.text).search(new RegExp("[\s\S]*" + filter + "[\s\S]*", "i"));
+            return res !== -1;
+        }
+        return false;
     }
 
     cellTemplate(data, column) {
