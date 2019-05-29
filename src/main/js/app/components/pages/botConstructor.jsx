@@ -304,7 +304,7 @@ class BotConstructor extends Component {
             for (let i = 0; i < this.state.components[groupId].length; i++) {
                 const elem = this.state.components[groupId][i];
                 if (elem.component.nextState === componentObj.component.id) {
-                    elem.component.nextState = elem.component.id;
+                    elem.component.nextState = null;
                 }
                 if (elem.buttonsGroup) {
                     for (let row = 0; row < elem.buttonsGroup.buttons.length; row++) {
@@ -313,7 +313,7 @@ class BotConstructor extends Component {
                                 if (this.state.groups[groupId].type === BotConstructor.GROUP_TYPE.VOTE && this.state.components[groupId].length > 0) {
                                     elem.buttonsGroup.buttons[row][col].nextState = this.state.components[groupId][0].component.id;
                                 } else {
-                                    elem.buttonsGroup.buttons[row][col].nextState = elem.component.id;
+                                    elem.buttonsGroup.buttons[row][col].nextState = null;
                                 }
                             }
                         }

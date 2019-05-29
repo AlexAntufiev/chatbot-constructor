@@ -27,6 +27,7 @@ class ButtonSettingsDialog extends BaseDialog {
         this.addMessage = this.addMessage.bind(this);
         this.onSave = this.onSave.bind(this);
         this.removeButton = this.removeButton.bind(this);
+        this.removeMessage = this.removeMessage.bind(this);
     }
 
     onShow(button, row, col, message, groupId) {
@@ -64,6 +65,15 @@ class ButtonSettingsDialog extends BaseDialog {
         }, null, this);
     }
 
+    removeMessage() {
+        if (this.state.message) {
+            this.props.removeComponent(this.state.message);
+            this.setState({
+                nextState: this.state.message.component.nextState,
+                message: null
+            });
+        }
+    }
 
     removeButton() {
         this.props.removeButton(this.state.row, this.state.col);
@@ -161,13 +171,7 @@ class ButtonSettingsDialog extends BaseDialog {
                             <Button label={intl.formatMessage({id: 'app.dialog.add.message'})}
                                     onClick={this.addMessage}/>}
                             {this.state.message && <Button label={intl.formatMessage({id: 'app.dialog.remove.message'})}
-                                                           onClick={() => {
-                                                               this.props.removeComponent(this.state.message);
-                                                               this.setState({
-                                                                   nextState: this.state.message.component.nextState,
-                                                                   message: null
-                                                               });
-                                                           }}/>}
+                                                           onClick={this.removeMessage}/>}
                         </div>
                         <div className={"form_detail-element"}>
                             {this.state.message &&
