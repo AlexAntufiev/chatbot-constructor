@@ -147,5 +147,11 @@ export default {
     'app.constructor.error.vote.component.title.template': 'Неверное название компонента ":title"',
     'app.constructor.scheme.add.group': 'Добавить группу',
     'app.constructor.error.empty.buttons.template': 'Группа кнопок не может быть без кнопок ":title"',
-    'app.constructor.error.empty.title': 'Пустое название'
+    'app.constructor.error.empty.title': 'Пустое название',
+
+    'app.attachments': 'Вложения',
+    'app.attach.type.file': 'Файл',
+    'app.attach.type.image': 'Изображение',
+    'app.attach.type.video': 'Видео',
+    'app.attach.type.audio': 'Аудио'
 };

@@ -23,14 +23,53 @@ class VotesResults extends React.Component {
             groups: {},
             ajaxRefreshProcess: false
         };
+        const {intl} = this.props;
+        this.ATTACHMENT_TYPES = {
+            file: intl.formatMessage({id: "app.attach.type.file"}),
+            image: intl.formatMessage({id: "app.attach.type.image"}),
+            video: intl.formatMessage({id: "app.attach.type.video"}),
+            audio: intl.formatMessage({id: "app.attach.type.audio"}),
+        };
 
         this.createTabs = this.createTabs.bind(this);
         this.refresh = this.refresh.bind(this);
+        this.cellTemplate = this.cellTemplate.bind(this);
+        this.filterColumn = this.filterColumn.bind(this);
+    }
+
+    filterColumn(value, filter) {
+        const res = String(value.text).search(new RegExp("[\s\S]*" + filter + "[\s\S]*", "i"));
+        return res !== -1;
+    }
+
+    cellTemplate(data, column) {
+        const cellData = data[column.field];
+        if (!cellData) {
+            return (<div/>);
+        }
+        let attachments = [];
+        if (Array.isArray(cellData.attachments)) {
+            cellData.attachments.forEach((attach) => {
+                if (attach.url && this.ATTACHMENT_TYPES[attach.type]) {
+                    attachments.push(<div className={"vote-table-cell_attach"}>
+                        <a href={attach.url}>{this.ATTACHMENT_TYPES[attach.type]}</a>
+                    </div>)
+                }
+            });
+        }
+
+        const {intl} = this.props;
+        return (<div className={"vote-table-cell"}>
+            <div className={"vote-table-cell_text"}>{cellData.text}</div>
+            {attachments.length > 0 && <h5 className={"vote-table-cell_attach-title"}>{intl.formatMessage({id: 'app.attachments'})}:</h5>}
+            {attachments}
+        </div>);
     }
 
     componentDidMount() {
         this.refresh();
     }
+
 
     refresh() {
         const botSchemeId = Number(this.props.match.params.id);
@@ -47,9 +86,12 @@ class VotesResults extends React.Component {
                 res.data.payload.forEach((vote) => {
                     if (votes[vote.groupId]) {
                         let voteObj = {
-                            userId: vote[VotesResults.SYSTEM_FIELDS[0]],
-                            username: vote[VotesResults.SYSTEM_FIELDS[1]],
-                            time: dateFormat(new Date(vote[VotesResults.SYSTEM_FIELDS[2]]), this.props.intl.locale === "ru" ? "dd-mm-yyyy H:MM" : "dd-mm-yyyy h:MM TT")
+                            userId: {text: vote[VotesResults.SYSTEM_FIELDS[0]], attachments: null},
+                            username: {text: vote[VotesResults.SYSTEM_FIELDS[1]], attachments: null},
+                            time: {
+                                text: dateFormat(new Date(vote[VotesResults.SYSTEM_FIELDS[2]]), this.props.intl.locale === "ru" ? "dd-mm-yyyy H:MM" : "dd-mm-yyyy h:MM TT"),
+                                attachments: null
+                            }
                         };
                         vote.voteFields.forEach((voteData) => {
                             voteObj[voteData.field] = voteData.value;
@@ -67,7 +109,6 @@ class VotesResults extends React.Component {
 
     createTabs() {
         let renderedTabs = [];
-
         for (let voteId in this.state.votes) {
             let columns = [];
             if (this.state.votes[voteId].length === 0) continue;
@@ -86,14 +127,14 @@ class VotesResults extends React.Component {
                 }
             }
             keys = VotesResults.SYSTEM_FIELDS.concat(keys);
-
             keys.forEach(key => {
                 columns.push(
-                    <Column field={key} header={key} filter={true}/>);
+                    <Column field={key} header={key} filter={true} filterFunction={this.filterColumn}
+                            filterMatchMode={"custom"} body={this.cellTemplate}/>);
             });
 
             renderedTabs.push(<TabPanel header={this.state.groups[voteId]}>
-                <DataTable value={this.state.votes[voteId]}>
+                <DataTable value={this.state.votes[voteId]} dataKey={"text"}>
                     {columns}
                 </DataTable>
             </TabPanel>)

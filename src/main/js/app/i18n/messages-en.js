@@ -148,6 +148,12 @@ export default {
     'app.constructor.error.vote.component.title.template': 'Invalid component title ":title"',
     'app.constructor.scheme.add.group': 'Add group',
     'app.constructor.error.empty.buttons.template': 'Button group can not be without buttons ":title"',
-    'app.constructor.error.empty.title': 'Empty title'
+    'app.constructor.error.empty.title': 'Empty title',
+
+    'app.attachments': 'Attachments',
+    'app.attach.type.file': 'File',
+    'app.attach.type.image': 'Image',
+    'app.attach.type.video': 'Video',
+    'app.attach.type.audio': 'Audio'
 };
 
