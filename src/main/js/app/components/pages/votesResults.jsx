@@ -134,7 +134,7 @@ class VotesResults extends React.Component {
             });
 
             renderedTabs.push(<TabPanel header={this.state.groups[voteId]}>
-                <DataTable value={this.state.votes[voteId]} dataKey={"text"}>
+                <DataTable value={this.state.votes[voteId]}>
                     {columns}
                 </DataTable>
             </TabPanel>)
