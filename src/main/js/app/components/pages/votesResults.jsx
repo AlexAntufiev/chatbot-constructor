@@ -34,10 +34,9 @@ class VotesResults extends React.Component {
         this.createTabs = this.createTabs.bind(this);
         this.refresh = this.refresh.bind(this);
         this.cellTemplate = this.cellTemplate.bind(this);
-        this.filterColumn = this.filterColumn.bind(this);
     }
 
-    filterColumn(value, filter) {
+    static filterColumn(value, filter) {
         const res = String(value.text).search(new RegExp("[\s\S]*" + filter + "[\s\S]*", "i"));
         return res !== -1;
     }
@@ -129,7 +128,7 @@ class VotesResults extends React.Component {
             keys = VotesResults.SYSTEM_FIELDS.concat(keys);
             keys.forEach(key => {
                 columns.push(
-                    <Column field={key} header={key} filter={true} filterFunction={this.filterColumn}
+                    <Column field={key} header={key} filter={true} filterFunction={VotesResults.filterColumn}
                             filterMatchMode={"custom"} body={this.cellTemplate}/>);
             });
 
