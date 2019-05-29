@@ -1,10 +1,12 @@
 package chat.tamtam.bot.service;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +17,7 @@ import chat.tamtam.bot.domain.builder.button.ButtonPayload;
 import chat.tamtam.bot.domain.builder.component.ComponentType;
 import chat.tamtam.bot.domain.builder.component.SchemeComponent;
 import chat.tamtam.bot.domain.vote.BotVote;
+import chat.tamtam.bot.domain.vote.Value;
 import chat.tamtam.bot.domain.vote.VoteEntry;
 import chat.tamtam.bot.domain.webhook.BotContext;
 import chat.tamtam.bot.repository.BotVoteRepository;
@@ -142,40 +145,35 @@ public class ActionProcessorService {
 
                 StringBuilder valueBuilder = new StringBuilder();
 
-                if (message.getMessage().getBody().getText() != null) {
-                    valueBuilder.append(message.getMessage().getBody().getText());
-                }
+                Value value = new Value();
+
+                value.setText(message.getMessage().getBody().getText());
 
                 List<Attachment> attachments = message.getMessage().getBody().getAttachments();
 
                 if (attachments != null && !attachments.isEmpty()) {
-                    for (Attachment attachment
-                            : attachments) {
-                        final String attachmentUrl = getAttachmentUrl(attachment);
-                        if (StringUtils.isEmpty(attachmentUrl)) {
-                            log.error(
-                                    String.format(
-                                            "Update with attachments(%s) contains unsupported attachment(%s),"
-                                                    + " context(%s)",
-                                            attachments, attachment, context
-                                    )
-                            );
-                            continue;
-                        }
-                        if (valueBuilder.length() != 0) {
-                            valueBuilder.append("\n");
-                        }
-                        valueBuilder.append(attachmentUrl);
-                    }
+
+                    List<chat.tamtam.bot.domain.vote.Attachment> list =
+                            attachments
+                                    .stream()
+                                    .map(attachment -> Optional.ofNullable(asAttachment(attachment)))
+                                    .filter(Optional::isPresent)
+                                    .map(Optional::get)
+                                    .collect(Collectors.toList());
+
+                    value.setAttachments(list);
                 }
 
-                voteEntry.setValue(valueBuilder.toString());
+                voteEntry.setValue(value);
             }
 
             if (update instanceof MessageCallbackUpdate) {
                 MessageCallbackUpdate callback = ((MessageCallbackUpdate) update);
                 ButtonPayload payload = new ButtonPayload(callback.getCallback().getPayload());
-                voteEntry.setValue(payload.getValue());
+                Value value = new Value();
+                value.setText(payload.getValue());
+                value.setAttachments(Collections.emptyList());
+                voteEntry.setValue(value);
             }
 
             context.setVoteData(mapper.writeValueAsBytes(entries));
@@ -184,8 +182,8 @@ public class ActionProcessorService {
         }
     }
 
-    private String getAttachmentUrl(Attachment attachment) {
-        return new AttachmentVisitor(attachment).getUrl();
+    private chat.tamtam.bot.domain.vote.Attachment asAttachment(Attachment attachment) {
+        return new AttachmentVisitor(attachment).getAttachment();
     }
 
     private void persistVote(final SchemeComponent component, final BotContext context) {
@@ -204,9 +202,10 @@ public class ActionProcessorService {
 
     private static class AttachmentVisitor implements Attachment.Visitor {
         @Getter
-        private String url;
+        private chat.tamtam.bot.domain.vote.Attachment attachment;
 
         AttachmentVisitor(final Attachment attachment) {
+            this.attachment = new chat.tamtam.bot.domain.vote.Attachment();
             switch (attachment.getType()) {
 
                 case Attachment.IMAGE:
@@ -226,28 +225,32 @@ public class ActionProcessorService {
                     break;
 
                 default:
-                    break;
+                    this.attachment = null;
             }
         }
 
         @Override
         public void visit(PhotoAttachment model) {
-            url = model.getPayload().getUrl();
+            attachment.setType(model.getType());
+            attachment.setUrl(model.getPayload().getUrl());
         }
 
         @Override
         public void visit(VideoAttachment model) {
-            url = model.getPayload().getUrl();
+            attachment.setType(model.getType());
+            attachment.setUrl(model.getPayload().getUrl());
         }
 
         @Override
         public void visit(AudioAttachment model) {
-            url = model.getPayload().getUrl();
+            attachment.setType(model.getType());
+            attachment.setUrl(model.getPayload().getUrl());
         }
 
         @Override
         public void visit(FileAttachment model) {
-            url = model.getPayload().getUrl();
+            attachment.setType(model.getType());
+            attachment.setUrl(model.getPayload().getUrl());
         }
 
         @Override

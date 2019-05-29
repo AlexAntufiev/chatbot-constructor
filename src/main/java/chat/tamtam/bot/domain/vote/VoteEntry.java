@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class VoteEntry {
     private String field;
-    private String value;
+    private Value value;
 
-    public VoteEntry(final String field, final String value) {
+    public VoteEntry(final String field, final Value value) {
         this.field = field;
         this.value = value;
     }
