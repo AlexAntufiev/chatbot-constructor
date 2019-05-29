@@ -1,0 +1,98 @@
+spring:
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        dialect: org.hibernate.dialect.PostgreSQL95Dialect
+        show-sql: false
+        format_sql: false
+        use_sql: false
+        temp:
+          use_jdbc_metadata_defaults: false
+    open-in-view: false
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+    hikari:
+      idle-timeout: 300000 #Default: 600000 (10 minutes)
+      connection-timeout: 10000 #Default: 30000 (30 seconds)
+      maximum-pool-size: 5 #((core_count * 2) + 1)
+      minimum-idle: 1
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  main:
+    banner-mode: log
+
+logging:
+  level:
+    com:
+      zaxxer:
+        hikari:
+          HikariConfig: INFO
+    org:
+      springframework: INFO
+      hibernate:
+        SQL: off
+        type:
+          descriptor:
+            sql:
+              BasicBinder: off
+    chat:
+      tamtam:
+        bot: INFO
+
+server:
+  address: 0.0.0.0
+  port: 8090
+
+rest:
+  timeout:
+    connect: 1000
+    request: 4000
+
+tamtam:
+  host: http://localhost:8090
+  chat:
+    listSizeThreshold: 20
+    chatsFetchAmount: 20
+  bot:
+    registration:
+      url: https://tt.me/BuilderRegBot
+      id: 581483330212
+      token: JUeixE5Dr7WoBY3ajjfwr72ya1CR_zw6D25VlR0sgNI
+      enabledIds: 555537636725, 590435433004, 575868018573, 577949140156
+    hockey2019:
+      url: https://tt.me/Hockey2019
+      id: 579249368771
+      token: _WJ5Jt0ksotmic5llAnm7DJNvXO8WAce8AIBpLGVW-o
+      external_url:
+        news: https://sport.mail.ru/inf/json_vk_bot_competition/hockey2019/news
+        news_team: https://sport.mail.ru/inf/json_vk_bot_competition/hockey2019/news/{id}
+        calendar: https://sport.mail.ru/inf/json_vk_bot_competition/hockey2019/calendar
+        results: https://sport.mail.ru/inf/json_vk_bot_competition/hockey2019/results
+        match: https://sport.mail.ru/inf/json_vk_bot_competition/hockey2019/match/{id}
+  broadcast:
+    enabled: true
+    delay:
+      send: 10000
+      delete: 10000
+    executor:
+      corePoolSize: 2
+      maxPoolSize: 4
+  rss:
+    enabled: true
+    token: Iu9O0wVu2dtllKK8MV-Sw9gbFMkM8Z5cLYCTnl8PMGg
+    delay:
+      refresh: 10000
+    executor:
+      corePoolSize: 2
+      maxPoolSize: 4

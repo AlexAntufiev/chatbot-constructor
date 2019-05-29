@@ -1,0 +1,10 @@
+errors:
+  - gorbatov.eg@gmail.com
+alerts:
+  github:
+    - gorbatovea
+format:
+  - short-title
+  - title-length=100
+tags:
+  - pdd
