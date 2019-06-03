@@ -1,10 +1,10 @@
 spring:
   cloud:
     consul:
-      enabled: false
+      enabled: true
       discovery:
         healthCheckInterval: 300s
       config:
         watch:
-          enabled: false
+          enabled: true
           delay: 1000 #ms
