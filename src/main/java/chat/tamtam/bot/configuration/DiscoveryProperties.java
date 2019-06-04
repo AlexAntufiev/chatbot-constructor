@@ -13,6 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 public class DiscoveryProperties {
 
     @Getter
-    @Value("${tamtam.webhook.eLama.ids:}")
+    @Value("${tamtam.webhook.elama.ids:}")
     private String enabledIds;
 }
