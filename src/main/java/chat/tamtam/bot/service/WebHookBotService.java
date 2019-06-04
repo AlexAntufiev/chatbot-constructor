@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
+import chat.tamtam.bot.configuration.DiscoveryProperties;
 import chat.tamtam.bot.converter.EnabledIds;
 import chat.tamtam.bot.converter.EnabledIdsConverter;
 import chat.tamtam.bot.domain.bot.BotScheme;
@@ -45,6 +46,8 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @RequiredArgsConstructor
 public class WebHookBotService {
+    private final DiscoveryProperties properties;
+
     private final BotContextRepository botContextRepository;
     private final BotSchemeRepository botSchemeRepository;
     private final TamBotRepository tamBotRepository;
@@ -59,13 +62,11 @@ public class WebHookBotService {
     // eLama bot filter
     @Value("${tamtam.webhook.eLama.schemeId:}")
     private Long eLamaSchemeId;
-    @Value("${tamtam.webhook.eLama.ids:}")
-    private String eLamaIds;
     private EnabledIds eLamaEnabledIds;
 
     @PostConstruct
     public void initELamaIds() {
-        eLamaEnabledIds = new EnabledIdsConverter().convert(eLamaIds, WebHookBotService.class);
+        eLamaEnabledIds = new EnabledIdsConverter().convert(properties.getEnabledIds(), WebHookBotService.class);
     }
 
     @PostConstruct

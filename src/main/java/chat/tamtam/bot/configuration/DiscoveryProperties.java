@@ -13,9 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class DiscoveryProperties {
 
-    // FIXME use getEnabledIds()
     @Setter
     @Getter
-    @Value("${tamtam.bot.elama.enabledIds:}")
+    @Value("${tamtam.webhook.eLama.ids:}")
     private String enabledIds;
 }
