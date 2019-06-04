@@ -32,3 +32,9 @@ logging:
     chat:
       tamtam:
         bot: DEBUG
+
+tamtam:
+  webhook:
+    eLama:
+      schemeId:
+      ids:
