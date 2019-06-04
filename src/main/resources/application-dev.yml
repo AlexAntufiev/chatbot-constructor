@@ -36,5 +36,4 @@ logging:
 tamtam:
   webhook:
     eLama:
-      schemeId:
-      ids:
+      schemeId: 10

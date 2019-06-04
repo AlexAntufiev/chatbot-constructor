@@ -5,7 +5,6 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Configuration;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -13,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class DiscoveryProperties {
 
-    @Setter
     @Getter
     @Value("${tamtam.webhook.eLama.ids:}")
     private String enabledIds;

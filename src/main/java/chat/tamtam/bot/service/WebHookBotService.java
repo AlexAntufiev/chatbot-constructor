@@ -15,7 +15,6 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
 import chat.tamtam.bot.configuration.DiscoveryProperties;
-import chat.tamtam.bot.converter.EnabledIds;
 import chat.tamtam.bot.converter.EnabledIdsConverter;
 import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
@@ -60,14 +59,8 @@ public class WebHookBotService {
     private static final String BOT_CONTEXT_LOCK_MAP = "bot-context-lock-map";
 
     // eLama bot filter
-    @Value("${tamtam.webhook.eLama.schemeId:}")
+    @Value("${tamtam.webhook.elama.schemeId:}")
     private Long eLamaSchemeId;
-    private EnabledIds eLamaEnabledIds;
-
-    @PostConstruct
-    public void initELamaIds() {
-        eLamaEnabledIds = new EnabledIdsConverter().convert(properties.getEnabledIds(), WebHookBotService.class);
-    }
 
     @PostConstruct
     public void initLockMap() {
@@ -88,7 +81,7 @@ public class WebHookBotService {
         if (eLamaSchemeId == null || !eLamaSchemeId.equals(schemeId)) {
             return true;
         }
-        return eLamaEnabledIds.isEnabled(userId);
+        return new EnabledIdsConverter().convert(properties.getEnabledIds(), WebHookBotService.class).isEnabled(userId);
     }
 
     @RequiredArgsConstructor
