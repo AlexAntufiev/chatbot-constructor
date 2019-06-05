@@ -12,5 +12,10 @@ public class DiscoveryProperties {
 
     @Getter
     @Value("${tamtam.webhook.elama.ids:}")
-    private String enabledIds;
+    private String elamaEnabledIds;
+
+    @Getter
+    @Value("${tamtam.webhook.elama.schemeId:}")
+    private Long elamaSchemeId;
+
 }

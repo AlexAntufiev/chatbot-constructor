@@ -8,7 +8,6 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.hazelcast.core.HazelcastInstance;
@@ -58,10 +57,6 @@ public class WebHookBotService {
     private IMap<Byte[], Object> botContextLockMap;
     private static final String BOT_CONTEXT_LOCK_MAP = "bot-context-lock-map";
 
-    // eLama bot filter
-    @Value("${tamtam.webhook.elama.schemeId:}")
-    private Long eLamaSchemeId;
-
     @PostConstruct
     public void initLockMap() {
         botContextLockMap = hazelcastInstance.getMap(BOT_CONTEXT_LOCK_MAP);
@@ -78,10 +73,11 @@ public class WebHookBotService {
 
     // Filter for eLama bot (temporary purpose)
     private boolean filter(final long schemeId, final long userId) {
-        if (eLamaSchemeId == null || !eLamaSchemeId.equals(schemeId)) {
+        Long elamaSchemeId = properties.getElamaSchemeId();
+        if (elamaSchemeId == null || !elamaSchemeId.equals(schemeId)) {
             return true;
         }
-        return new EnabledIdsConverter().convert(properties.getEnabledIds(), WebHookBotService.class).isEnabled(userId);
+        return new EnabledIdsConverter().convert(properties.getElamaEnabledIds(), WebHookBotService.class).isEnabled(userId);
     }
 
     @RequiredArgsConstructor
