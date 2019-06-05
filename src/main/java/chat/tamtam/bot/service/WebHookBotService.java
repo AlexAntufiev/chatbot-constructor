@@ -77,7 +77,9 @@ public class WebHookBotService {
         if (elamaSchemeId == null || !elamaSchemeId.equals(schemeId)) {
             return true;
         }
-        return new EnabledIdsConverter().convert(properties.getElamaEnabledIds(), WebHookBotService.class).isEnabled(userId);
+        return new EnabledIdsConverter()
+                .convert(properties.getElamaEnabledIds(), WebHookBotService.class)
+                .isEnabled(userId);
     }
 
     @RequiredArgsConstructor
