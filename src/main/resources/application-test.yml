@@ -31,3 +31,6 @@ logging:
 
 tamtam:
   host: http://89.208.84.173
+  webhook:
+    elama:
+      schemeId: 10

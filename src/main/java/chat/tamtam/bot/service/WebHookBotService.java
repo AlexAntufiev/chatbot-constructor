@@ -8,11 +8,14 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
+import chat.tamtam.bot.configuration.DiscoveryProperties;
+import chat.tamtam.bot.converter.EnabledIdsConverter;
 import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.builder.component.ComponentType;
@@ -42,6 +45,8 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @RequiredArgsConstructor
 public class WebHookBotService {
+    private final DiscoveryProperties properties;
+
     private final BotContextRepository botContextRepository;
     private final BotSchemeRepository botSchemeRepository;
     private final TamBotRepository tamBotRepository;
@@ -52,6 +57,10 @@ public class WebHookBotService {
     private final HazelcastInstance hazelcastInstance;
     private IMap<Byte[], Object> botContextLockMap;
     private static final String BOT_CONTEXT_LOCK_MAP = "bot-context-lock-map";
+
+    // eLama bot filter
+    @Value("${tamtam.webhook.elama.schemeId:}")
+    private Long eLamaSchemeId;
 
     @PostConstruct
     public void initLockMap() {
@@ -65,6 +74,14 @@ public class WebHookBotService {
         } catch (RuntimeException e) {
             log.error("Submitting message produced exception", e);
         }
+    }
+
+    // Filter for eLama bot (temporary purpose)
+    private boolean filter(final long schemeId, final long userId) {
+        if (eLamaSchemeId == null || !eLamaSchemeId.equals(schemeId)) {
+            return true;
+        }
+        return new EnabledIdsConverter().convert(properties.getEnabledIds(), WebHookBotService.class).isEnabled(userId);
     }
 
     @RequiredArgsConstructor
@@ -208,6 +225,17 @@ public class WebHookBotService {
 
         @Override
         public void visit(final MessageCreatedUpdate model) {
+
+            if (!filter(botSchemeId, model.getMessage().getSender().getUserId())) {
+                log.info(
+                        String.format(
+                                "%s ignored, filter by id rejection(schemeId=%d)",
+                                model, botSchemeId
+                        )
+                );
+                return;
+            }
+
             rejectIfUpdateFromChat(model.getMessage().getRecipient().getUserId(), model);
             log.info("WEB_HOOK_BOT MESSAGE {}", botSchemeId);
             setBotContextLockKey(model.getMessage().getSender().getUserId());
@@ -222,6 +250,16 @@ public class WebHookBotService {
 
         @Override
         public void visit(MessageCallbackUpdate model) {
+            if (!filter(botSchemeId, model.getCallback().getUser().getUserId())) {
+                log.info(
+                        String.format(
+                                "%s ignored, filter by id rejection(schemeId=%d)",
+                                model, botSchemeId
+                        )
+                );
+                return;
+            }
+
             log.info("WEB_HOOK_BOT CALLBACK {}", botSchemeId);
             setBotContextLockKey(model.getCallback().getUser().getUserId());
             lock();
@@ -270,6 +308,17 @@ public class WebHookBotService {
 
         @Override
         public void visit(BotStartedUpdate model) {
+
+            if (!filter(botSchemeId, model.getUserId())) {
+                log.info(
+                        String.format(
+                                "%s ignored, filter by id rejection(schemeId=%d)",
+                                model, botSchemeId
+                        )
+                );
+                return;
+            }
+
             log.info("WEB_HOOK_BOT STARTED {}", botSchemeId);
             setBotContextLockKey(model.getUserId());
             lock();
