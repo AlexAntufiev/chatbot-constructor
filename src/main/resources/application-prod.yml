@@ -13,6 +13,3 @@ spring:
 
 tamtam:
   host: http://89.208.85.185
-  webhook:
-    elama:
-      schemeId: 10
