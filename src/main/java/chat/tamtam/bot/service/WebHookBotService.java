@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
+import chat.tamtam.bot.configuration.DiscoveryProperties;
+import chat.tamtam.bot.converter.EnabledIdsConverter;
 import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.builder.component.ComponentType;
@@ -42,6 +44,8 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @RequiredArgsConstructor
 public class WebHookBotService {
+    private final DiscoveryProperties properties;
+
     private final BotContextRepository botContextRepository;
     private final BotSchemeRepository botSchemeRepository;
     private final TamBotRepository tamBotRepository;
@@ -65,6 +69,17 @@ public class WebHookBotService {
         } catch (RuntimeException e) {
             log.error("Submitting message produced exception", e);
         }
+    }
+
+    // Filter for eLama bot (temporary purpose)
+    private boolean filter(final long schemeId, final long userId) {
+        Long elamaSchemeId = properties.getElamaSchemeId();
+        if (elamaSchemeId == null || !elamaSchemeId.equals(schemeId)) {
+            return true;
+        }
+        return new EnabledIdsConverter()
+                .convert(properties.getElamaEnabledIds(), WebHookBotService.class)
+                .isEnabled(userId);
     }
 
     @RequiredArgsConstructor
@@ -208,6 +223,17 @@ public class WebHookBotService {
 
         @Override
         public void visit(final MessageCreatedUpdate model) {
+
+            if (!filter(botSchemeId, model.getMessage().getSender().getUserId())) {
+                log.info(
+                        String.format(
+                                "%s ignored, filter by id rejection(schemeId=%d)",
+                                model, botSchemeId
+                        )
+                );
+                return;
+            }
+
             rejectIfUpdateFromChat(model.getMessage().getRecipient().getUserId(), model);
             log.info("WEB_HOOK_BOT MESSAGE {}", botSchemeId);
             setBotContextLockKey(model.getMessage().getSender().getUserId());
@@ -222,6 +248,16 @@ public class WebHookBotService {
 
         @Override
         public void visit(MessageCallbackUpdate model) {
+            if (!filter(botSchemeId, model.getCallback().getUser().getUserId())) {
+                log.info(
+                        String.format(
+                                "%s ignored, filter by id rejection(schemeId=%d)",
+                                model, botSchemeId
+                        )
+                );
+                return;
+            }
+
             log.info("WEB_HOOK_BOT CALLBACK {}", botSchemeId);
             setBotContextLockKey(model.getCallback().getUser().getUserId());
             lock();
@@ -270,6 +306,17 @@ public class WebHookBotService {
 
         @Override
         public void visit(BotStartedUpdate model) {
+
+            if (!filter(botSchemeId, model.getUserId())) {
+                log.info(
+                        String.format(
+                                "%s ignored, filter by id rejection(schemeId=%d)",
+                                model, botSchemeId
+                        )
+                );
+                return;
+            }
+
             log.info("WEB_HOOK_BOT STARTED {}", botSchemeId);
             setBotContextLockKey(model.getUserId());
             lock();

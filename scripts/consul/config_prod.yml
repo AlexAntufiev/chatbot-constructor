@@ -21,3 +21,7 @@ tamtam:
     executor:
       corePoolSize: 2
       maxPoolSize: 4
+  webhook:
+    elama:
+      ids:
+      schemeId:
