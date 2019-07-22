@@ -1,7 +1,6 @@
 addons:
   ssh_known_hosts:
-    - 89.208.85.185
-    - 89.208.84.173
+    - ec2-18-188-3-124.us-east-2.compute.amazonaws.com
 
 language: java
 
@@ -29,19 +28,15 @@ script:
   - ./gradlew clean build
 
 before_deploy:
-  - echo "${TEST_SSH}" | base64 --decode >/tmp/test_ssh
   - echo "${PROD_SSH}" | base64 --decode >/tmp/prod_ssh
-  - chmod 600 /tmp/test_ssh /tmp/prod_ssh
+  - chmod 600 /tmp/prod_ssh
   - chmod +x scripts/deploy.sh
 
 deploy:
   - provider: script
-    script: ./scripts/deploy.sh test ${TEST_IP}
-    skip_cleanup: true
-    on:
-      branch: develop
-  - provider: script
     script: ./scripts/deploy.sh prod ${PROD_IP}
     skip_cleanup: true
     on:
-      branch: master
+      branch:
+        - develop
+        - master

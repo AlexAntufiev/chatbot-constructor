@@ -2,7 +2,7 @@ spring:
   cloud:
     consul:
       enabled: true
-      host: 89.208.85.185
+      host: ec2-18-188-3-124.us-east-2.compute.amazonaws.com
       port: 8500
       discovery:
         healthCheckInterval: 300s

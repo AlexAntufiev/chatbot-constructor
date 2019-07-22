@@ -1,14 +1,14 @@
 #!/bin/bash
 
 app_name="chatbot-constructor"
-user="centos"
+user="ubuntu"
 server_type=$1
 
 ssh_test="keys/TEST-1.pem"
 ip_test="89.208.84.173"
 
-ssh_prod="keys/PROD-1.pem"
-ip_prod="89.208.85.185"
+ssh_prod="keys/cc-key.cer"
+ip_prod="ec2-18-188-3-124.us-east-2.compute.amazonaws.com"
 
 if [ "$server_type" == "test" ]; then
     ssh_path=${ssh_test}

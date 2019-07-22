@@ -7,4 +7,4 @@ COPY $app_name /
 
 EXPOSE 8090
 
-ENTRYPOINT java -jar $app_name -Xms10g -Xmx20g --spring.profiles.active=$profile
+ENTRYPOINT java -jar $app_name -Xms512m -Xmx512m --spring.profiles.active=$profile

@@ -5,7 +5,7 @@ mode=$1
 if [ "$mode" == "test" ]; then
     node_address="192.168.9.152"
 elif [ "$mode" == "prod" ]; then
-    node_address="192.168.23.55"
+    node_address="ec2-18-188-3-124.us-east-2.compute.amazonaw"
 else
     echo "Incorrect mode"
     exit
