@@ -53,7 +53,7 @@ public class ComponentProcessorService {
                             )
                     ).userId(context.getId().getUserId())
                             .execute();
-            context.setLastMessageId(result.getMessage().getBody().getMid());
+            context.setLastMessageId(result.getMessage().getBody().getSeq().toString());
             context.setState(component.getNextState());
 
             actionProcessor.perform(component, context, null);
@@ -127,7 +127,7 @@ public class ComponentProcessorService {
             final TamTamBotAPI api
     ) {
         try {
-            if (!update.getMessage().getBody().getMid().equals(context.getLastMessageId())) {
+            if (!update.getMessage().getBody().getSeq().toString().equals(context.getLastMessageId())) {
 
                 CallbackAnswer answer = new CallbackAnswer();
                 answer.message(new NewMessageBody(update.getMessage().getBody().getText(), null));
