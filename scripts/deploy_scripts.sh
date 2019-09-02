@@ -8,7 +8,7 @@ ssh_test="keys/TEST-1.pem"
 ip_test="89.208.84.173"
 
 ssh_prod="keys/cc-key.cer"
-ip_prod="ec2-18-188-3-124.us-east-2.compute.amazonaws.com"
+ip_prod="ec2-18-218-83-47.us-east-2.compute.amazonaws.com"
 
 if [ "$server_type" == "test" ]; then
     ssh_path=${ssh_test}
