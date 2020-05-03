@@ -23,11 +23,6 @@ branches:
 script:
   - ./gradlew clean build
 
-before_deploy:
-  - echo "${PROD_SSH}" | base64 --decode >/tmp/prod_ssh
-  - chmod 600 /tmp/prod_ssh
-  - chmod +x scripts/deploy.sh
-
 deploy:
   - provider: script
     script: ./scripts/deploy.sh prod ${PROD_IP}

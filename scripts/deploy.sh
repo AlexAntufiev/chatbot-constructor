@@ -1,8 +1,8 @@
 #!/bin/bash
 
 app_name="chatbot-constructor"
-ssh_deploy_file_test="/tmp/test_ssh"
-ssh_deploy_file_prod="/tmp/prod_ssh"
+ssh_deploy_file_test="chatbot.pem"
+ssh_deploy_file_prod="chatbot.pem"
 user="ubuntu"
 server_type=$1
 server=$2
