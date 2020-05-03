@@ -40,3 +40,4 @@ deploy:
       branch:
         - develop
         - master
+        - feature/new-host
