@@ -3,7 +3,7 @@ services:
   app:
     build: .
     container_name: app
-    restart: unless-stopped
+    restart: always
     env_file: app.env
     ports:
       - 80:8090
@@ -13,6 +13,7 @@ services:
       - ~/chatbot-constructor/logs:/logs
     depends_on:
       - db
+      - consul
     logging:
       options:
         max-size: "100m"
@@ -28,6 +29,12 @@ services:
       - 5432:5432
     networks:
       - default
+  consul:
+    container_name: consul
+    image: consul
+    ports:
+      - 8500:8500
+    command: agent -ui -server -bind 0.0.0.0 -client 0.0.0.0 -bootstrap-expect 1
 
 networks:
   default:

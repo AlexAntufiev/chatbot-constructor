@@ -1,8 +1,8 @@
 #!/bin/bash
 
 app_name="chatbot-constructor"
-ssh_deploy_file_test="/tmp/test_ssh"
-ssh_deploy_file_prod="/tmp/prod_ssh"
+ssh_deploy_file_test="/tmp/prod_ssh.pem"
+ssh_deploy_file_prod="/tmp/prod_ssh.pem"
 user="ubuntu"
 server_type=$1
 server=$2
@@ -25,5 +25,5 @@ printf "POSTGRES_USER=${server_type}\nPOSTGRES_PASSWORD=${db_password}" > db.env
 
 time ssh -i ${ssh_path} ${user}@${server} "mkdir -p ${app_name} && cd ${app_name} && rm -f ${app_name}*"
 rsync -avz -e "ssh -i ${ssh_path}" ./ ${user}@${server}:/home/${user}/${app_name}
-time ssh -i ${ssh_path} ${user}@${server} "cd ${app_name} && chmod +x docker.sh && \
-                                           nohup ./docker.sh ${server_type} ${server} > /dev/null 2>&1 &"
+#time ssh -i ${ssh_path} ${user}@${server} "cd ${app_name} && chmod +x docker.sh && \
+#                                           nohup ./docker.sh ${server_type} ${server} > /dev/null 2>&1 &"

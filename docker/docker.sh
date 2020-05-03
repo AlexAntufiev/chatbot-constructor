@@ -36,20 +36,20 @@ function main() {
     fi
 
     if [[ $(docker-compose ps) != *"db"* ]]; then
-        send_message "${server_type} будет создан"
+#        send_message "${server_type} будет создан"
         docker-compose build app
         docker-compose up -d
-        send_message "${server_type} создался: http://${host}/index.html \n managing config: http://${host}:${config_service_port}/ui/dc1/services"
+#        send_message "${server_type} создался: http://${host}/index.html \n managing config: http://${host}:${config_service_port}/ui/dc1/services"
     else
-        send_message "${server_type} будет остановлен"
+#        send_message "${server_type} будет остановлен"
         docker-compose stop app
         docker-compose rm -f app
         docker image rm -f chatbot-constructor_app
-        send_message "${server_type} остановлен"
+#        send_message "${server_type} остановлен"
 
         docker-compose build app
         docker-compose up -d app
-        send_message "${server_type} перезапустился: http://${host}/index.html \n managing config: http://${host}:${config_service_port}/ui/dc1/services"
+#        send_message "${server_type} перезапустился: http://${host}/index.html \n managing config: http://${host}:${config_service_port}/ui/dc1/services"
     fi
 }
 
