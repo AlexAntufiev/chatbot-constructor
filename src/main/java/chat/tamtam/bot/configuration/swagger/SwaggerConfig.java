@@ -1,10 +1,9 @@
 package chat.tamtam.bot.configuration.swagger;
 
+import chat.tamtam.bot.configuration.AppProfiles;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-
-import chat.tamtam.bot.configuration.AppProfiles;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
@@ -13,7 +12,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @EnableSwagger2
-@Profile({AppProfiles.DEVELOPMENT, AppProfiles.TEST})
+@Profile({AppProfiles.DEVELOPMENT})
 public class SwaggerConfig {
 
     public static final String[] SWAGGER_URLS = {

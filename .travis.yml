@@ -34,7 +34,7 @@ before_deploy:
 
 deploy:
   - provider: script
-    script: ./scripts/deploy.sh prod ${PROD_IP}
+    script: ./scripts/deploy.sh ${PROD_IP}
     skip_cleanup: true
     on:
       branch:

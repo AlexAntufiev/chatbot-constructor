@@ -1,11 +1,5 @@
 package chat.tamtam.bot.service;
 
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Profile;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import chat.tamtam.bot.configuration.AppProfiles;
 import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.domain.user.UserAuthEntity;
@@ -13,6 +7,11 @@ import chat.tamtam.bot.domain.user.UserEntity;
 import chat.tamtam.bot.repository.SessionRepository;
 import chat.tamtam.bot.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
@@ -46,16 +45,5 @@ public class UserService {
     @Profile(AppProfiles.DEVELOPMENT)
     InitializingBean populateDevelopmentDatabase() {
         return () -> addUser(new UserAuthEntity("admin", "admin"));
-    }
-
-    @Bean
-    @Profile(AppProfiles.TEST)
-    InitializingBean populateTestDatabase() {
-        return () -> {
-            addUser(new UserAuthEntity("test1", "B&]LhfC2bP^Joh.{b,g\\b\"a,%)'DW;x\""));
-            addUser(new UserAuthEntity("test2", "_vq#4g7K<w*k*hFRuX]upQ2Grz{_K?WH"));
-            addUser(new UserAuthEntity("test3", "fP6~)w=U]d=FL&5s=E{$w`=ej[]',,5,"));
-            addUser(new UserAuthEntity("test4", "}NeP#<A6J(a$LM/3Yh\\-/;oTf~`#Y?uJ"));
-        };
     }
 }

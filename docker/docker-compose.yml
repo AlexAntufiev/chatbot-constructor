@@ -4,7 +4,6 @@ services:
     build: .
     container_name: app
     restart: always
-    env_file: app.env
     ports:
       - 80:8090
     networks:

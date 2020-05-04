@@ -4,8 +4,7 @@ application_name="chatbot-constructor"
 token="QeFH2Jalc16THlx9YcNBDhtdx_u3uHOeDp8y8P20pT4"
 chat_id="-70460825709429"
 url="https://botapi.tamtam.chat/messages?access_token=${token}&chat_id=${chat_id}"
-server_type=$1
-host=$2
+host=$1
 config_service_port="8500"
 body=""
 
@@ -25,13 +24,8 @@ function send_message() {
 }
 
 function main() {
-    if [ "$server_type" != "test" ] && [ "$server_type" != "prod" ]; then
-        echo "Mode must be set and 'test' or 'prod'"
-        exit
-    fi
-
-    if [ -z "$host" ] && [ "$server_type" != "local" ]; then
-        echo "host must be set or be 'local'"
+    if [ -z "$host" ]; then
+        echo "host must be set"
         exit
     fi
 
