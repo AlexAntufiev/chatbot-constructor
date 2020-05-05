@@ -34,14 +34,9 @@ spring:
 
 logging:
   level:
-    com:
-      zaxxer:
-        hikari:
-          HikariConfig: INFO
+    root: ERROR
     org:
-      springframework: INFO
       hibernate:
-        SQL: off
         type:
           descriptor:
             sql:
