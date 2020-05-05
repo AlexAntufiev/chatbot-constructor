@@ -1,18 +1,15 @@
 #!/bin/bash
 
 app_name="chatbot-constructor"
-ssh_deploy_file_prod="/tmp/prod_ssh.pem"
-user="ubuntu"
-server=$1
+ssh_path="/tmp/prod_ssh.pem"
 
-ssh_path=${ssh_deploy_file_prod}
-db_password=QUFNRXNlY3JldDA0MDUyMDE5MzA4Cg==
+echo "${PROD_SSH}" | base64 --decode >${ssh_path}
+chmod 600 ${ssh_path}
 
 cp ./build/libs/chatbot-constructor* ./docker/
 cd ./docker/
-printf "POSTGRES_USER=prod\nPOSTGRES_PASSWORD=${db_password}" > db.env
+printf "POSTGRES_USER=${db_user}\nPOSTGRES_PASSWORD=${db_password}" > db.env
 
-time ssh -i ${ssh_path} ${user}@${server} "mkdir -p ${app_name} && cd ${app_name} && rm -f ${app_name}*"
-rsync -avz -e "ssh -i ${ssh_path}" ./ ${user}@${server}:/home/${user}/${app_name}
-#time ssh -i ${ssh_path} ${user}@${server} "cd ${app_name} && chmod +x docker.sh && \
-#                                           nohup ./docker.sh ${server_type} ${server} > /dev/null 2>&1 &"
+time ssh -i ${ssh_path} ${server_user}@${PROD_IP} "mkdir -p ${app_name} && cd ${app_name} && rm -f ${app_name}*"
+rsync -avz -e "ssh -i ${ssh_path}" ./ ${server_user}@${PROD_IP}:/home/${server_user}/${app_name}
+time ssh -i ${ssh_path} ${server_user}@${PROD_IP} "cd ${app_name} && docker-compose up -d"

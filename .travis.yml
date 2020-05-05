@@ -15,6 +15,7 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
+    - $HOME/node_modules
 
 before_install:
   - npm i -g npm@6.7.0
@@ -27,14 +28,9 @@ branches:
 script:
   - ./gradlew clean build
 
-before_deploy:
-  - echo "${PROD_SSH}" | base64 --decode >/tmp/prod_ssh.pem
-  - chmod 600 /tmp/prod_ssh.pem
-  - chmod +x scripts/deploy.sh
-
 deploy:
   - provider: script
-    script: ./scripts/deploy.sh ${PROD_IP}
+    script: ./scripts/deploy.sh
     skip_cleanup: true
     on:
       branch:

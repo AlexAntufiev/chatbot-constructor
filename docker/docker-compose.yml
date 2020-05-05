@@ -31,6 +31,7 @@ services:
   consul:
     container_name: consul
     image: consul
+    restart: unless-stopped
     ports:
       - 8500:8500
     command: agent -ui -server -bind 0.0.0.0 -client 0.0.0.0 -bootstrap-expect 1
