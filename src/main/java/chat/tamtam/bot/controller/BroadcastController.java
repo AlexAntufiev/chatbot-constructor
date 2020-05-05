@@ -1,5 +1,14 @@
 package chat.tamtam.bot.controller;
 
+import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
+import chat.tamtam.bot.domain.broadcast.message.attachment.BroadcastMessageAttachmentUpdate;
+import chat.tamtam.bot.domain.chatchannel.SelectedChatChannelEntity;
+import chat.tamtam.bot.service.BroadcastMessageService;
+import chat.tamtam.bot.service.ChatChannelService;
+import chat.tamtam.bot.service.TamBotService;
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,15 +21,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import chat.tamtam.bot.domain.broadcast.message.BroadcastMessageUpdate;
-import chat.tamtam.bot.domain.broadcast.message.attachment.BroadcastMessageAttachmentUpdate;
-import chat.tamtam.bot.domain.chatchannel.SelectedChatChannelEntity;
-import chat.tamtam.bot.service.BroadcastMessageService;
-import chat.tamtam.bot.service.ChatChannelService;
-import chat.tamtam.bot.service.TamBotService;
-import lombok.AllArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-
 @Log4j2
 @RestController
 @AllArgsConstructor
@@ -28,6 +28,11 @@ import lombok.extern.log4j.Log4j2;
         path = Endpoint.API_BOT + Endpoint.ID + Endpoint.TAM_CHATCHANNEL,
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
+)
+@ConditionalOnProperty(
+        prefix = "tamtam.rss",
+        name = "enabled",
+        havingValue = "true"
 )
 public class BroadcastController {
     private final TamBotService tamBotService;

@@ -1,13 +1,5 @@
 package chat.tamtam.bot.service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
 import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
@@ -32,9 +24,22 @@ import chat.tamtam.bot.repository.BroadcastMessageAttachmentRepository;
 import chat.tamtam.bot.repository.BroadcastMessageRepository;
 import chat.tamtam.bot.utils.TransactionalUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(
+        prefix = "tamtam",
+        name = {"rss.enabled", "broadcast.enabled"},
+        havingValue = "true"
+)
 public class BroadcastMessageService {
     private static final String ZONED_DATE_TIME_PATTERN = "EEE MMM dd uuuu HH:mm:ss 'GMT'x";
     private final BroadcastMessageRepository broadcastMessageRepository;
