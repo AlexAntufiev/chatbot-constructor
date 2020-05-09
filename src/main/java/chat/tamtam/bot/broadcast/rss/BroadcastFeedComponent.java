@@ -1,28 +1,5 @@
 package chat.tamtam.bot.broadcast.rss;
 
-import java.io.IOException;
-import java.net.URL;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.stereotype.Component;
-
-import com.rometools.rome.feed.synd.SyndEntry;
-import com.rometools.rome.feed.synd.SyndFeed;
-import com.rometools.rome.io.FeedException;
-import com.rometools.rome.io.SyndFeedInput;
-import com.rometools.rome.io.XmlReader;
-
 import chat.tamtam.bot.domain.broadcast.rss.RssFeed;
 import chat.tamtam.bot.repository.RssFeedRepository;
 import chat.tamtam.bot.utils.TransactionalUtils;
@@ -33,18 +10,36 @@ import chat.tamtam.botapi.model.Chat;
 import chat.tamtam.botapi.model.ChatMember;
 import chat.tamtam.botapi.model.ChatType;
 import chat.tamtam.botapi.model.NewMessageBody;
+import com.rometools.rome.feed.synd.SyndEntry;
+import com.rometools.rome.feed.synd.SyndFeed;
+import com.rometools.rome.io.FeedException;
+import com.rometools.rome.io.SyndFeedInput;
+import com.rometools.rome.io.XmlReader;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.net.URL;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Log4j2
 @Component
-@RefreshScope
 @ConditionalOnProperty(
         prefix = "tamtam.rss",
         name = "enabled",
         havingValue = "true"
 )
 public class BroadcastFeedComponent {
-    private static final long DEFAULT_REFRESH_RATE = 10_000L;
 
     @Value("${tamtam.rss.enabled}")
     private Boolean enabled;
@@ -52,8 +47,6 @@ public class BroadcastFeedComponent {
     private final ThreadPoolTaskExecutor broadcastFeedExecutor;
 
     private final RssFeedRepository rssFeedRepository;
-
-    private final TransactionalUtils transactionalUtils;
 
     private final TamTamBotAPI api;
 
@@ -71,7 +64,6 @@ public class BroadcastFeedComponent {
         );
         this.broadcastFeedExecutor = broadcastFeedExecutor;
         this.rssFeedRepository = rssFeedRepository;
-        this.transactionalUtils = transactionalUtils;
         api = TamTamBotAPI.create(token);
         transactionalUtils.invokeRunnable(this::init);
     }

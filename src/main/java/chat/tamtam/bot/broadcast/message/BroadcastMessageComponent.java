@@ -1,18 +1,5 @@
 package chat.tamtam.bot.broadcast.message;
 
-import java.nio.ByteBuffer;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Executor;
-
-import org.jetbrains.annotations.Nullable;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
 import chat.tamtam.bot.domain.bot.BotScheme;
 import chat.tamtam.bot.domain.bot.TamBotEntity;
 import chat.tamtam.bot.domain.broadcast.message.BroadcastMessage;
@@ -42,6 +29,17 @@ import chat.tamtam.botapi.model.UploadedInfo;
 import chat.tamtam.botapi.model.VideoAttachmentRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.jetbrains.annotations.Nullable;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.nio.ByteBuffer;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executor;
 
 @Log4j2
 @Component
@@ -51,7 +49,6 @@ import lombok.extern.log4j.Log4j2;
         havingValue = "true"
 )
 @RequiredArgsConstructor
-@RefreshScope
 public class BroadcastMessageComponent {
     private final BroadcastMessageRepository broadcastMessageRepository;
     private final BotSchemeRepository botSchemeRepository;

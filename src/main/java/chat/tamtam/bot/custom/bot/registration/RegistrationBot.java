@@ -1,17 +1,5 @@
 package chat.tamtam.bot.custom.bot.registration;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.core.env.Environment;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Component;
-
-import com.auth0.jwt.JWT;
-
 import chat.tamtam.bot.converter.EnabledIds;
 import chat.tamtam.bot.converter.EnabledIdsConverter;
 import chat.tamtam.bot.custom.bot.AbstractCustomBot;
@@ -41,8 +29,17 @@ import chat.tamtam.botapi.model.NewMessageBody;
 import chat.tamtam.botapi.model.Update;
 import chat.tamtam.botapi.model.UserAddedToChatUpdate;
 import chat.tamtam.botapi.model.UserRemovedFromChatUpdate;
+import com.auth0.jwt.JWT;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 import static chat.tamtam.bot.security.SecurityConstants.EXPIRATION_TIME;
 import static chat.tamtam.bot.security.SecurityConstants.SECRET;
@@ -51,7 +48,6 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 
 @Log4j2
 @Component
-@RefreshScope
 public class RegistrationBot extends AbstractCustomBot {
     private static final String HELP_MESSAGE =
             "Команды:\n\n"

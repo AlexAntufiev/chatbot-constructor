@@ -1,15 +1,5 @@
 package chat.tamtam.bot.custom.bot.hockey;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
-
 import chat.tamtam.bot.custom.bot.AbstractCustomBot;
 import chat.tamtam.bot.custom.bot.BotType;
 import chat.tamtam.bot.domain.bot.hockey.Calendar;
@@ -40,10 +30,17 @@ import chat.tamtam.botapi.model.Update;
 import chat.tamtam.botapi.model.UserAddedToChatUpdate;
 import chat.tamtam.botapi.model.UserRemovedFromChatUpdate;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Log4j2
 @Component
-@RefreshScope
 public class Hockey2019Bot extends AbstractCustomBot {
 
     private static final String HELLO_MESSAGE = "Чемпионат мира по хоккею 2019";
