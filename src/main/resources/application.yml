@@ -35,12 +35,6 @@ spring:
 logging:
   level:
     root: ERROR
-    org:
-      hibernate:
-        type:
-          descriptor:
-            sql:
-              BasicBinder: off
     chat:
       tamtam:
         bot: INFO
