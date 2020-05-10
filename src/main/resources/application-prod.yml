@@ -25,7 +25,7 @@ tamtam:
       corePoolSize: 2
       maxPoolSize: 4
   rss:
-    enabled: true
+    enabled: false
     token: Iu9O0wVu2dtllKK8MV-Sw9gbFMkM8Z5cLYCTnl8PMGg
     executor:
       corePoolSize: 1
