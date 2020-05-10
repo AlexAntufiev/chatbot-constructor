@@ -7,12 +7,7 @@ spring:
   cloud:
     consul:
       enabled: false
-      host: localhost
-      port: 8500
-      discovery:
-        healthCheckInterval: 300s
       config:
         watch:
           enabled: false
-          delay: 1000 #ms
         format: yaml

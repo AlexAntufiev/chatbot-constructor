@@ -3,6 +3,12 @@ services:
   app:
     build: .
     container_name: app
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/prod
+      - SPRING_DATASOURCE_USERNAME=prod
+      - SPRING_DATASOURCE_PASSWORD=QUFNRXNlY3JldDA0MDUyMDE5MzA4Cg==
+      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_PORT=8500
     restart: always
     ports:
       - 80:8090
