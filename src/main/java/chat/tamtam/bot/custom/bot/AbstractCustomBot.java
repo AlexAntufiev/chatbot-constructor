@@ -39,7 +39,7 @@ public abstract class AbstractCustomBot {
     ) {
         this.id = id;
         this.token = token;
-        this.host = host;
+        this.host = "http://" + host;
         this.environment = environment;
         api = token == null ? null : TamTamBotAPI.create(token);
     }
@@ -63,7 +63,7 @@ public abstract class AbstractCustomBot {
         log.info(String.format("%s(id:%s, token:%s) initialized", getClass().getCanonicalName(), id, token));
         if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
             try {
-                url = "http://" + host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
+                url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
                 SimpleQueryResult result = api.subscribe(new SubscriptionRequestBody(url)).execute();
                 if (result.isSuccess()) {
                     log.info(

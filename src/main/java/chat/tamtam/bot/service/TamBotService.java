@@ -1,9 +1,5 @@
 package chat.tamtam.bot.service;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
 import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.controller.Endpoint;
 import chat.tamtam.bot.domain.bot.BotScheme;
@@ -26,6 +22,9 @@ import chat.tamtam.botapi.model.UploadType;
 import chat.tamtam.botapi.model.UserWithPhoto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Log4j2
 @Service
@@ -129,7 +128,7 @@ public class TamBotService {
                         Error.TAM_BOT_CONNECTED_TO_OTHER_BOT_SCHEME
                 );
             }
-            final String url = host + Endpoint.TAM_BOT + "/" + bot.getId();
+            final String url = "http://" + host + Endpoint.TAM_BOT + "/" + bot.getId();
             SimpleQueryResult result = tamTamBotAPI
                     .subscribe(new SubscriptionRequestBody(url))
                     .execute();
@@ -193,7 +192,7 @@ public class TamBotService {
                 .findById(new TamBotEntity.Id(bot.getBotId(), bot.getUserId()));
         TamTamBotAPI tamTamBotAPI = TamTamBotAPI.create(tamBot.getToken());
         try {
-            final String url = host + Endpoint.TAM_BOT + "/" + bot.getId();
+            final String url = "http://" + host + Endpoint.TAM_BOT + "/" + bot.getId();
             SimpleQueryResult result = tamTamBotAPI
                     .unsubscribe(url)
                     .execute();

@@ -1,12 +1,5 @@
 package chat.tamtam.bot.service;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.controller.Endpoint;
 import chat.tamtam.bot.domain.bot.BotScheme;
@@ -26,6 +19,12 @@ import chat.tamtam.botapi.model.SimpleQueryResult;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Log4j2
 @Service
@@ -116,7 +115,7 @@ public class BotSchemeService {
     private void disconnect(final TamBotEntity tamBot, final int schemeId) {
         TamTamBotAPI tamTamBotAPI = TamTamBotAPI.create(tamBot.getToken());
         try {
-            final String url = host + Endpoint.TAM_BOT + "/" + schemeId;
+            final String url = "http://" + host + Endpoint.TAM_BOT + "/" + schemeId;
 
             SimpleQueryResult result =
                     tamTamBotAPI

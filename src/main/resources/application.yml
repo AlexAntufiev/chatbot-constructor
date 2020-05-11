@@ -54,7 +54,7 @@ rest:
     request: 4000
 
 tamtam:
-  host: http://localhost:8090
+  host: localhost:8090
   chat:
     listSizeThreshold: 20
     chatsFetchAmount: 20
