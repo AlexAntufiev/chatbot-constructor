@@ -1,4 +1,4 @@
-FROM openjdk:11-jre-stretch
+FROM adoptopenjdk/openjdk11:jre-11.0.7_10-alpine
 
 COPY chatbot-constructor*.jar /
 
