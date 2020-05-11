@@ -19,3 +19,14 @@ tamtam:
       url:
       id: 593077348372
       token: Oj6kkmCdCyTBMYHJC_8RimGuRatU3pLv8Md6xu9j4h0
+  broadcast:
+    enabled: true
+    executor:
+      corePoolSize: 2
+      maxPoolSize: 4
+  rss:
+    enabled: true
+    token: Iu9O0wVu2dtllKK8MV-Sw9gbFMkM8Z5cLYCTnl8PMGg
+    executor:
+      corePoolSize: 1
+      maxPoolSize: 4
