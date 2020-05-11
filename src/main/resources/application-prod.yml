@@ -20,7 +20,7 @@ tamtam:
       id: 593077348372
       token: Oj6kkmCdCyTBMYHJC_8RimGuRatU3pLv8Md6xu9j4h0
   broadcast:
-    enabled: true
+    enabled: false
     executor:
       corePoolSize: 2
       maxPoolSize: 4
