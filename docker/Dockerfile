@@ -1,9 +1,7 @@
 FROM openjdk:11-jre-stretch
 
-ENV app_name=chatbot-constructor*.jar
-
-COPY $app_name /
+COPY chatbot-constructor*.jar /
 
 EXPOSE 8090
 
-ENTRYPOINT java -jar $app_name -Xms512m -Xmx512m --spring.profiles.active=prod
+ENTRYPOINT java -jar chatbot-constructor*.jar -Xms256m -Xmx256m

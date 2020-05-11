@@ -1,14 +1,5 @@
 package chat.tamtam.bot.custom.bot;
 
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
-import org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.core.env.Environment;
-
 import chat.tamtam.bot.configuration.AppProfiles;
 import chat.tamtam.bot.controller.Endpoint;
 import chat.tamtam.botapi.TamTamBotAPI;
@@ -21,6 +12,13 @@ import chat.tamtam.botapi.model.SubscriptionRequestBody;
 import chat.tamtam.botapi.model.Update;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.cloud.context.scope.refresh.RefreshScopeRefreshedEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.util.List;
 
 @Log4j2
 public abstract class AbstractCustomBot {
@@ -65,7 +63,7 @@ public abstract class AbstractCustomBot {
         log.info(String.format("%s(id:%s, token:%s) initialized", getClass().getCanonicalName(), id, token));
         if (environment.acceptsProfiles(AppProfiles.noDevelopmentProfiles())) {
             try {
-                url = host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
+                url = "http://" + host + Endpoint.TAM_CUSTOM_BOT_WEBHOOK + "/" + id;
                 SimpleQueryResult result = api.subscribe(new SubscriptionRequestBody(url)).execute();
                 if (result.isSuccess()) {
                     log.info(

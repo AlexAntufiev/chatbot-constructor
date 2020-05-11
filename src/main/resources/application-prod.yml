@@ -7,6 +7,3 @@ spring:
   servlet:
     multipart:
       max-file-size: 10MB
-
-tamtam:
-  host: 0.0.0.0
