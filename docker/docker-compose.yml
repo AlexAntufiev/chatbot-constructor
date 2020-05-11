@@ -25,7 +25,7 @@ services:
         max-file: "3"
   db:
     container_name: db
-    image: library/postgres:12.2
+    image: library/postgres:12.2-alpine
     restart: unless-stopped
     volumes:
       - data:/var/lib/postgresql/data/
