@@ -31,6 +31,7 @@ import chat.tamtam.botapi.model.UserAddedToChatUpdate;
 import chat.tamtam.botapi.model.UserRemovedFromChatUpdate;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +42,11 @@ import java.util.stream.Stream;
 
 @Log4j2
 @Component
+@ConditionalOnProperty(
+        prefix = "tamtam.bot.hockey2019",
+        name = "enabled",
+        havingValue = "true"
+)
 public class Hockey2019Bot extends AbstractCustomBot {
 
     private static final String HELLO_MESSAGE = "Чемпионат мира по хоккею 2019";

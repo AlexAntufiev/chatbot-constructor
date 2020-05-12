@@ -15,6 +15,7 @@ tamtam:
       token: JUeixE5Dr7WoBY3ajjfwr72ya1CR_zw6D25VlR0sgNI
       enabledIds: 555537636725, 590435433004, 575868018573, 577949140156
     hockey2019:
+      enabled: true
       url: hockeyUrl
       id: 1488
       token: token

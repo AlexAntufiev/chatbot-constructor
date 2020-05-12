@@ -1,17 +1,22 @@
 package chat.tamtam.bot.service.hockey;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
 import chat.tamtam.bot.configuration.logging.Loggable;
 import chat.tamtam.bot.domain.bot.hockey.Calendar;
 import chat.tamtam.bot.domain.bot.hockey.Match;
 import chat.tamtam.bot.domain.bot.hockey.News;
 import chat.tamtam.bot.domain.bot.hockey.Results;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
+@ConditionalOnProperty(
+        prefix = "tamtam.bot.hockey2019",
+        name = "enabled",
+        havingValue = "true"
+)
 public class Hockey2019Service {
 
     @Value("${tamtam.bot.hockey2019.external_url.news}")
