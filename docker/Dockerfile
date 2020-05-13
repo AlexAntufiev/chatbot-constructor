@@ -5,7 +5,7 @@ WORKDIR /app/
 EXPOSE 8090
 
 ENTRYPOINT java \
--server -XX:+UseG1GC \
+-XX:+UseG1GC \
 -Xlog:gc*:file=gc.log \
 -jar /app/chatbot-constructor*.jar \
 -Xms256m -Xmx256m
