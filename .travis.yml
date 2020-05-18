@@ -30,8 +30,8 @@ branches:
 
 script:
   - ./gradlew clean build
-  - cp ./build/libs/chatbot-constructor-*.jar ./chatbot-constructor/chatbot-constructor.jar
-  - docker build -t $docker_user/chatbot-constructor chatbot-constructor/
+  - cp ./build/libs/chatbot-constructor-*.jar ./chatbot-constructor.jar
+  - docker build -t $docker_user/chatbot-constructor .
 
 before_deploy:
   - echo $docker_password | docker login -u $docker_user --password-stdin
