@@ -20,34 +20,14 @@ cache:
     - $HOME/.gradle/wrapper/
     - $HOME/node_modules/
 
-before_install:
-  - npm i -g npm@6.7.0
-
 branches:
   only:
     - master
     - develop
 
-script:
-  - ./gradlew clean build
-  - cp ./build/libs/chatbot-constructor-*.jar ./chatbot-constructor.jar
-  - docker build -t $docker_user/chatbot-constructor .
-
-before_deploy:
-  - echo $docker_password | docker login -u $docker_user --password-stdin
-  - docker images
-
 deploy:
-  - provider: script
-    script: docker push $docker_user/chatbot-constructor
-    skip_cleanup: true
-    on:
-      branch: develop
   - provider: script
     script: ./scripts/deploy.sh
     skip_cleanup: true
     on:
       branch: develop
-
-after_deploy:
-  - docker logout
