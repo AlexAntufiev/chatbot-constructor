@@ -1,7 +1,7 @@
-version: "2"
+version: "3.8"
 services:
   influxdb:
-    image: influxdb
+    image: influxdb:1.7.10-alpine
     container_name: influxdb
     ports:
       - 8083:8083
@@ -15,21 +15,18 @@ services:
     volumes:
       - /influxdb_data:/var/lib/influxdb
   telegraf:
-    image: telegraf
+    image: telegraf:1.12.6-alpine
     container_name: telegraf
     networks:
       - monitoring
     volumes:
       - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:6.6.0
     container_name: grafana
     ports:
       - 3000:3000
     networks:
       - monitoring
-#    volumes:
-#      - /grafana_data:/var/lib/grafana
-
 networks:
   monitoring:
